@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\sales;
 
+use App\Http\Controllers\Controller;
+use App\Models\Faktur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -10,7 +12,7 @@ class OcrController extends Controller
     public function index()
     {
         // Menampilkan halaman utama
-        return view('ocr');
+        return view('sales.ocr');
     }
 
     // public function cekModel()
@@ -84,5 +86,30 @@ class OcrController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    // Fungsi untuk menyimpan data verifikasi manual ke Database
+    public function createFaktur(Request $request)
+    {
+        $request->validate([
+            'nama_toko' => 'required|string|max:255',
+            'tanggal_nota' => 'nullable|string',
+            'total_tagihan' => 'nullable|numeric',
+            'nominal_tagihan' => 'nullable|numeric',
+            'catatan' => 'nullable|string',
+        ]);
+
+        Faktur::create($request->all());
+
+        // Setelah sukses, sementara kita lempar ke halaman Dashboard Admin
+        return redirect('/admin/dashboard')->with('success', 'Data faktur berhasil disimpan!');
+    }
+
+    // Fungsi untuk menampilkan Dashboard Admin
+    public function dashboard()
+    {
+        // Mengambil semua data faktur, diurutkan dari yang terbaru
+        $fakturs = Faktur::latest()->get();
+        return view('admin.dashboard', compact('fakturs'));
     }
 }

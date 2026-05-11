@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\OcrController;
+use App\Http\Controllers\sales\OcrController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -13,3 +13,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [OcrController::class, 'index']);
 Route::post('/api/scan', [OcrController::class, 'processApi']);
+Route::post('/faktur/simpan', [OcrController::class, 'createFaktur']);
+Route::get('/admin/dashboard', [OcrController::class, 'dashboard']);

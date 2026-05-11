@@ -49,33 +49,37 @@
                     <span id="aiBadge" class="hidden bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full">Auto-filled by AI</span>
                 </h2>
 
-                <form action="#" method="POST" class="space-y-4">
-                    <!-- Kolom Hasil AI (Bisa diedit manual) -->
+                <form action="/faktur/simpan" method="POST" class="space-y-4">
+                    @csrf 
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Toko / Penerima</label>
-                        <input type="text" id="input_nama_toko" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                        <input type="text" id="input_nama_toko" name="nama_toko" required class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Nota</label>
-                            <input type="text" id="input_tanggal_nota" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                            <input type="text" id="input_tanggal_nota" name="tanggal_nota" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Total Tagihan (Rp)</label>
-                            <input type="number" id="input_total_tagihan" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                            <input type="number" id="input_total_tagihan" name="total_tagihan" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                         </div>
                     </div>
-
-                    <!-- Kolom Tambahan (Wajib isi manual) -->
-                    <div class="pt-4 border-t border-gray-200">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Tambahan (Manual)</label>
-                        <textarea id="input_catatan" rows="2" placeholder="Tulis info tambahan jika ada..." class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></textarea>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nominal Tagihan (Rp)</label>
+                        <input type="number" id="input_nominal_tagihan" name="nominal_tagihan" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                     </div>
 
-                    <button type="button" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition duration-200">
+                    <div class="pt-4 border-t border-gray-200">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Tambahan (Manual)</label>
+                        <textarea id="input_catatan" name="catatan" rows="2" placeholder="Tulis info tambahan jika ada..." class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition duration-200">
                         Simpan ke Database
                     </button>
+                </form>
                 </form>
             </div>
 

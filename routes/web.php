@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/scan', [OcrController::class, 'process']);
 // Route::get('/cek-model', [OcrController::class, 'cekModel']);
 
+Route::view('/offline', 'offline');
+
 Route::get('/', [OcrController::class, 'index']);
 Route::post('/api/scan', [OcrController::class, 'processApi']);
 Route::post('/faktur/simpan', [OcrController::class, 'createFaktur']);

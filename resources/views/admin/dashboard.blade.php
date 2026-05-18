@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     @vite('resources/css/app.css')
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#4A89F3">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(registration => console.log('PWA ServiceWorker registered!'))
+                    .catch(err => console.log('PWA ServiceWorker registration failed: ', err));
+            });
+        }
+    </script>
 </head>
 <body class="bg-gray-100">
 

@@ -6,6 +6,20 @@
     <title>Sales Ledger - Scan Faktur</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite('resources/css/app.css')
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#4A89F3">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(registration => console.log('PWA ServiceWorker registered!'))
+                    .catch(err => console.log('PWA ServiceWorker registration failed: ', err));
+            });
+        }
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 pb-10">
 

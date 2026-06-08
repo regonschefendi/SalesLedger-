@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Faktur extends Model
 {
-    protected $fillable = ['nama_toko', 'tanggal_nota', 'total_tagihan', 'nominal_tagihan', 'catatan'];
-
+    protected $fillable = [
+        'nama_toko',
+        'nomor_faktur',
+        'tanggal_nota',
+        'total_tagihan',
+        'catatan',
+        'total_dibayar',
+        'status',
+        'sales_id'
+    ];
 }

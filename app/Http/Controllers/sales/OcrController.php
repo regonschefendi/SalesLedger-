@@ -5,29 +5,19 @@ namespace App\Http\Controllers\sales;
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class OcrController extends Controller
 {
     public function index()
     {
-        // Menampilkan halaman utama
         return view('sales.ocr');
     }
 
-    // public function cekModel()
-    // {
-    //     $apiKey = env('GEMINI_API_KEY');
-    //     $url = "https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}";
-        
-    //     $response = Http::get($url);
-        
-    //     return response()->json($response->json());
-    // }
-
     public function processApi(Request $request)
     {
-        // 1. Validasi File (Bisa dari kamera atau galeri)
+        // Validasi File Gambar yang Diupload
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
@@ -38,11 +28,8 @@ class OcrController extends Controller
             $base64Image = base64_encode(file_get_contents($imagePath));
 
             $apiKey = env('GEMINI_API_KEY');
-            // Pastikan pakai model yang tersedia di API Key lu (contoh pake 1.5-flash-latest atau 001)
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
-
-            // 2. Prompting Super Spesifik buat Ekstrak 3 Data Utama
-            $prompt = 'Lu adalah asisten admin data entry. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Tanggal Nota" (Tanggal faktur). Cari "Total Tagihan" (Jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={$apiKey}";
+            $prompt = 'Kamu adalah asisten admin data entry. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor invoice/nota). Cari "Tanggal Nota" (Tanggal faktur). Cari "Total Tagihan" (Jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
 
             $response = Http::post($url, [
                 'contents' => [
@@ -58,7 +45,7 @@ class OcrController extends Controller
                         ]
                     ]
                 ],
-                // 3. SECURITY & CLEAN CODE: Paksa Gemini ngebalikin JSON murni!
+                // Respon Balik JSON
                 'generationConfig' => [
                     'response_mime_type' => 'application/json',
                 ]
@@ -78,8 +65,9 @@ class OcrController extends Controller
                 'success' => true,
                 'data' => [
                     'nama_toko' => $extractedData['Nama Toko'] ?? $extractedData['nama_toko'] ?? '',
+                    'nomor_faktur' => $extractedData['Nomor Faktur'] ?? $extractedData['nomor_faktur'] ?? 'INV-'.rand(10000,99999),
                     'tanggal_nota' => $extractedData['Tanggal Nota'] ?? $extractedData['tanggal_nota'] ?? '',
-                    'total_tagihan' => $extractedData['Total Tagihan'] ?? $extractedData['total_tagihan'] ?? '',
+                    'total_tagihan' => preg_replace('/[^0-9]/', '', $extractedData['Total Tagihan'] ?? '0'),
                 ]
             ]);
 
@@ -88,21 +76,34 @@ class OcrController extends Controller
         }
     }
 
-    // Fungsi untuk menyimpan data verifikasi manual ke Database
     public function createFaktur(Request $request)
     {
         $request->validate([
             'nama_toko' => 'required|string|max:255',
-            'tanggal_nota' => 'nullable|string',
-            'total_tagihan' => 'nullable|numeric',
-            'nominal_tagihan' => 'nullable|numeric',
-            'catatan' => 'nullable|string',
+            'nomor_faktur' => 'required|string|max:100',
+            'tanggal_nota' => 'required|string|max:100',
+            'total_tagihan' => 'required|numeric|min:0',
+            'total_dibayar' => 'nullable|numeric|min:0',
         ]);
 
-        Faktur::create($request->all());
+        // Konversi tipe data agar operasi matematika presisi
+        $totalTagihan = (int) $request->total_tagihan;
+        $totalDibayar = (int) ($request->total_dibayar ?? 0);
 
-        // Setelah sukses, sementara kita lempar ke halaman Dashboard Admin
-        return redirect('/admin/dashboard')->with('success', 'Data faktur berhasil disimpan!');
+        $faktur = Faktur::create([
+            'nama_toko' => $request->nama_toko,
+            'nomor_faktur' => $request->nomor_faktur,
+            'tanggal_nota' => $request->tanggal_nota,
+            'total_tagihan' => $totalTagihan,
+            'total_dibayar' => $totalDibayar,
+            'status' => ($totalDibayar >= $totalTagihan) ? 'lunas' : 'belum_lunas',
+            'sales_id' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Data faktur berhasil disimpan!'
+        ]);
     }
 
     // Fungsi untuk menampilkan Dashboard Admin

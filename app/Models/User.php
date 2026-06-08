@@ -22,6 +22,16 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    protected $fillable = [
+        'full_name',
+        'username',
+        'email',
+        'password',
+        'role',
+        'admin_code',
+        'parent_admin_id',
+    ];
+
     protected function casts(): array
     {
         return [

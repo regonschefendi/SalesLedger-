@@ -13,17 +13,17 @@ export default defineConfig({
         
         // 2. Settingan PWA
         VitePWA({
-            outDir: 'public', // Output ditaruh di folder public biar Laravel gampang bacanya
+            outDir: 'public', // Output ditaruh di folder public
             buildBase: '/',
             scope: '/',
-            injectRegister: null, // Kita register manual di Blade biar aman
+            injectRegister: null, // Register manual di Blade
             manifest: {
                 name: 'Sales Ledger App',
                 short_name: 'SalesLedger',
                 description: 'Aplikasi Scan Faktur AI untuk Tim Sales',
-                theme_color: '#4A89F3', // Warna biru tema lu
+                theme_color: '#4A89F3',
                 background_color: '#F8F9FE',
-                display: 'standalone', // Bikin tampilan full screen tanpa address bar (Native feel)
+                display: 'standalone',
                 icons: [
                     {
                         src: '/icons/icon-192x192.png',
@@ -44,12 +44,12 @@ export default defineConfig({
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
                     {
-                        // 1. Dilarang keras nge-cache route API dan submit data! (Network Only)
+                        // Dilarang nge-cache route API dan submit data! (Network Only)
                         urlPattern: /\/(api|faktur)\/.*/i,
                         handler: 'NetworkOnly', 
                     },
                     {
-                        // 2. File statis luar (kayak font Google) boleh di-cache biar cepet
+                        // File statis luar (kayak font Google) boleh di-cache biar cepet
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',
                         options: { cacheName: 'google-fonts-cache' }

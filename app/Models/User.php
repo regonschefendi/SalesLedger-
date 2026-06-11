@@ -39,4 +39,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Admin memiliki banyak Sales
+    public function sales()
+    {
+        return $this->hasMany(User::class, 'parent_admin_id', 'id');
+    }
 }

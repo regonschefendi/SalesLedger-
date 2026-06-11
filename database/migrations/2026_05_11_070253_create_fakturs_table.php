@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_toko');
             $table->string('nomor_faktur')->nullable();
             $table->date('tanggal_nota')->nullable();
+            $table->string('metode_bayar')->nullable();
             $table->decimal('total_tagihan', 15, 2)->nullable();
             $table->decimal('total_dibayar', 15, 2)->default(0);
             $table->enum('status', ['lunas', 'belum_lunas'])->default('belum_lunas');

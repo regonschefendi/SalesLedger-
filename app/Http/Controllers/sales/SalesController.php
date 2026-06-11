@@ -13,6 +13,9 @@ class SalesController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
+        if (!$user->parent_admin_id) {
+            return redirect('/select-role')->with('error', 'Lu harus masukin Kode Referal Admin dulu!');
+        }
 
         $fakturs = Faktur::where('sales_id', $user->id)->get();
 
@@ -43,5 +46,46 @@ class SalesController extends Controller
         ];
 
         return view('sales.home', $data);
+    }
+
+    public function profileIndex()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Hitung statistik langsung dari database
+        $stats = [
+            // Hitung berapa toko unik yang pernah diinput sales ini
+            'total_toko' => \App\Models\Faktur::where('sales_id', $user->id)->distinct('nama_toko')->count('nama_toko'),
+            // Hitung total nota yang pernah dikirim
+            'total_nota' => \App\Models\Faktur::where('sales_id', $user->id)->count(),
+            // Hitung total nominal uang dari semua nota
+            'total_tagihan' => (int) \App\Models\Faktur::where('sales_id', $user->id)->sum('total_tagihan'),
+            // Hitung berapa nota yang statusnya belum lunas
+            'belum_lunas' => \App\Models\Faktur::where('sales_id', $user->id)->where('status', 'belum_lunas')->count(),
+        ];
+
+        return view('sales.profile.index', compact('user', 'stats'));
+    }
+
+    public function profileEdit()
+    {
+        $user = Auth::user();
+        return view('sales.profile.edit', compact('user'));
+    }
+
+    public function profileUpdate(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:20'
+        ]);
+
+        $user->update($request->only('full_name', 'phone_number'));
+
+        return redirect()->route('sales.profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 }

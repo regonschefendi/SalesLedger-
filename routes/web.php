@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\RoleController;
 use App\Http\Controllers\sales\OcrController;
@@ -54,10 +55,6 @@ Route::middleware('guest')->group(function () {
     // API Reset Password
     Route::post('/api/forgot-password/send-otp', [AuthController::class, 'sendResetOtp']);
     Route::post('/api/forgot-password/reset', [AuthController::class, 'resetPassword']);
-
-    // Google OAuth
-    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
-    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
 // ==========================================
@@ -66,8 +63,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // Logout (KEMBALIKAN KE POST DEMI KEAMANAN CSRF!)
-    // Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Halaman & Proses Verifikasi Email
     Route::view('/verify-email', 'auth.verify-email')->name('verification.notice');
@@ -88,7 +85,11 @@ Route::middleware('auth')->group(function () {
         // ROLE: SALES AREA
         // ------------------------------------------
         Route::middleware('role:sales')->prefix('sales')->name('sales.')->group(function () {
-            Route::get('/home', [SalesController::class, 'index'])->name('home'); 
+            Route::get('/home', [SalesController::class, 'index'])->name('home');
+            
+            Route::get('/profile', [SalesController::class, 'profileIndex'])->name('profile.index');
+            Route::get('/profile/edit', [SalesController::class, 'profileEdit'])->name('profile.edit');
+            Route::post('/profile/update', [SalesController::class, 'profileUpdate'])->name('profile.update');
 
             // OCR & Faktur
             Route::get('/input', [OcrController::class, 'index'])->name('input');
@@ -100,7 +101,15 @@ Route::middleware('auth')->group(function () {
         // ROLE: ADMIN AREA
         // ------------------------------------------
         Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-            Route::get('/dashboard', [OcrController::class, 'dashboard'])->name('dashboard');
+            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/pembukuan', [AdminController::class, 'pembukuanIndex'])->name('pembukuan.index');
+            Route::get('/pembukuan/{id}', [AdminController::class, 'pembukuanShow'])->name('pembukuan.show');
+
+            Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile.index');
+            Route::get('/profile/edit', [AdminController::class, 'profileEdit'])->name('profile.edit');
+            Route::post('/profile/update', [AdminController::class, 'profileUpdate'])->name('profile.update');
+            Route::get('/profile/custom-code', [AdminController::class, 'customCodeIndex'])->name('profile.custom_code');
+            Route::post('/profile/custom-code/update', [AdminController::class, 'customCodeUpdate'])->name('profile.custom-code.update');
         });
     });
 });

@@ -29,7 +29,9 @@ class RoleController extends Controller
     public function setSales(Request $request)
     {
         $request->validate([
-            'admin_code' => 'required|string'
+            'admin_code' => 'required|string|exists:users,admin_code'
+        ], [
+            'admin_code.exists' => 'Kode Referal tidak ditemukan! Pastikan lu minta kode yang benar ke Admin lu.'
         ]);
 
         // Cek apakah kode admin tersebut ada di database?

@@ -55,16 +55,6 @@
                     <span class="mx-4 text-xs text-gray-400 font-medium">Or</span>
                     <div class="flex-grow border-t border-gray-200"></div>
                 </div>
-
-                <!-- Google Button yang Mengarah ke Backend -->
-                <div class="text-center pt-4">
-                    <button type="submit" id="btn-submit" class="w-full rounded-xl shadow-md transition duration-200 text-sm">
-                        <a href="/auth/google" class="w-full bg-[#F3F4F6] hover:bg-gray-200 text-gray-700 font-semibold py-3.5 rounded-xl transition duration-200 text-sm flex items-center justify-center space-x-2 cursor-pointer">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="w-5 h-5" alt="Google">
-                    <span>Continue With Google</span>
-                </a>
-                    </button>
-                </div>
             </div>
 
             <div class="text-center text-xs text-gray-500 pt-6">

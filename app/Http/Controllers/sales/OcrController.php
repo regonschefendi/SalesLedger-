@@ -28,7 +28,7 @@ class OcrController extends Controller
             $base64Image = base64_encode(file_get_contents($imagePath));
 
             $apiKey = env('GEMINI_API_KEY');
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={$apiKey}";
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
             $prompt = 'Kamu adalah asisten admin data entry. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor invoice/nota). Cari "Tanggal Nota" (Tanggal faktur). Cari "Total Tagihan" (Jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
 
             $response = Http::post($url, [
@@ -84,6 +84,7 @@ class OcrController extends Controller
             'tanggal_nota' => 'required|string|max:100',
             'total_tagihan' => 'required|numeric|min:0',
             'total_dibayar' => 'nullable|numeric|min:0',
+            'metode_bayar' => 'required|in:Cash,Transfer',
         ]);
 
         // Konversi tipe data agar operasi matematika presisi
@@ -96,6 +97,7 @@ class OcrController extends Controller
             'tanggal_nota' => $request->tanggal_nota,
             'total_tagihan' => $totalTagihan,
             'total_dibayar' => $totalDibayar,
+            'metode_bayar' => $request->metode_bayar,
             'status' => ($totalDibayar >= $totalTagihan) ? 'lunas' : 'belum_lunas',
             'sales_id' => Auth::id(),
         ]);

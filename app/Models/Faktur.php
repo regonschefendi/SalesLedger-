@@ -16,4 +16,9 @@ class Faktur extends Model
         'status',
         'sales_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'sales_id', 'id');
+    }
 }

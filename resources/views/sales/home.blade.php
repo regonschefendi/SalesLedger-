@@ -196,7 +196,7 @@
 
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[60] hidden flex-col items-center justify-center">
         <svg class="animate-spin h-10 w-10 text-[#0F47A1] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="text-sm text-gray-800 font-bold animate-pulse">AI sedang menganalisis nota...</p>
+        <p class="text-sm text-gray-800 font-bold animate-pulse">Faktur sedang di proses, mohon tunggu...</p>
     </div>
 
     <script>
@@ -212,23 +212,72 @@
             }
         }
 
+        // --- ALAT KOMPRES GAMBAR & KONVERSI BASE64 ---
+        // Ini memastikan memori browser (sessionStorage) tidak jebol dan foto tetap terbaca
+        function compressImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1000; // Diperkecil agar ringan di session storage
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height = Math.round((height * MAX_WIDTH) / width);
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Ubah ke JPEG kualitas 60% (Sangat kecil & aman buat session storage)
+                        const base64String = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve(base64String);
+                    };
+                    img.onerror = (err) => reject(err);
+                };
+                reader.onerror = (err) => reject(err);
+            });
+        }
+
         // Handle File yang dipilih dari Kamera atau Galeri
-        function handleUpload(input) {
+        async function handleUpload(input) {
             if (input.files && input.files[0]) {
                 toggleUploadModal(); // Tutup modal biar rapi
-                sendToOcrApi(input.files[0]); // Kirim ke AI
+                
+                const file = input.files[0];
+                const loadingOverlay = document.getElementById('loading-overlay');
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.add('flex');
+
+                try {
+                    // Kompres gambar secara lokal dulu untuk disimpan ke Session Browser
+                    const compressedBase64 = await compressImageToBase64(file);
+                    
+                    // Kirim file asli ke AI OCR agar akurasi bacanya maksimal
+                    await sendToOcrApi(file, compressedBase64);
+                } catch (e) {
+                    alert("Gagal memproses gambar sebelum dikirim.");
+                    console.error(e);
+                    loadingOverlay.classList.add('hidden');
+                    loadingOverlay.classList.remove('flex');
+                }
             }
             input.value = ''; // Reset input value biar bisa milih file yang sama lagi kalo gagal
         }
 
         // Tembak API OCR
-        async function sendToOcrApi(imageFile) {
+        async function sendToOcrApi(imageFile, compressedBase64) {
             const formData = new FormData();
-            formData.append('image', imageFile);
-
-            const loadingOverlay = document.getElementById('loading-overlay');
-            loadingOverlay.classList.remove('hidden');
-            loadingOverlay.classList.add('flex');
+            formData.append('image', imageFile); // File asli dikirim ke Laravel AI
 
             try {
                 const response = await fetch("{{ route('sales.scan') }}", {
@@ -239,24 +288,28 @@
                     },
                     body: formData
                 });
-
                 const result = await response.json();
 
                 if (response.ok && result.success) {
                     // Simpan data AI ke Session Storage
                     sessionStorage.setItem('ocrData', JSON.stringify(result.data));
-                    sessionStorage.setItem('ocrImage', URL.createObjectURL(imageFile));
                     
+                    // SIMPAN BASE64 KOMPRES KE SESSION (BUKAN blob: URL)
+                    // Karena ini Base64 asli, panjangnya bakal ribuan karakter (lolos jebakan >100 karakter)
+                    sessionStorage.setItem('ocrImage', compressedBase64);
+                    
+                    // Pindah ke halaman edit
                     window.location.href = "{{ route('sales.input') }}"; 
                 } else {
                     alert('Gagal membaca nota: ' + result.message);
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                    document.getElementById('loading-overlay').classList.remove('flex');
                 }
             } catch (error) {
                 alert('Terjadi kesalahan jaringan/sistem.');
                 console.error(error);
-            } finally {
-                loadingOverlay.classList.add('hidden');
-                loadingOverlay.classList.remove('flex');
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('loading-overlay').classList.remove('flex');
             }
         }
     </script>

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('total_tagihan', 15, 2)->nullable();
             $table->decimal('total_dibayar', 15, 2)->default(0);
             $table->enum('status', ['lunas', 'belum_lunas'])->default('belum_lunas');
+            $table->string('foto_url')->nullable();
             $table->foreignId('sales_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

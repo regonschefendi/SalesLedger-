@@ -63,6 +63,8 @@
         </div>
     </div>
 
+    @include('partials.loading')
+
     <script>
         // Fungsi Toggle Mata Password
         function togglePasswordVisibility() {
@@ -72,6 +74,7 @@
 
         // Fungsi AJAX Login
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            Loading.show('Mengautentikasi...');
             e.preventDefault();
             
             const form = e.target;
@@ -115,6 +118,7 @@
                 alert("Terjadi kesalahan jaringan.");
             } finally {
                 // Kembalikan tombol ke semula
+                Loading.hide();
                 btnText.innerText = "Sign In";
                 btn.disabled = false;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');

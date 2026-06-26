@@ -7,6 +7,8 @@ use App\Models\Faktur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class OcrController extends Controller
 {
@@ -87,11 +89,42 @@ class OcrController extends Controller
             'metode_bayar' => 'required|in:Cash,Transfer',
         ]);
 
-        // Konversi tipe data agar operasi matematika presisi
+        if (!$request->hasFile('foto_file')) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'GAGAL: Server tidak menerima file foto. Hal ini biasanya karena ukuran file melebihi limit server (upload_max_filesize) atau proses kompresi gagal.'
+            ]);
+        }
+
+        $file = $request->file('foto_file');
+        
+        // Cek kalau filenya corrupt saat diupload
+        if (!$file->isValid()) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'GAGAL: File rusak saat diunggah. Kode error: ' . $file->getErrorMessage()
+            ]);
+        }
+
+        // PROSES UPLOAD KE SUPABASE
+        try {
+            $fileName = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+
+            $uploadSukses = Storage::disk('supabase')->put($fileName, file_get_contents($file), 'public');
+            
+            if ($uploadSukses) {
+                $fotoUrl = env('SUPABASE_PROJECT_URL') . '/storage/v1/object/public/' . env('SUPABASE_STORAGE_BUCKET') . '/' . $fileName;
+            } else {
+                return response()->json(['success' => false, 'message' => 'Gagal mengunggah file ke Supabase. Cek Access Key di .env!']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error Server Cloud: ' . $e->getMessage()]);
+        }
+
         $totalTagihan = (int) $request->total_tagihan;
         $totalDibayar = (int) ($request->total_dibayar ?? 0);
 
-        $faktur = Faktur::create([
+        Faktur::create([
             'nama_toko' => $request->nama_toko,
             'nomor_faktur' => $request->nomor_faktur,
             'tanggal_nota' => $request->tanggal_nota,
@@ -100,19 +133,13 @@ class OcrController extends Controller
             'metode_bayar' => $request->metode_bayar,
             'status' => ($totalDibayar >= $totalTagihan) ? 'lunas' : 'belum_lunas',
             'sales_id' => Auth::id(),
+            'foto_url' => $fotoUrl 
         ]);
 
         return response()->json([
             'success' => true, 
-            'message' => 'Data faktur berhasil disimpan!'
+            'message' => 'Data faktur berhasil disimpan!',
+            'foto_url' => $fotoUrl
         ]);
-    }
-
-    // Fungsi untuk menampilkan Dashboard Admin
-    public function dashboard()
-    {
-        // Mengambil semua data faktur, diurutkan dari yang terbaru
-        $fakturs = Faktur::latest()->get();
-        return view('admin.dashboard', compact('fakturs'));
     }
 }

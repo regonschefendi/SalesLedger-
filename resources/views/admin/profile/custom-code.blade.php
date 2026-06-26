@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
-    <form action="{{ route('admin.profile.custom-code.update') }}" method="POST" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
+    <form action="{{ route('admin.profile.custom-code.update') }}" method="POST" id="form-action" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         @csrf
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100">
@@ -52,6 +52,8 @@
         </div>
     </form>
 
+    @include('partials.loading')
+
     <script>
         function copyToClipboard() {
             const code = document.getElementById('ref-code-text').innerText;
@@ -61,6 +63,11 @@
                 setTimeout(() => toast.classList.add('hidden'), 2500);
             });
         }
+
+        // Mencegah klik ganda dan memunculkan loading saat form disubmit
+        document.getElementById('form-action').addEventListener('submit', function() {
+            Loading.show('Menyimpan perubahan...');
+        });
     </script>
 </body>
 </html>

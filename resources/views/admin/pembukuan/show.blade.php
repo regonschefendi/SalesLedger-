@@ -63,7 +63,7 @@
                 </div>
             </div>
 
-            <div class="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white space-y-4">
+            {{-- <div class="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white space-y-4">
                 <div class="flex items-center space-x-2 text-blue-600 border-b border-gray-50 pb-2">
                     <svg class="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     <span class="text-[13px] font-bold text-gray-900">Foto Nota</span>
@@ -75,8 +75,32 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     <span>Lihat Foto</span>
                 </button>
-            </div>
+            </div> --}}
 
+            <div class="border border-gray-100 rounded-2xl p-5 bg-white shadow-sm space-y-4">
+                <div class="flex items-center space-x-2 text-gray-900">
+                    <svg class="w-5 h-5 text-[#0F47A1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-[14px] font-bold">Foto Nota</span>
+                </div>
+                
+                <div class="w-full h-48 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden relative">
+                    @if($faktur->foto_url)
+                        <img src="{{ $faktur->foto_url }}" alt="Thumbnail Faktur" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition cursor-pointer" onclick="toggleAdminPhotoModal(true)">
+                    @else
+                        <div class="flex flex-col items-center justify-center text-gray-400">
+                            <svg class="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z"></path></svg>
+                            <span class="text-[11px] font-medium">Tidak ada foto nota</span>
+                        </div>
+                    @endif
+                </div>
+
+                @if($faktur->foto_url)
+                    <button onclick="toggleAdminPhotoModal(true)" class="w-full border border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 text-[13px] font-bold py-3.5 rounded-full flex items-center justify-center space-x-2 transition duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                        <span>Lihat Foto Ukuran Penuh</span>
+                    </button>
+                @endif
+            </div>
         </div>
 
         <div class="p-4 bg-white border-t border-gray-100 fixed bottom-0 inset-x-0 max-w-md mx-auto z-40">
@@ -84,5 +108,67 @@
         </div>
     </div>
 
+    @if($faktur->foto_url)
+    <div id="modal-photo-admin" class="fixed inset-0 z-[60] hidden justify-center bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="w-full max-w-md bg-white flex flex-col h-full shadow-2xl relative">
+            
+            <div class="px-6 pt-12 pb-4 flex items-center border-b border-gray-100 bg-white shadow-sm z-10">
+                <button onclick="toggleAdminPhotoModal(false)" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Bukti Nota Autentik</h1>
+            </div>
+            
+            <div class="flex-grow bg-[#E5E7EB] flex items-center justify-center overflow-hidden relative p-4">
+                
+                <div id="loading-admin-image" class="absolute flex flex-col items-center text-gray-500 font-medium text-[12px]">
+                    <svg class="w-8 h-8 mb-2 animate-spin text-[#0F47A1]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Memuat Dokumen...
+                </div>
+
+                <img id="admin-preview-image" src="" alt="Faktur Full" 
+                     class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300"
+                     onload="document.getElementById('loading-admin-image').classList.add('hidden'); this.classList.remove('hidden');"
+                     onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '⚠️ Foto telah dihapus dari server atau koneksi terputus.';">
+            </div>
+            
+            <div class="p-6 bg-white space-y-3 pb-8 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-10">
+                <button onclick="toggleAdminPhotoModal(false)" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-full shadow-md transition duration-200 text-[14px]">Tutup Dokumen</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        function toggleAdminPhotoModal(show) {
+            const modal = document.getElementById('modal-photo-admin');
+            const imgEl = document.getElementById('admin-preview-image');
+            const loaderEl = document.getElementById('loading-admin-image');
+            
+            if(!modal) return;
+
+            if(show) {
+                // Reset loader state
+                imgEl.classList.add('hidden');
+                if(loaderEl) {
+                    loaderEl.classList.remove('hidden');
+                    loaderEl.innerHTML = '<svg class="w-8 h-8 mb-2 animate-spin text-[#0F47A1]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Memuat Dokumen...';
+                }
+
+                // Tembak URL dari PHP ke atribut src JS
+                imgEl.src = "{{ $faktur->foto_url }}";
+                
+                modal.classList.remove('hidden'); 
+                modal.classList.add('flex'); 
+            } else { 
+                modal.classList.add('hidden'); 
+                modal.classList.remove('flex'); 
+                
+                // Bersihkan cache img agar animasi loading selalu jalan pas dibuka lagi
+                setTimeout(() => { imgEl.src = ""; }, 300);
+            }
+        }
+    </script>
+    @endif
 </body>
 </html>

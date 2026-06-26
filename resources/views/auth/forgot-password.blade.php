@@ -74,6 +74,8 @@
         </div>
     </div>
 
+    @include('partials.loading')
+
     <!-- AJAX LOGIC -->
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -125,6 +127,7 @@
 
         // Submit OTP & Sandi Baru
         document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+            Loading.show('Menyimpan password baru...');
             e.preventDefault();
             const btn = document.getElementById('btn-reset');
             const email = document.getElementById('email-input').value; // Ambil email
@@ -145,6 +148,7 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
+                    Loading.hide();
                     alert(result.message); // Native alert biar jelas
                     window.location.href = result.redirect; // Lempar ke halaman Login
                 } else {

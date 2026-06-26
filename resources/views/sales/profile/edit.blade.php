@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
-    <form action="{{ route('sales.profile.update') }}" method="POST" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
+    <form action="{{ route('sales.profile.update') }}" method="POST" id="form-action" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         @csrf
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100 relative z-10">
@@ -57,6 +57,15 @@
 
         </div>
     </form>
-
+    
+    @include('partials.loading')
+    
+    <script>
+        // Mencegah klik ganda dan memunculkan loading saat form disubmit
+        document.getElementById('form-action').addEventListener('submit', function() {
+            Loading.show('Menyimpan perubahan...');
+        });
+    </script>
+</body>
 </body>
 </html>

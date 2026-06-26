@@ -84,16 +84,10 @@
                 </div>
 
                 <div class="space-y-3 pt-2">
-                    <button id="btn-save-database" disabled class="w-full bg-slate-400 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-not-allowed">Simpan Data</button>
                     <button onclick="switchView('edit')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Edit Faktur</button>
+                    <button id="btn-save-database" disabled class="w-full bg-slate-400 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-not-allowed">Simpan Data</button>
                 </div>
 
-                <div class="flex justify-center pt-2">
-                    <button onclick="togglePhotoModal()" class="flex items-center space-x-2 border border-[#0F47A1] text-[#0F47A1] px-5 py-2.5 rounded-full text-[13px] font-bold hover:bg-blue-50 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span>Lihat Foto Faktur</span>
-                    </button>
-                </div>
                 <p class="text-center text-[10px] text-gray-400 mt-2"><span class="text-[#10B981]">✓</span> Periksa data terlebih dahulu sebelum menyimpan.</p>
             </div>
 
@@ -144,21 +138,14 @@
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer">
                                 <input type="radio" id="edit-metode-transfer" name="edit_metode" value="Transfer" class="w-4 h-4 text-[#0F47A1]">
-                                <span class="text-[13px] font-medium text-gray-800">¼️ Transfer</span>
+                                <span class="text-[13px] font-medium text-gray-800">💳 Transfer</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-center py-2">
-                    <button onclick="togglePhotoModal()" class="flex items-center space-x-2 border border-[#0F47A1] text-[#0F47A1] px-5 py-2.5 rounded-full text-[13px] font-bold hover:bg-blue-50 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span>Lihat Foto Faktur</span>
-                    </button>
-                </div>
-
                 <div class="space-y-3 pt-2">
-                    <button onclick="saveEdit()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px]">Simpan</button>
+                    <button onclick="saveEdit()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px]">Simpan Perubahan</button>
                     <button onclick="switchView('review')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Batalkan</button>
                 </div>
             </div>
@@ -211,7 +198,8 @@
                     </div>
                 </div>
 
-                <div class="w-full mt-auto">
+                <div class="w-full mt-auto space-y-3">
+                    <button onclick="togglePhotoModal(true)" class="w-full bg-white border border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-semibold py-4 rounded-full shadow-sm transition duration-200 text-[14px]">Lihat Foto Faktur</button>
                     <button onclick="finishProcess()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-full shadow-md transition duration-200 text-[14px]">Selesai</button>
                 </div>
             </div>
@@ -219,23 +207,39 @@
         </div>
     </div>
 
-    <div id="modal-photo" class="fixed inset-0 z-50 hidden bg-white flex-col">
-        <div class="px-6 pt-12 pb-4 flex items-center border-b border-gray-100">
-            <button onclick="togglePhotoModal()" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Foto Nota</h1>
-        </div>
-        <div class="flex-grow p-5 bg-gray-100 flex items-center justify-center">
-            <img id="preview-image" src="" alt="Faktur" class="max-w-full max-h-full rounded-xl shadow-md object-contain">
-        </div>
-        <div class="p-6 bg-white space-y-3">
-            <button onclick="togglePhotoModal()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px]">Kembali</button>
+    <div id="modal-photo" class="fixed inset-0 z-[60] hidden justify-center bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-md bg-white flex flex-col h-full shadow-2xl relative">
+            
+            <div class="px-6 pt-12 pb-4 flex items-center border-b border-gray-100 bg-white">
+                <button onclick="togglePhotoModal(false)" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Foto Nota</h1>
+            </div>
+            
+            <div class="flex-grow p-5 bg-gray-100 flex items-center justify-center overflow-hidden relative">
+                
+                <div id="loading-image" class="absolute text-[13px] font-bold text-gray-400 flex flex-col items-center">
+                    <svg class="w-8 h-8 mb-2 animate-spin text-[#0F47A1]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Memuat Foto...
+                </div>
+
+                <img id="preview-image" src="" alt="Faktur" 
+                     class="max-w-full max-h-full rounded-xl shadow-md object-contain relative z-10 hidden"
+                     onload="document.getElementById('loading-image').classList.add('hidden'); this.classList.remove('hidden');"
+                     onerror="this.classList.add('hidden'); document.getElementById('loading-image').innerHTML = '⚠️ Gagal memuat gambar.<br><span class=\'text-[10px] font-normal\'>URL tidak valid atau file terhapus.</span>';">
+            </div>
+            
+            <div class="p-6 bg-white space-y-3 pb-8">
+                <button onclick="togglePhotoModal(false)" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px]">Kembali</button>
+            </div>
+            
         </div>
     </div>
 
+    @include('partials.loading')
+
     <script>
-        // State Management Data Global
         let currentData = {
             nama_toko: '',
             nomor_faktur: '',
@@ -243,46 +247,90 @@
             total_tagihan: 0,
             total_dibayar: 0,
             sisa_tagihan: 0,
-            metode_bayar: '' // State Penampung Baru
+            metode_bayar: ''
         };
+        let savedFotoUrl = '';
 
         const formatRp = (angka) => 'Rp' + parseInt(angka || 0).toLocaleString('id-ID');
 
+        // INIT PAGE & BACA SESSION (Pencegah "Loading..." abadi)
         window.addEventListener('DOMContentLoaded', () => {
             const ocrDataString = sessionStorage.getItem('ocrData');
-            const ocrImage = sessionStorage.getItem('ocrImage');
-            
-            if (ocrImage) document.getElementById('preview-image').src = ocrImage;
 
-            if (ocrDataString) {
-                try {
-                    const parsed = JSON.parse(ocrDataString);
-                    currentData.nama_toko = parsed.nama_toko || '';
-                    currentData.nomor_faktur = parsed.nomor_faktur || '';
-                    currentData.tanggal_nota = parsed.tanggal_nota || '';
-                    currentData.total_tagihan = parseInt(parsed.total_tagihan) || 0;
-                    currentData.total_dibayar = 0;
-                    updateCalculations();
-                    renderReview();
-                } catch (e) {
-                    console.error("Gagal parse data session");
-                }
+            // Jika data kosong, beri tahu user daripada macet
+            if (!ocrDataString) {
+                alert("Waduh, data hasil scan tidak ditemukan di memori! Silakan kembali dan scan ulang fotonya.");
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(ocrDataString);
+                currentData.nama_toko = parsed.nama_toko || '-';
+                currentData.nomor_faktur = parsed.nomor_faktur || '-';
+                currentData.tanggal_nota = parsed.tanggal_nota || '-';
+                currentData.total_tagihan = parseInt(parsed.total_tagihan) || 0;
+                currentData.total_dibayar = 0;
+
+                updateCalculations();
+                renderReview(); // Fungsi ini yang mengubah teks "Loading..." jadi data asli
+            } catch (e) {
+                console.error("Gagal membaca data JSON:", e);
+                alert("Data scan rusak. Harap ulangi proses scan.");
             }
         });
 
-        function updateCalculations() {
-            currentData.sisa_tagihan = currentData.total_tagihan - currentData.total_dibayar;
-            if(currentData.sisa_tagihan < 0) currentData.sisa_tagihan = 0;
+        // FUNGSI KONVERSI BASE64 KE BLOB
+        function base64ToBlob(base64Data, contentType = 'image/png') {
+            const base64Clean = base64Data.indexOf('base64,') !== -1
+                ? base64Data.split('base64,')[1]
+                : base64Data;
+            const byteCharacters = atob(base64Clean);
+            const byteArrays = [];
+            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                const slice = byteCharacters.slice(offset, offset + 512);
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                byteArrays.push(new Uint8Array(byteNumbers));
+            }
+            return new Blob(byteArrays, {type: contentType});
         }
 
-        // Logic Kunci Tombol Simpan Otomatis (UX Handal)
+        // FUNGSI PREVIEW MODAL
+        function togglePhotoModal(show = true) {
+            const modal = document.getElementById('modal-photo');
+            const imgEl = document.getElementById('preview-image');
+            const loaderEl = document.getElementById('loading-image');
+
+            if (!modal) return;
+
+            if (show) {
+                if (savedFotoUrl) {
+                    imgEl.classList.add('hidden');
+                    if (loaderEl) loaderEl.classList.remove('hidden');
+
+                    imgEl.src = savedFotoUrl;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                } else {
+                    alert("Foto faktur sedang diproses atau tidak tersedia.");
+                }
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                setTimeout(() => { imgEl.src = ""; }, 300);
+            }
+        }
+
+        // --- FUNGSI-FUNGSI LOGIKA UI LAINNYA ---
+        function updateCalculations() {
+            currentData.sisa_tagihan = Math.max(0, currentData.total_tagihan - currentData.total_dibayar);
+        }
+
         function setMetodePembayaran(value) {
             currentData.metode_bayar = value;
-            
-            // Sembunyikan alert penunjuk cara bayar
             document.getElementById('alert-metode').classList.add('hidden');
-            
-            // Aktifkan tombol simpan data & ganti warna ke Biru Aktif
             const btnSave = document.getElementById('btn-save-database');
             btnSave.disabled = false;
             btnSave.className = "w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-pointer";
@@ -296,7 +344,6 @@
             document.getElementById('txt-dibayar').innerText = formatRp(currentData.total_dibayar);
             document.getElementById('txt-sisa').innerText = formatRp(currentData.sisa_tagihan);
 
-            // Set radio button jika state terisi lewat form edit
             if (currentData.metode_bayar) {
                 const radios = document.getElementsByName('review_metode');
                 radios.forEach(r => { if(r.value === currentData.metode_bayar) r.checked = true; });
@@ -313,44 +360,6 @@
             }
         }
 
-        function prepEditForm() {
-            document.getElementById('input-nama').value = currentData.nama_toko;
-            document.getElementById('input-nofaktur').value = currentData.nomor_faktur;
-            document.getElementById('input-tanggal').value = currentData.tanggal_nota;
-            document.getElementById('input-tagihan').value = currentData.total_tagihan;
-            document.getElementById('input-dibayar').value = currentData.total_dibayar;
-            
-            // Set radio di form edit
-            if(currentData.metode_bayar === 'Cash') document.getElementById('edit-metode-cash').checked = true;
-            if(currentData.metode_bayar === 'Transfer') document.getElementById('edit-metode-transfer').checked = true;
-            
-            calcSisaEdit();
-        }
-
-        function calcSisaEdit() {
-            const tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
-            const dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
-            let sisa = tagihan - dibayar;
-            if(sisa < 0) sisa = 0;
-            document.getElementById('input-sisa').value = formatRp(sisa);
-        }
-
-        function saveEdit() {
-            currentData.nama_toko = document.getElementById('input-nama').value;
-            currentData.nomor_faktur = document.getElementById('input-nofaktur').value;
-            currentData.tanggal_nota = document.getElementById('input-tanggal').value;
-            currentData.total_tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
-            currentData.total_dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
-            
-            // Ambil pilihan metode dari form edit
-            const selectedMetode = document.querySelector('input[name="edit_metode"]:checked');
-            if(selectedMetode) currentData.metode_bayar = selectedMetode.value;
-
-            updateCalculations();
-            renderReview();
-            switchView('review');
-        }
-
         function switchView(view) {
             document.getElementById('view-review').classList.add('hidden');
             document.getElementById('view-edit').classList.add('hidden');
@@ -360,12 +369,15 @@
             if (view === 'review') {
                 document.getElementById('view-review').classList.remove('hidden');
             } else if (view === 'edit') {
-                prepEditForm();
+                document.getElementById('input-nama').value = currentData.nama_toko;
+                document.getElementById('input-nofaktur').value = currentData.nomor_faktur;
+                document.getElementById('input-tanggal').value = currentData.tanggal_nota;
+                document.getElementById('input-tagihan').value = currentData.total_tagihan;
+                document.getElementById('input-dibayar').value = currentData.total_dibayar;
+                calcSisaEdit();
                 document.getElementById('view-edit').classList.remove('hidden');
             } else if (view === 'success') {
                 document.getElementById('main-header').classList.add('hidden');
-                
-                // Render Data Sukses Sesuai HasilNota.png
                 document.getElementById('success-nama').innerText = currentData.nama_toko;
                 document.getElementById('success-nofaktur').innerText = currentData.nomor_faktur;
                 document.getElementById('success-tanggal').innerText = currentData.tanggal_nota;
@@ -373,7 +385,7 @@
                 document.getElementById('success-tagihan').innerText = formatRp(currentData.total_tagihan);
                 document.getElementById('success-dibayar').innerText = formatRp(currentData.total_dibayar);
                 document.getElementById('success-sisa').innerText = formatRp(currentData.sisa_tagihan);
-                
+
                 const badge = document.getElementById('success-status-badge');
                 if (currentData.sisa_tagihan === 0 && currentData.total_tagihan > 0) {
                     badge.className = "text-[#10B981] bg-[#ECFDF5] text-[11px] font-bold px-3 py-1 rounded";
@@ -382,23 +394,35 @@
                     badge.className = "text-[#F59E0B] bg-[#FFF7ED] text-[11px] font-bold px-3 py-1 rounded";
                     badge.innerText = "Belum Lunas";
                 }
-
                 document.getElementById('view-success').classList.remove('hidden');
                 document.getElementById('view-success').classList.add('flex');
             }
         }
 
-        function togglePhotoModal() {
-            const modal = document.getElementById('modal-photo');
-            if(modal.classList.contains('hidden')){ modal.classList.remove('hidden'); modal.classList.add('flex'); } 
-            else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+        function calcSisaEdit() {
+            const tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
+            const dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
+            document.getElementById('input-sisa').value = formatRp(Math.max(0, tagihan - dibayar));
         }
 
-        // Submit Data via AJAX POST
+        function saveEdit() {
+            currentData.nama_toko = document.getElementById('input-nama').value;
+            currentData.nomor_faktur = document.getElementById('input-nofaktur').value;
+            currentData.tanggal_nota = document.getElementById('input-tanggal').value;
+            currentData.total_tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
+            currentData.total_dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
+            const selectedMetode = document.querySelector('input[name="edit_metode"]:checked');
+            if(selectedMetode) currentData.metode_bayar = selectedMetode.value;
+
+            updateCalculations();
+            renderReview();
+            switchView('review');
+        }
+
+        // SUBMIT DATA & AUTO COMPRESS IMAGE
         document.getElementById('btn-save-database').addEventListener('click', async function() {
+            if (typeof Loading !== 'undefined') Loading.show('Memproses dan mengunggah foto...');
             const btn = this;
-            const originalText = btn.innerText;
-            btn.innerText = "Menyimpan...";
             btn.disabled = true;
 
             const formData = new FormData();
@@ -407,9 +431,56 @@
             formData.append('tanggal_nota', currentData.tanggal_nota);
             formData.append('total_tagihan', currentData.total_tagihan);
             formData.append('total_dibayar', currentData.total_dibayar);
-            formData.append('metode_bayar', currentData.metode_bayar); // Data terkirim aman
+            formData.append('metode_bayar', currentData.metode_bayar);
+
+            const ocrImage = sessionStorage.getItem('ocrImage');
+            
+            // Pengecekan ketat memori foto
+            if (!ocrImage || ocrImage.length < 100) {
+                alert("Foto tidak ditemukan di memori! Silakan kembali dan ulangi proses scan.");
+                if (typeof Loading !== 'undefined') Loading.hide();
+                btn.disabled = false;
+                return;
+            }
 
             try {
+                // MESIN KOMPRESOR GAMBAR HTML5 CANVAS
+                await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1200; // Resolusi aman baca teks
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Perkecil dimensi jika terlalu besar
+                        if (width > MAX_WIDTH) {
+                            height = Math.round((height * MAX_WIDTH) / width);
+                            width = MAX_WIDTH;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Ubah jadi JPEG dan kompres size-nya (Kualitas 70%)
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                formData.append('foto_file', blob, 'bukti_faktur.jpg');
+                                resolve();
+                            } else {
+                                reject(new Error("Gagal konversi Canvas ke Blob"));
+                            }
+                        }, 'image/jpeg', 0.7); 
+                    };
+                    img.onerror = () => reject(new Error("Gagal meload gambar dari memori"));
+                    
+                    // Antisipasi jika murni Base64 tanpa header data URL
+                    img.src = ocrImage.indexOf('base64,') === -1 ? 'data:image/jpeg;base64,' + ocrImage : ocrImage;
+                });
+
+                // KIRIM KE LARAVEL
                 const response = await fetch("{{ route('sales.addFaktur') }}", {
                     method: 'POST',
                     headers: {
@@ -420,15 +491,18 @@
                 });
 
                 const result = await response.json();
+                
                 if (response.ok && result.success) {
+                    savedFotoUrl = result.foto_url;
                     switchView('success');
                 } else {
-                    alert("Gagal menyimpan data: " + result.message);
+                    alert(result.message); // Akan memunculkan peringatan Jebakan Batman jika gagal
                 }
             } catch (err) {
-                alert("Kesalahan jaringan.");
+                console.error("Critical Error:", err);
+                alert("Terjadi kesalahan sistem: " + err.message);
             } finally {
-                btn.innerText = originalText;
+                if (typeof Loading !== 'undefined') Loading.hide();
                 btn.disabled = false;
             }
         });

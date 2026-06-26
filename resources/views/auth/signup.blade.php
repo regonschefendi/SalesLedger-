@@ -62,8 +62,11 @@
         </div>
     </div>
 
+    @include('partials.loading')
+
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            Loading.show('Membuat akun...');
             e.preventDefault();
             
             const form = e.target;

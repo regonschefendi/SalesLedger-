@@ -54,6 +54,8 @@
         </div>
     </div>
 
+    @include('partials.loading')
+
     <script>
         let timeLeft = 120; // 2 Menit dalam hitungan detik
         let timerInterval;
@@ -91,6 +93,7 @@
 
         // AJAX: Submit OTP
         document.getElementById('otpForm').addEventListener('submit', async function(e) {
+            Loading.show('Memverifikasi OTP...');
             e.preventDefault();
             const formData = new FormData(e.target);
             const btnText = document.getElementById('btn-text');
@@ -125,6 +128,7 @@
             } finally {
                 btnText.innerText = "Verify & Continue";
                 btnSubmit.disabled = false;
+                Loading.hide();
             }
         });
 

@@ -64,6 +64,8 @@
         </div>
     </div>
 
+    @include('partials.loading')
+
     <script>
         let currentRole = 'admin'; // Default
 
@@ -101,6 +103,7 @@
 
         // AJAX: Submit Data Peran
         document.getElementById('roleForm').addEventListener('submit', async function(e) {
+            Loading.show('Menyimpan peran...');
             e.preventDefault();
             const formData = new FormData(e.target);
             const btnText = document.getElementById('btn-text');
@@ -138,6 +141,7 @@
             } finally {
                 btnSubmit.disabled = false;
                 toggleRole(currentRole); // Reset tombol text state
+                Loading.hide();
             }
         });
     </script>

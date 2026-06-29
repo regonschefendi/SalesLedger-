@@ -4,6 +4,11 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa'; // 1. Import plugin PWA
 
 export default defineConfig({
+    // set deployment ke netlify
+    build: {
+        outDir: "dist"
+    },
+
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],

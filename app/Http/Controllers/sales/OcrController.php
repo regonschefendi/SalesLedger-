@@ -4,6 +4,7 @@ namespace App\Http\Controllers\sales;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
+use App\Models\Toko;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -78,10 +79,24 @@ class OcrController extends Controller
         }
     }
 
+    // Fungsi API untuk fitur Dropdown Search Toko di Frontend
+    public function searchToko(Request $request)
+    {
+        $keyword = $request->get('q');
+        
+        // Cari maksimal 5 toko yang namanya mirip dengan ketikan/bacaan AI
+        // Pake ILIKE kalau PostgreSQL, pake LIKE kalau MySQL
+        $tokos = Toko::where('nama_toko', 'ILIKE', "%{$keyword}%")
+                                ->select('id', 'nama_toko', 'alamat')
+                                ->limit(5)
+                                ->get();
+
+        return response()->json($tokos);
+    }
     public function createFaktur(Request $request)
     {
         $request->validate([
-            'nama_toko' => 'required|string|max:255',
+            'toko_id' => 'required|exists:tokos,id',
             'nomor_faktur' => 'required|string|max:100',
             'tanggal_nota' => 'required|string|max:100',
             'total_tagihan' => 'required|numeric|min:0',
@@ -125,7 +140,7 @@ class OcrController extends Controller
         $totalDibayar = (int) ($request->total_dibayar ?? 0);
 
         Faktur::create([
-            'nama_toko' => $request->nama_toko,
+            'toko_id' => $request->toko_id,
             'nomor_faktur' => $request->nomor_faktur,
             'tanggal_nota' => $request->tanggal_nota,
             'total_tagihan' => $totalTagihan,

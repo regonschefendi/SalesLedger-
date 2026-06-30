@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\admin\TokoController;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\RoleController;
 use App\Http\Controllers\sales\OcrController;
@@ -87,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:sales')->prefix('sales')->name('sales.')->group(function () {
             Route::get('/home', [SalesController::class, 'index'])->name('home');
             
+            // Fitur Manajemen Pengguna
             Route::get('/profile', [SalesController::class, 'profileIndex'])->name('profile.index');
             Route::get('/profile/edit', [SalesController::class, 'profileEdit'])->name('profile.edit');
             Route::post('/profile/update', [SalesController::class, 'profileUpdate'])->name('profile.update');
@@ -95,6 +97,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/input', [OcrController::class, 'index'])->name('input');
             Route::post('/api/scan', [OcrController::class, 'processApi'])->name('scan');
             Route::post('/faktur/simpan', [OcrController::class, 'createFaktur'])->name('addFaktur');
+            Route::get('/toko/search', [OcrController::class, 'searchToko'])->name('toko.search');
         });
 
         // ------------------------------------------
@@ -102,9 +105,19 @@ Route::middleware('auth')->group(function () {
         // ------------------------------------------
         Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+            // Fitur Pembukuan
             Route::get('/pembukuan', [AdminController::class, 'pembukuanIndex'])->name('pembukuan.index');
             Route::get('/pembukuan/{id}', [AdminController::class, 'pembukuanShow'])->name('pembukuan.show');
 
+            // Fitur Manajemen Toko
+            Route::get('/toko', [TokoController::class, 'index'])->name('toko.index');
+            Route::get('/toko/tambah', [TokoController::class, 'create'])->name('toko.create');
+            Route::post('/toko/store', [TokoController::class, 'store'])->name('toko.store');
+            Route::get('/toko/{id}', [TokoController::class, 'show'])->name('toko.show');
+            Route::get('/nota/{id}', [TokoController::class, 'showNota'])->name('nota.show');
+
+            // Fitur Manajemen Pengguna
             Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile.index');
             Route::get('/profile/edit', [AdminController::class, 'profileEdit'])->name('profile.edit');
             Route::post('/profile/update', [AdminController::class, 'profileUpdate'])->name('profile.update');

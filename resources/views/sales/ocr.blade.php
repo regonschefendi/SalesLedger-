@@ -33,6 +33,23 @@
                     </div>
                 </div>
 
+                <div class="relative z-50">
+                    <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Pilih Toko Pelanggan</label>
+                    <div class="relative">
+                        <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        
+                        <input type="text" id="input-nama" onkeyup="searchTokoProcess(this.value)" autocomplete="off" placeholder="Ketik nama toko..." class="w-full border-2 border-blue-100 bg-blue-50/30 rounded-2xl pl-10 pr-10 py-3 text-[13px] font-bold text-gray-900 focus:ring-0 focus:border-[#0F47A1] transition outline-none">
+                        
+                        <button id="btn-clear-toko" type="button" onclick="clearTokoSelection()" class="hidden absolute right-3.5 top-3.5 text-red-500 hover:text-red-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div id="dropdown-toko" class="hidden absolute w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-lg max-h-48 overflow-y-auto z-50">
+                        <ul id="list-toko" class="divide-y divide-gray-50"></ul>
+                    </div>
+                </div>
+
                 <div class="flex justify-center my-2">
                     <span id="badge-status" class="bg-[#FFF7ED] text-[#F59E0B] border border-[#F59E0B]/20 text-[13px] font-bold px-4 py-1.5 rounded-md">Belum Lunas</span>
                 </div>
@@ -68,6 +85,11 @@
                     <div class="w-4 h-4 border border-[#2563EB] rounded-full flex items-center justify-center font-bold text-[10px]">!</div>
                     <span>Pilih Metode Pembayaran</span>
                 </div>
+                
+                <div id="alert-toko-review" class="hidden flex items-center justify-center space-x-2 text-red-500 text-[12px] font-medium pt-1">
+                    <div class="w-4 h-4 border border-red-500 rounded-full flex items-center justify-center font-bold text-[10px]">!</div>
+                    <span id="alert-toko-msg">Toko tidak ditemukan. Klik Edit Faktur.</span>
+                </div>
 
                 <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm">
                     <p class="text-[12px] font-bold text-gray-900 mb-3 flex items-center"><svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 022 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>Metode Pembayaran</p>
@@ -99,11 +121,6 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Nama Toko</label>
-                        <div class="relative"><svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        <input type="text" id="input-nama" class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none"></div>
-                    </div>
-                    <div>
                         <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Nomor Faktur</label>
                         <div class="relative"><svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         <input type="text" id="input-nofaktur" class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none"></div>
@@ -127,20 +144,6 @@
                         <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Sisa Tagihan</label>
                         <div class="relative"><svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#F59E0B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 022 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         <input type="text" id="input-sisa" disabled class="w-full border border-gray-200 bg-gray-50 text-[#F59E0B] rounded-2xl pl-10 pr-4 py-3 text-[13px] font-bold"></div>
-                    </div>
-                    
-                    <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm">
-                        <label class="block text-[12px] font-bold text-gray-900 mb-2">Metode Pembayaran</label>
-                        <div class="flex space-x-6">
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" id="edit-metode-cash" name="edit_metode" value="Cash" class="w-4 h-4 text-[#0F47A1]">
-                                <span class="text-[13px] font-medium text-gray-800">💵 Cash</span>
-                            </label>
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" id="edit-metode-transfer" name="edit_metode" value="Transfer" class="w-4 h-4 text-[#0F47A1]">
-                                <span class="text-[13px] font-medium text-gray-800">💳 Transfer</span>
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -241,6 +244,7 @@
 
     <script>
         let currentData = {
+            toko_id: null,  
             nama_toko: '',
             nomor_faktur: '',
             tanggal_nota: '',
@@ -265,7 +269,8 @@
 
             try {
                 const parsed = JSON.parse(ocrDataString);
-                currentData.nama_toko = parsed.nama_toko || '-';
+                currentData.nama_toko = '';
+                currentData.toko_id = null;
                 currentData.nomor_faktur = parsed.nomor_faktur || '-';
                 currentData.tanggal_nota = parsed.tanggal_nota || '-';
                 currentData.total_tagihan = parseInt(parsed.total_tagihan) || 0;
@@ -278,6 +283,71 @@
                 alert("Data scan rusak. Harap ulangi proses scan.");
             }
         });
+
+        // FUNGSI AUTO-MATCH TOKO DARI DATABASE
+        async function autoMatchToko(keyword) {
+            try {
+                const response = await fetch(`{{ route('sales.toko.search') }}?q=${keyword}`);
+                const tokos = await response.json();
+                
+                if (tokos.length > 0) {
+                    // Ambil toko urutan pertama yang paling mirip
+                    currentData.toko_id = tokos[0].id;
+                    currentData.nama_toko = tokos[0].nama_toko;
+                    
+                    // Update tampilan teks di layar
+                    document.getElementById('txt-nama').innerText = currentData.nama_toko;
+                    document.getElementById('input-nama').value = currentData.nama_toko;
+                    
+                    // Sembunyikan alert error
+                    document.getElementById('alert-toko-review').classList.add('hidden');
+                    checkSaveButton(); // Cek apakah metode bayar udah diisi juga
+                } else {
+                    // Kalau AI ngawur dan tokonya nggak ada di DB
+                    currentData.toko_id = null;
+                    showTokoAlert(`Toko "${keyword}" tidak terdaftar. Klik Edit Faktur.`);
+                }
+            } catch (e) {
+                console.error("Auto match gagal", e);
+            }
+        }
+
+        function showTokoAlert(msg) {
+            document.getElementById('alert-toko-msg').innerText = msg;
+            document.getElementById('alert-toko-review').classList.remove('hidden');
+            document.getElementById('btn-save-database').disabled = true;
+            document.getElementById('btn-save-database').className = "w-full bg-slate-400 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-not-allowed";
+        }
+
+        function checkSaveButton() {
+            const btnSave = document.getElementById('btn-save-database');
+            if (currentData.toko_id && currentData.metode_bayar) {
+                btnSave.disabled = false;
+                btnSave.className = "w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-pointer";
+            } else {
+                btnSave.disabled = true;
+                btnSave.className = "w-full bg-slate-400 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-not-allowed";
+            }
+        }
+
+        // LOGIKA KLIK HASIL PENCARIAN
+        function selectToko(id, nama) {
+            currentData.toko_id = id;
+            currentData.nama_toko = nama;
+            document.getElementById('input-nama').value = nama;
+            document.getElementById('dropdown-toko').classList.add('hidden');
+            document.getElementById('alert-toko').classList.add('hidden');
+            document.getElementById('btn-clear-toko').classList.remove('hidden');
+            checkSaveButton();
+        }
+
+        function clearTokoSelection() {
+            currentData.toko_id = null;
+            document.getElementById('input-nama').value = '';
+            document.getElementById('btn-clear-toko').classList.add('hidden');
+            document.getElementById('input-nama').focus();
+            checkSaveButton();
+        }
 
         // FUNGSI KONVERSI BASE64 KE BLOB
         function base64ToBlob(base64Data, contentType = 'image/png') {
@@ -328,12 +398,46 @@
             currentData.sisa_tagihan = Math.max(0, currentData.total_tagihan - currentData.total_dibayar);
         }
 
+        // METODE PEMBAYARAN DIKLIK DARI REVIEW PAGE
         function setMetodePembayaran(value) {
             currentData.metode_bayar = value;
             document.getElementById('alert-metode').classList.add('hidden');
-            const btnSave = document.getElementById('btn-save-database');
-            btnSave.disabled = false;
-            btnSave.className = "w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-pointer";
+            checkSaveButton();
+        }
+
+        // DROPDOWN PENCARIAN TOKO MANUAL (Di Halaman Edit)
+        let searchTimeout;
+        async function searchTokoProcess(keyword) {
+            const dropdown = document.getElementById('dropdown-toko');
+            const listToko = document.getElementById('list-toko');
+            
+            currentData.toko_id = null;
+            document.getElementById('btn-clear-toko').classList.add('hidden');
+
+            if (keyword.length < 2) { dropdown.classList.add('hidden'); return; }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`{{ route('sales.toko.search') }}?q=${keyword}`);
+                    const tokos = await response.json();
+                    
+                    listToko.innerHTML = '';
+                    if (tokos.length > 0) {
+                        tokos.forEach(toko => {
+                            listToko.innerHTML += `
+                                <li onclick="selectToko(${toko.id}, '${toko.nama_toko.replace(/'/g, "\\'")}')" class="p-3 hover:bg-blue-50 cursor-pointer transition">
+                                    <p class="text-[13px] font-bold text-gray-900">${toko.nama_toko}</p>
+                                    <p class="text-[10px] text-gray-400 truncate">${toko.alamat || 'Alamat belum diisi'}</p>
+                                </li>`;
+                        });
+                        dropdown.classList.remove('hidden');
+                    } else {
+                        listToko.innerHTML = `<li class="p-3 text-[12px] text-gray-500 text-center">Toko tidak ditemukan. Hubungi Admin.</li>`;
+                        dropdown.classList.remove('hidden');
+                    }
+                } catch (e) { console.error(e); }
+            }, 300);
         }
 
         function renderReview() {
@@ -368,14 +472,15 @@
 
             if (view === 'review') {
                 document.getElementById('view-review').classList.remove('hidden');
+                
             } else if (view === 'edit') {
-                document.getElementById('input-nama').value = currentData.nama_toko;
                 document.getElementById('input-nofaktur').value = currentData.nomor_faktur;
                 document.getElementById('input-tanggal').value = currentData.tanggal_nota;
                 document.getElementById('input-tagihan').value = currentData.total_tagihan;
                 document.getElementById('input-dibayar').value = currentData.total_dibayar;
                 calcSisaEdit();
                 document.getElementById('view-edit').classList.remove('hidden');
+                
             } else if (view === 'success') {
                 document.getElementById('main-header').classList.add('hidden');
                 document.getElementById('success-nama').innerText = currentData.nama_toko;
@@ -406,16 +511,14 @@
         }
 
         function saveEdit() {
-            currentData.nama_toko = document.getElementById('input-nama').value;
             currentData.nomor_faktur = document.getElementById('input-nofaktur').value;
             currentData.tanggal_nota = document.getElementById('input-tanggal').value;
             currentData.total_tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
             currentData.total_dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
-            const selectedMetode = document.querySelector('input[name="edit_metode"]:checked');
-            if(selectedMetode) currentData.metode_bayar = selectedMetode.value;
 
             updateCalculations();
             renderReview();
+            checkSaveButton();
             switchView('review');
         }
 
@@ -426,7 +529,7 @@
             btn.disabled = true;
 
             const formData = new FormData();
-            formData.append('nama_toko', currentData.nama_toko);
+            formData.append('toko_id', currentData.toko_id);
             formData.append('nomor_faktur', currentData.nomor_faktur);
             formData.append('tanggal_nota', currentData.tanggal_nota);
             formData.append('total_tagihan', currentData.total_tagihan);

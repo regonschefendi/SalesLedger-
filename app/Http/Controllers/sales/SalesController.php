@@ -56,7 +56,7 @@ class SalesController extends Controller
         // Hitung statistik langsung dari database
         $stats = [
             // Hitung berapa toko unik yang pernah diinput sales ini
-            'total_toko' => \App\Models\Faktur::where('sales_id', $user->id)->distinct('nama_toko')->count('nama_toko'),
+            'total_toko' => \App\Models\Faktur::where('sales_id', $user->id)->distinct('toko_id')->count('toko_id'),
             // Hitung total nota yang pernah dikirim
             'total_nota' => \App\Models\Faktur::where('sales_id', $user->id)->count(),
             // Hitung total nominal uang dari semua nota

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Faktur extends Model
 {
     protected $fillable = [
-        'nama_toko',
+        'toko_id',
         'nomor_faktur',
         'tanggal_nota',
         'metode_bayar',
@@ -22,5 +22,9 @@ class Faktur extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'sales_id', 'id');
+    }
+
+    public function toko() {
+        return $this->belongsTo(Toko::class);
     }
 }

@@ -141,30 +141,11 @@
             </div>
 
         </div>
-
-        <div class="fixed bottom-0 max-w-md mx-auto inset-x-0 w-full bg-white border-t border-gray-100 h-[72px] flex justify-between items-center px-10 z-50 rounded-t-[20px] shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
-            
-            <a href="{{ route('sales.home') }}" class="flex flex-col items-center text-[#0F47A1] w-16">
-                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
-                <span class="text-[10px] font-bold">Home</span>
-            </a>
-
-            <div class="relative flex flex-col items-center w-24">
-                <button onclick="toggleUploadModal()" class="absolute -top-[45px] bg-[#0F47A1] text-white rounded-full p-[14px] border-[6px] border-white hover:bg-blue-800 transition transform hover:scale-105">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                </button>
-                <span class="text-[10px] font-bold text-[#0F47A1] absolute top-[20px] whitespace-nowrap">Upload Nota</span>
-            </div>
-
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-gray-700 w-16">
-                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
-                <span class="text-[10px] font-medium">Riwayat</span>
-            </a>
-
-        </div>
     </div>
 
-    <div id="upload-modal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+    @include('partials.sales-bottom-nav')
+
+    {{-- <div id="upload-modal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
         <div class="bg-white w-full max-w-md rounded-t-[30px] sm:rounded-[30px] p-6 pb-10 transform transition-transform animate-slideUp">
             
             <div class="flex justify-between items-center mb-6">
@@ -312,7 +293,7 @@
                 document.getElementById('loading-overlay').classList.remove('flex');
             }
         }
-    </script>
+    </script> --}}
 
 </body>
 </html>

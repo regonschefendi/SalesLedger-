@@ -10,6 +10,7 @@ class Faktur extends Model
         'toko_id',
         'nomor_faktur',
         'tanggal_nota',
+        'tanggal_pembayaran',
         'metode_bayar',
         'total_tagihan',
         'catatan',

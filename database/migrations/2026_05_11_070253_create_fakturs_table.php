@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('toko_id')->constrained('tokos')->cascadeOnDelete();
             $table->string('nomor_faktur')->nullable();
             $table->date('tanggal_nota')->nullable();
+            $table->date('tanggal_pembayaran')->nullable();
             $table->string('metode_bayar')->nullable();
             $table->decimal('total_tagihan', 15, 2)->nullable();
             $table->decimal('total_dibayar', 15, 2)->default(0);

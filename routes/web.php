@@ -6,6 +6,7 @@ use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\RoleController;
 use App\Http\Controllers\sales\OcrController;
 use App\Http\Controllers\sales\SalesController;
+use App\Http\Controllers\sales\SalesRiwayatController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -98,6 +99,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/api/scan', [OcrController::class, 'processApi'])->name('scan');
             Route::post('/faktur/simpan', [OcrController::class, 'createFaktur'])->name('addFaktur');
             Route::get('/toko/search', [OcrController::class, 'searchToko'])->name('toko.search');
+
+            // Riwayat Faktur
+            Route::get('/riwayat', [SalesRiwayatController::class, 'index'])->name('riwayat.index');
+            Route::get('/riwayat/{id}', [SalesRiwayatController::class, 'show'])->name('riwayat.show');
+            // Route::get('/riwayat/{id}/detail', [SalesRiwayatController::class, 'detail'])->name('riwayat.detail');
+            Route::get('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'editPembayaran'])->name('riwayat.edit');
+            Route::post('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'updatePembayaran'])->name('riwayat.update');
         });
 
         // ------------------------------------------

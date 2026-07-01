@@ -49,12 +49,6 @@
                 <div class="text-center">
                     <a href="/forgot-password" class="text-xs font-semibold text-[#0F47A1] hover:underline">Forgot Password?</a>
                 </div>
-
-                <div class="flex items-center my-6">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="mx-4 text-xs text-gray-400 font-medium">Or</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
-                </div>
             </div>
 
             <div class="text-center text-xs text-gray-500 pt-6">

@@ -56,13 +56,13 @@ class SalesController extends Controller
         // Hitung statistik langsung dari database
         $stats = [
             // Hitung berapa toko unik yang pernah diinput sales ini
-            'total_toko' => \App\Models\Faktur::where('sales_id', $user->id)->distinct('toko_id')->count('toko_id'),
+            'total_toko' => $user->tokosPegangan()->count(),
             // Hitung total nota yang pernah dikirim
-            'total_nota' => \App\Models\Faktur::where('sales_id', $user->id)->count(),
+            'total_nota' => Faktur::where('sales_id', $user->id)->count(),
             // Hitung total nominal uang dari semua nota
-            'total_tagihan' => (int) \App\Models\Faktur::where('sales_id', $user->id)->sum('total_tagihan'),
+            'total_tagihan' => (int) Faktur::where('sales_id', $user->id)->sum('total_tagihan'),
             // Hitung berapa nota yang statusnya belum lunas
-            'belum_lunas' => \App\Models\Faktur::where('sales_id', $user->id)->where('status', 'belum_lunas')->count(),
+            'belum_lunas' => Faktur::where('sales_id', $user->id)->where('status', 'belum_lunas')->count(),
         ];
 
         return view('sales.profile.index', compact('user', 'stats'));

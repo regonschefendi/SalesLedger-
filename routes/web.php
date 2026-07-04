@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\admin\SalesController as adminsalesctrl;
 use App\Http\Controllers\admin\TokoController;
 use App\Http\Controllers\auth\AuthController;
+use App\Http\Controllers\auth\ProfileChangePasswordController;
 use App\Http\Controllers\auth\RoleController;
 use App\Http\Controllers\sales\OcrController;
 use App\Http\Controllers\sales\SalesController;
 use App\Http\Controllers\sales\SalesRiwayatController;
+use App\Http\Controllers\sales\TokoPeganganController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +86,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/set-admin', [RoleController::class, 'setAdmin']);
         Route::post('/api/set-sales', [RoleController::class, 'setSales']);
 
+        // Fitur Ubah Password (Bisa diakses Admin & Sales)
+        Route::get('/profile/change-password', [ProfileChangePasswordController::class, 'edit'])->name('profile.password.edit');
+        Route::post('/profile/change-password', [ProfileChangePasswordController::class, 'update'])->name('profile.password.update');
+
         // ------------------------------------------
         // ROLE: SALES AREA
         // ------------------------------------------
@@ -106,6 +113,10 @@ Route::middleware('auth')->group(function () {
             // Route::get('/riwayat/{id}/detail', [SalesRiwayatController::class, 'detail'])->name('riwayat.detail');
             Route::get('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'editPembayaran'])->name('riwayat.edit');
             Route::post('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'updatePembayaran'])->name('riwayat.update');
+
+            // Fitur Toko Pegangan
+            Route::get('/toko-pegangan', [TokoPeganganController::class, 'index'])->name('toko-pegangan.index');
+            Route::post('/toko-pegangan', [TokoPeganganController::class, 'sync'])->name('toko-pegangan.sync');
         });
 
         // ------------------------------------------
@@ -131,6 +142,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/profile/update', [AdminController::class, 'profileUpdate'])->name('profile.update');
             Route::get('/profile/custom-code', [AdminController::class, 'customCodeIndex'])->name('profile.custom_code');
             Route::post('/profile/custom-code/update', [AdminController::class, 'customCodeUpdate'])->name('profile.custom-code.update');
+
+            // Fitur Manajemen Sales
+            Route::get('/sales', [adminsalesctrl::class, 'index'])->name('sales.index');
+            Route::get('/sales/{id}', [adminsalesctrl::class, 'show'])->name('sales.show');
         });
     });
 });

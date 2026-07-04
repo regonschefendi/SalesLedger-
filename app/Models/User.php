@@ -45,4 +45,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'parent_admin_id', 'id');
     }
+
+    public function tokosPegangan()
+    {
+        return $this->belongsToMany(Toko::class, 'sales_tokos', 'user_id', 'toko_id');
+    }
 }

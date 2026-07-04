@@ -20,4 +20,9 @@ class Toko extends Model
     {
         return $this->hasMany(Faktur::class);
     }
+
+    public function sales()
+    {
+        return $this->belongsToMany(User::class, 'sales_tokos', 'toko_id', 'user_id');
+    }
 }

@@ -73,16 +73,16 @@
 
             <div class="space-y-3 pt-2">
                 <div class="border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden divide-y divide-gray-50">
-                    <a href="#" class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
+                    <a href="{{ route('sales.toko-pegangan.index') }}" class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"></path></svg>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 7V5c0-1.103-.897-2-2-2H5c-1.103 0-2 .897-2 2v2a3 3 0 0 0 1.488 2.585V19c0 1.103.897 2 2 2h11c1.103 0 2-.897 2-2V9.585A3 3 0 0 0 21 7zM5 5h14v2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5zm12.5 14H6.5V9.038A2.969 2.969 0 0 0 8 9.5a2.969 2.969 0 0 0 2-1.5 2.969 2.969 0 0 0 2 1.5 2.969 2.969 0 0 0 2-1.5 2.969 2.969 0 0 0 2 1.5c.571 0 1.102-.178 1.5-.462V19z"></path></svg>
                             </div>
                             <span class="text-[14px] font-bold text-gray-800">Toko Pegangan</span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                     </a>
-                    <a href="#" class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
+                    <a href="{{ route('profile.password.edit') }}" class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>

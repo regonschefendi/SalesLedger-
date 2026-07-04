@@ -24,12 +24,12 @@
             <form id="registerForm" class="space-y-4 pt-2">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Full Name</label>
-                    <input type="text" name="full_name" placeholder="full name" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
+                    <input type="text" name="full_name" placeholder="Full Name" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Username</label>
-                    <input type="text" name="username" placeholder="username" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                    <input type="text" name="username" placeholder="Username" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                 </div>
 
                 <div>
@@ -40,7 +40,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Password</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                        <input type="password" id="password" name="password" placeholder="Password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                         <button type="button" onclick="togglePasswordVisibility('password')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
@@ -51,7 +51,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Confirm Password</label>
                     <div class="relative">
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Konfirmasi Password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                         <button type="button" onclick="togglePasswordVisibility('confirm_password')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>

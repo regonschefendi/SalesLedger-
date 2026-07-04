@@ -63,7 +63,7 @@
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                     
-                    <a href="#" class="flex justify-between items-center p-4 hover:bg-slate-50/80 transition">
+                    <a href="{{ route('profile.password.edit') }}" class="flex justify-between items-center p-4 hover:bg-slate-50/80 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
                             <span class="text-[14px] font-bold text-gray-800">Ubah Password</span>

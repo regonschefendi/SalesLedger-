@@ -40,11 +40,6 @@ Route::get('/', function () {
 })->name('landing');
 
 // ==========================================
-// GLOBAL / PWA ROUTES
-// ==========================================
-Route::view('/offline', 'offline')->name('offline');
-
-// ==========================================
 // GUEST ROUTES (Hanya untuk yang belum login)
 // ==========================================
 Route::middleware('guest')->group(function () {

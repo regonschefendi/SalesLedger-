@@ -16,13 +16,15 @@ export default defineConfig({
         }),
         tailwindcss(),
         
-        // 2. Settingan PWA
+        // Settingan PWA
         VitePWA({
-            outDir: 'public', // Output ditaruh di folder public
-            buildBase: '/',
+            outDir: 'public', 
+            base: '/build/',
             scope: '/',
-            injectRegister: null, // Register manual di Blade
+            injectRegister: null, 
             manifest: {
+                id: '/',
+                start_url: '/',
                 name: 'Sales Ledger App',
                 short_name: 'SalesLedger',
                 description: 'Aplikasi Scan Faktur AI untuk Tim Sales',
@@ -43,18 +45,16 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                // SECURITY SETTING:
-                navigateFallback: '/offline', // Kalau ga ada sinyal internet, paksa masuk ke halaman Offline
-                globPatterns: ['build/assets/**/*.{js,css,png,svg,ico}'], // Cuma simpan file styling
+                navigateFallback: '/offline.html', 
+                
+                globPatterns: ['build/assets/**/*.{js,css,png,svg,ico}', 'offline.html'],
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
                     {
-                        // Dilarang nge-cache route API dan submit data! (Network Only)
                         urlPattern: /\/(api|faktur)\/.*/i,
                         handler: 'NetworkOnly', 
                     },
                     {
-                        // File statis luar (kayak font Google) boleh di-cache biar cepet
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',
                         options: { cacheName: 'google-fonts-cache' }

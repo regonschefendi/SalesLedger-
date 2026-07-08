@@ -76,5 +76,15 @@
         <p>Sepertinya kamu sedang offline. Silakan periksa koneksi internetmu lalu coba lagi.</p>
         <button onclick="window.location.reload()">Coba Muat Ulang</button>
     </div>
+
+    <script>
+        // Fitur Otomatis deteksi kalau sinyal HP kembali menyala
+        window.addEventListener('online', function() {
+            // Kasih jeda 1.5 detik biar koneksi beneran stabil nembus ke server
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        });
+    </script>
 </body>
 </html>

@@ -12,6 +12,14 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev
 
+# Install Node.js versi 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install package NPM dan Build Vite untuk Production
+RUN npm install \
+    && npm run build
+
 RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE ${PORT:-8080}

@@ -45,11 +45,23 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                navigateFallback: '/offline.html', 
+                // MATIKAN MODE SPA BIAR NAVIGASI NORMAL
+                navigateFallback: null, 
                 
                 globPatterns: ['build/assets/**/*.{js,css,png,svg,ico}', 'offline.html'],
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
+                    {
+                        // TANGKAP SEMUA PINDAH HALAMAN / RELOAD
+                        urlPattern: ({ request }) => request.mode === 'navigate',
+                        handler: 'NetworkOnly', // Wajib minta ke server dulu
+                        options: {
+                            precacheFallback: {
+                                // KALAU SERVER GAGAL (OFFLINE), BARU TAMPILIN INI
+                                fallbackURL: '/offline.html'
+                            }
+                        }
+                    },
                     {
                         urlPattern: /\/(api|faktur)\/.*/i,
                         handler: 'NetworkOnly', 

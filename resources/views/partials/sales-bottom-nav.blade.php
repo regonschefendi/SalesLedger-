@@ -51,6 +51,20 @@
     <p class="text-sm text-gray-800 font-bold animate-pulse">Faktur sedang diproses, mohon tunggu...</p>
 </div>
 
+<div id="ocr-fail-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div class="bg-white w-full max-w-sm rounded-[24px] p-6 text-center shadow-2xl transform transition-all animate-slideUp">
+        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h3 class="text-[16px] font-bold text-gray-900 mb-1">Gagal Membaca Faktur</h3>
+        <p class="text-[12px] text-gray-500 mb-6 leading-relaxed">AI sedang sibuk atau foto kurang jelas. Kamu tetap bisa melanjutkan proses dengan mengisi data faktur secara manual.</p>
+        <div class="flex space-x-3">
+            <button onclick="closeOcrFailModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-[13px] transition">Kembali</button>
+            <button id="btn-lanjut-manual" class="w-1/2 bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3 rounded-xl text-[13px] shadow-md transition">Lanjut Manual</button>
+        </div>
+    </div>
+</div>
+
 <script>
     function toggleUploadModal() {
         const modal = document.getElementById('upload-modal');
@@ -127,26 +141,67 @@
         input.value = '';
     }
 
+    function closeOcrFailModal() {
+        const modal = document.getElementById('ocr-fail-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function triggerManualFallback(compressedBase64) {
+        document.getElementById('loading-overlay').classList.add('hidden'); 
+        document.getElementById('loading-overlay').classList.remove('flex');
+        
+        const modal = document.getElementById('ocr-fail-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const btnManual = document.getElementById('btn-lanjut-manual');
+        btnManual.onclick = function() {
+            // Buat data kosong sebagai fallback, pasang flag is_manual
+            const fallbackData = {
+                nama_toko: '',
+                nomor_faktur: 'INV-' + Math.floor(10000 + Math.random() * 90000), // Random default INV
+                tanggal_nota: new Date().toISOString().split('T')[0], // Hari ini (YYYY-MM-DD)
+                total_tagihan: 0,
+                is_manual: true 
+            };
+            
+            // PENTING: Foto tetap disimpen ke sessionStorage biar ga hilang!
+            sessionStorage.setItem('ocrData', JSON.stringify(fallbackData));
+            sessionStorage.setItem('ocrImage', compressedBase64);
+            
+            window.location.href = "{{ route('sales.input') }}";
+        };
+    }
+
     async function sendToOcrApi(imageFile, compressedBase64) {
-        const formData = new FormData(); formData.append('image', imageFile);
+        const formData = new FormData(); 
+        formData.append('image', imageFile);
         try {
             const response = await fetch("{{ route('sales.scan') }}", {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+                headers: { 
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 
+                    'Accept': 'application/json' 
+                },
                 body: formData
             });
+            
             const result = await response.json();
+            
             if (response.ok && result.success) {
                 sessionStorage.setItem('ocrData', JSON.stringify(result.data));
                 sessionStorage.setItem('ocrImage', compressedBase64);
                 window.location.href = "{{ route('sales.input') }}";
             } else {
-                alert('Gagal: ' + result.message);
-                document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex');
+                // JIKA API GEMINI GAGAL/LIMIT, LEMPAR KE MODAL MANUAL
+                console.warn('OCR Gagal:', result.message);
+                triggerManualFallback(compressedBase64);
             }
         } catch (e) {
-            alert('Terjadi kesalahan jaringan/sistem.');
-            document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex');
+            // JIKA ERROR JARINGAN / TIMEOUT / IPHONE MEMORY LIMIT, LEMPAR KE MODAL MANUAL
+            console.error('Network/System Error:', e);
+            triggerManualFallback(compressedBase64);
         }
     }
 </script>

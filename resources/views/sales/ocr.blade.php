@@ -278,6 +278,22 @@
 
                 updateCalculations();
                 renderReview(); // Fungsi ini yang mengubah teks "Loading..." jadi data asli
+
+                if (parsed.is_manual === true) {
+                    // Ganti teks banner biru di halaman edit biar relevan
+                    const editBanner = document.querySelector('#view-edit .bg-blue-50 p');
+                    if(editBanner) {
+                        editBanner.innerText = "Mode Input Manual: Silakan isi nomor faktur dan total tagihan dari foto.";
+                    }
+                    
+                    // Langsung otomatis buka form edit tanpa harus klik "Edit Faktur"
+                    switchView('edit');
+                    
+                    // Kasih info ringan ke user
+                    setTimeout(() => {
+                        alert("Silakan ketik data faktur, foto bukti nota tetap aman terlampir.");
+                    }, 300);
+                }
             } catch (e) {
                 console.error("Gagal membaca data JSON:", e);
                 alert("Data scan rusak. Harap ulangi proses scan.");

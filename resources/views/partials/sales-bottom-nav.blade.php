@@ -94,37 +94,6 @@
         });
     }
 
-    // function compressImageToBase64(file) {
-    //         return new Promise((resolve, reject) => {
-    //             const reader = new FileReader();
-    //             reader.readAsDataURL(file);
-    //             reader.onload = (event) => {
-    //                 const img = new Image();
-    //                 img.src = event.target.result;
-    //                 img.onload = () => {
-    //                     const canvas = document.createElement('canvas');
-    //                     const MAX_WIDTH = 1000; // Diperkecil agar ringan di session storage
-    //                     let width = img.width;
-    //                     let height = img.height;
-    //                     if (width > MAX_WIDTH) {
-    //                         height = Math.round((height * MAX_WIDTH) / width);
-    //                         width = MAX_WIDTH;
-    //                     }
-    //                     canvas.width = width;
-    //                     canvas.height = height;
-    //                     const ctx = canvas.getContext('2d');
-    //                     ctx.drawImage(img, 0, 0, width, height);
-
-    //                     // Ubah ke JPEG kualitas 60% (Sangat kecil & aman buat session storage)
-    //                     const base64String = canvas.toDataURL('image/jpeg', 0.6);
-    //                     resolve(base64String);
-    //                 };
-    //                 img.onerror = (err) => reject(err);
-    //             };
-    //             reader.onerror = (err) => reject(err);
-    //         });
-    //     }
-
     async function handleUpload(input) {
         if (input.files && input.files[0]) {
             toggleUploadModal();

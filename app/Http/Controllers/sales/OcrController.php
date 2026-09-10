@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class OcrController extends Controller
 {
@@ -30,7 +31,7 @@ class OcrController extends Controller
             $mimeType = $request->file('image')->getMimeType();
             $base64Image = base64_encode(file_get_contents($imagePath));
 
-            $apiKey = env('GEMINI_API_KEY');
+            $apiKey = config('services.gemini.key');
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
             $prompt = 'Kamu adalah asisten admin data entry. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor invoice/nota). Cari "Tanggal Nota" (Tanggal faktur). Cari "Total Tagihan" (Jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
 
@@ -60,6 +61,8 @@ class OcrController extends Controller
 
             $result = $response->json();
             $jsonString = $result['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+
+            $jsonString = preg_replace('/^```json\s*(.*?)\s*```$/is', '$1', trim($jsonString));
             
             // Parsing JSON dari Gemini
             $extractedData = json_decode($jsonString, true);
@@ -69,7 +72,7 @@ class OcrController extends Controller
                 'data' => [
                     'nama_toko' => $extractedData['Nama Toko'] ?? $extractedData['nama_toko'] ?? '',
                     'nomor_faktur' => $extractedData['Nomor Faktur'] ?? $extractedData['nomor_faktur'] ?? 'INV-'.rand(10000,99999),
-                    'tanggal_nota' => $extractedData['Tanggal Nota'] ?? $extractedData['tanggal_nota'] ?? '',
+                    // 'tanggal_nota' => $extractedData['Tanggal Nota'] ?? $extractedData['tanggal_nota'] ?? '',
                     'total_tagihan' => preg_replace('/[^0-9]/', '', $extractedData['Total Tagihan'] ?? '0'),
                 ]
             ]);
@@ -98,11 +101,13 @@ class OcrController extends Controller
         $request->validate([
             'toko_id' => 'required|exists:tokos,id',
             'nomor_faktur' => 'required|string|max:100',
-            'tanggal_nota' => 'required|string|max:100',
+            'tanggal_nota' => 'required|string|max:100|date_format:d/m/Y',
             'total_tagihan' => 'required|numeric|min:0',
             'total_dibayar' => 'nullable|numeric|min:0',
             'metode_bayar' => 'required|in:Cash,Transfer',
         ]);
+
+        $request['tanggal_nota'] = Carbon::createFromFormat('d/m/Y', $request->tanggal_nota)->format('Y-m-d');
 
         if (!$request->hasFile('foto_file')) {
             return response()->json([
@@ -125,10 +130,10 @@ class OcrController extends Controller
         try {
             $fileName = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
 
-            $uploadSukses = Storage::disk('supabase')->put($fileName, file_get_contents($file), 'public');
+            $uploadSukses = Storage::disk('supabase')->putFileAs('/', $file, $fileName, 'public');
             
             if ($uploadSukses) {
-                $fotoUrl = env('SUPABASE_PROJECT_URL') . '/storage/v1/object/public/' . env('SUPABASE_STORAGE_BUCKET') . '/' . $fileName;
+                $fotoUrl = config('services.supabase.url') . '/storage/v1/object/public/' . env('SUPABASE_STORAGE_BUCKET') . '/' . $fileName;
             } else {
                 return response()->json(['success' => false, 'message' => 'Gagal mengunggah file ke Supabase. Cek Access Key di .env!']);
             }

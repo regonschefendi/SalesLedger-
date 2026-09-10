@@ -6,6 +6,8 @@
     <title>Upload Nota - Sales Ledger</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
     @vite('resources/css/app.css')
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
@@ -122,13 +124,24 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Nomor Faktur</label>
-                        <div class="relative"><svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <input type="text" id="input-nofaktur" class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none"></div>
+                        <div class="relative">
+                            <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <input type="text" id="input-nofaktur" class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none">
+                        </div>
                     </div>
+
                     <div>
                         <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Tanggal Faktur</label>
-                        <div class="relative"><svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <input type="text" id="input-tanggal" class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none"></div>
+                        <div class="relative">
+                            <!-- Icon Kalender -->
+                            <div>
+                                <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <!-- Input Field Flatpickr -->
+                            <input type="text" id="tanggal_faktur" name="tanggal_faktur" required
+                                class="w-full border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none bg-white"
+                                placeholder="Pilih tanggal (dd/mm/yyyy)">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-[12px] font-bold text-gray-900 mb-1.5">Total Tagihan (Angka)</label>
@@ -296,7 +309,11 @@
                 }
             } catch (e) {
                 console.error("Gagal membaca data JSON:", e);
-                alert("Data scan rusak. Harap ulangi proses scan.");
+                alert("AI sedang sibuk. Silakan masukkan data faktur secara manual.");
+                
+                // Paksa render UI kosong dan buka form edit
+                renderReview();
+                switchView('edit');
             }
         });
 
@@ -491,7 +508,7 @@
                 
             } else if (view === 'edit') {
                 document.getElementById('input-nofaktur').value = currentData.nomor_faktur;
-                document.getElementById('input-tanggal').value = currentData.tanggal_nota;
+                document.getElementById('tanggal_faktur').value = currentData.tanggal_nota;
                 document.getElementById('input-tagihan').value = currentData.total_tagihan;
                 document.getElementById('input-dibayar').value = currentData.total_dibayar;
                 calcSisaEdit();
@@ -528,7 +545,7 @@
 
         function saveEdit() {
             currentData.nomor_faktur = document.getElementById('input-nofaktur').value;
-            currentData.tanggal_nota = document.getElementById('input-tanggal').value;
+            currentData.tanggal_nota = document.getElementById('tanggal_faktur').value;
             currentData.total_tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
             currentData.total_dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
 
@@ -631,6 +648,21 @@
             sessionStorage.removeItem('ocrImage');
             window.location.href = "{{ route('sales.home') }}";
         }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Locale Bahasa Indonesia -->
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#tanggal_faktur", {
+                dateFormat: "d/m/Y", // Memaksa format dd/MM/yyyy
+                locale: "id",        // Pakai bahasa Indonesia
+                allowInput: true,    // Izinkan ketik manual tapi difilter
+                disableMobile: true  // Memaksa pakai UI Kalender Flatpickr, bukan bawaan browser HP
+            });
+        });
     </script>
 </body>
 </html>

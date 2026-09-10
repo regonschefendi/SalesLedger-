@@ -68,7 +68,7 @@
                     </div>
                     <div class="flex-grow">
                         <h3 class="text-[14px] font-bold text-gray-900">{{ $toko->nama_toko }}</h3>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Sales: {{ $salesPegangan->first()['nama'] ?? '-' }}</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Sales: {{ $toko->sales_name ?? 'Belum ada' }}</p>
                     </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-[10px] font-bold px-2.5 py-1 rounded-md {{ $toko->status_pembayaran == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : 'bg-[#FFF7ED] text-[#F59E0B]' }}">

@@ -15,31 +15,30 @@ class TokoController extends Controller
     // TAMPILAN INDEX TOKO
     // ==========================================
     public function index()
-    {
-        // Ambil semua toko beserta relasi faktur dan user (sales)
-        $tokos = Toko::with(['fakturs.user'])->get()->map(function($toko) {
-            // Kalkulasi status lunas/belum lunas dari seluruh faktur toko ini
-            $totalTagihan = $toko->fakturs->sum('total_tagihan');
-            $totalDibayar = $toko->fakturs->sum('total_dibayar');
-            $sisa = $totalTagihan - $totalDibayar;
-            
-            $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
-            
-            // Ambil nama sales terakhir yang menangani toko ini
-            $latestFaktur = $toko->fakturs->sortByDesc('created_at')->first();
-            $toko->sales_name = $latestFaktur && $latestFaktur->user ? $latestFaktur->user->full_name : 'Belum ada';
-            
-            return $toko;
-        });
+{
+    $tokos = Toko::with(['fakturs', 'sales'])->get()->map(function($toko) {
+        
+        // Kalkulasi status lunas/belum lunas dari seluruh faktur
+        $totalTagihan = $toko->fakturs->sum('total_tagihan');
+        $totalDibayar = $toko->fakturs->sum('total_dibayar');
+        $sisa = $totalTagihan - $totalDibayar;
+        
+        $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
 
-        // Hitung statistik global untuk kartu di atas list
-        $stats = [
-            'total' => $tokos->count(),
-            'belum_lunas' => $tokos->where('status_pembayaran', 'belum_lunas')->count(),
-        ];
+        // Cek dulu apakah toko ini punya sales (tidak null)
+        $toko->sales_name = $toko->sales->isNotEmpty() ? $toko->sales->first()->full_name : 'Belum ditugaskan';
+        
+        return $toko;
+    });
 
-        return view('admin.toko.index', compact('tokos', 'stats'));
-    }
+    // Hitung statistik global untuk kartu di atas list
+    $stats = [
+        'total' => $tokos->count(),
+        'belum_lunas' => $tokos->where('status_pembayaran', 'belum_lunas')->count(),
+    ];
+
+    return view('admin.toko.index', compact('tokos', 'stats'));
+}
 
     // ==========================================
     // MENAMPILKAN HALAMAN DETAIL TOKO (SHOW)

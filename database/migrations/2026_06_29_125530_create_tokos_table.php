@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('kota')->nullable();
             $table->string('kode_pos', 10)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

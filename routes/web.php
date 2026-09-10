@@ -129,6 +129,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/toko/tambah', [TokoController::class, 'create'])->name('toko.create');
             Route::post('/toko/store', [TokoController::class, 'store'])->name('toko.store');
             Route::get('/toko/{id}', [TokoController::class, 'show'])->name('toko.show');
+            Route::get('/toko/{toko}/edit', [TokoController::class, 'edit'])->name('toko.edit');
+            Route::put('/toko/{toko}', [TokoController::class, 'update'])->name('toko.update');
+            Route::delete('/toko/{toko}', [TokoController::class, 'destroy'])->name('toko.destroy');
             Route::get('/nota/{id}', [TokoController::class, 'showNota'])->name('nota.show');
 
             // Fitur Manajemen Pengguna

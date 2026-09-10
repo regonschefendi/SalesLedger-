@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('fakturs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('toko_id')->constrained('tokos')->cascadeOnDelete();
             $table->string('nomor_faktur')->nullable();
             $table->date('tanggal_nota')->nullable();
             $table->date('tanggal_pembayaran')->nullable();

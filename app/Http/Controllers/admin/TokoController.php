@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TokoRequest;
 use App\Models\Faktur;
 use App\Models\Toko;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TokoController extends Controller
 {
@@ -49,6 +51,12 @@ class TokoController extends Controller
             $query->orderBy('created_at', 'desc'); // Urutkan nota dari yang terbaru
         }, 'fakturs.user'])->findOrFail($id);
 
+        $salesPegangan = $toko->sales->map(function($sales) {
+            return [
+                'nama' => $sales->full_name,
+            ];
+        });
+
         // Kalkulasi Statistik Keuangan Toko
         $totalTagihan = $toko->fakturs->sum('total_tagihan');
         $totalDibayar = $toko->fakturs->sum('total_dibayar');
@@ -64,7 +72,7 @@ class TokoController extends Controller
         $latestFaktur = $toko->fakturs->first();
         $toko->sales_name = $latestFaktur && $latestFaktur->user ? $latestFaktur->user->full_name : 'Belum ditugaskan';
 
-        return view('admin.toko.show', compact('toko', 'stats'));
+        return view('admin.toko.show', compact('toko', 'stats', 'salesPegangan'));
     }
 
     // Menampilkan halaman SPA Tambah Toko
@@ -74,20 +82,10 @@ class TokoController extends Controller
     }
 
     // Endpoint API untuk menyimpan data via AJAX
-    public function store(Request $request)
+    public function store(TokoRequest $request)
     {
-        // Validasi dan Security
-        $validated = $request->validate([
-            'nama_toko' => 'required|string|max:255',
-            'no_telp' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string',
-            'provinsi' => 'nullable|string|max:100',
-            'kota' => 'nullable|string|max:100',
-            'kode_pos' => 'nullable|string|max:10',
-        ]);
-
         try {
-            Toko::create($validated);
+            Toko::create($request->validated());
             return response()->json(['success' => true, 'message' => 'Toko berhasil ditambahkan!']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Gagal menyimpan data sistem.']);
@@ -101,5 +99,36 @@ class TokoController extends Controller
         $faktur = Faktur::with(['toko', 'user'])->findOrFail($id);
         
         return view('admin.toko.detail-faktur', compact('faktur'));
+    }
+
+    // Menampilkan Form Edit
+    public function edit(Toko $toko)
+    {
+        Gate::authorize('update', $toko); 
+        
+        return view('admin.toko.edit', compact('toko'));
+    }
+
+    // Memproses Update Data
+    public function update(TokoRequest $request, Toko $toko)
+    {
+        Gate::authorize('update', $toko);
+
+        // Data sudah otomatis divalidasi oleh TokoRequest
+        $toko->update($request->validated());
+
+        return redirect()->route('admin.toko.show', $toko->id)
+                         ->with('success', 'Informasi toko berhasil diperbarui.');
+    }
+
+    // Memproses Soft Delete
+    public function destroy(Toko $toko)
+    {
+        Gate::authorize('delete', $toko);
+
+        $toko->delete(); // Akan mengisi kolom deleted_at berkat SoftDeletes
+
+        return redirect()->route('admin.toko.index')
+                         ->with('success', 'Toko berhasil dihapus dari daftar aktif.');
     }
 }

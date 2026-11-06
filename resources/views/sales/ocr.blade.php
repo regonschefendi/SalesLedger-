@@ -285,7 +285,9 @@
                 currentData.nama_toko = '';
                 currentData.toko_id = null;
                 currentData.nomor_faktur = parsed.nomor_faktur || '-';
-                currentData.tanggal_nota = parsed.tanggal_nota || '-';
+                const now = new Date();
+                const tanggalHariIni = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+                currentData.tanggal_nota = parsed.tanggal_nota || tanggalHariIni;
                 currentData.total_tagihan = parseInt(parsed.total_tagihan) || 0;
                 currentData.total_dibayar = 0;
 
@@ -369,7 +371,7 @@
             currentData.nama_toko = nama;
             document.getElementById('input-nama').value = nama;
             document.getElementById('dropdown-toko').classList.add('hidden');
-            document.getElementById('alert-toko').classList.add('hidden');
+            document.getElementById('alert-toko-review').classList.add('hidden');
             document.getElementById('btn-clear-toko').classList.remove('hidden');
             checkSaveButton();
         }

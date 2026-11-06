@@ -44,7 +44,7 @@
         <div class="px-5 w-full mt-auto mb-10">
             @php
                 // Logika Pintar: Ngecek role user buat nentuin tombol Selesai balik ke mana
-                $redirectUrl = Auth::user()->role === 'admin' ? route('admin.home') : route('sales.profile.index');
+                $redirectUrl = Auth::user()->role === 'admin' ? route('admin.dashboard') : route('sales.profile.index');
             @endphp
             <button onclick="window.location.href='{{ $redirectUrl }}'" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-4 rounded-full shadow-md transition duration-200 text-[14px]">Selesai</button>
         </div>

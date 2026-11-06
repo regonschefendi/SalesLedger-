@@ -78,7 +78,7 @@
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"></path></svg>
                         </div>
                         <div>
-                            <h3 class="text-[14px] font-bold text-gray-900">{{ $item->nama_toko }}</h3>
+                            <h3 class="text-[14px] font-bold text-gray-900">{{ $item->toko->nama_toko ?? '-' }}</h3>
                             <p class="text-[11px] text-gray-500 font-medium mt-0.5">Sales: {{ $item->user->full_name ?? 'Sales' }} • {{ $item->nomor_faktur }}</p>
                             <p class="text-[11px] text-gray-400 mt-0.5">Bayar {{ \Carbon\Carbon::parse($item->tanggal_nota)->format('d M Y') }}</p>
                         </div>

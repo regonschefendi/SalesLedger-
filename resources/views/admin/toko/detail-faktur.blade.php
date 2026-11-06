@@ -25,13 +25,12 @@
                 $sisaTagihan = $faktur->total_tagihan - $faktur->total_dibayar;
                 $isLunas = $faktur->status === 'lunas';
                 // Warna Dinamis
-                $colorTheme = $isLunas ? 'emerald' : 'orange';
                 $hexColor = $isLunas ? '#10B981' : '#F59E0B';
                 $bgLight = $isLunas ? '#ECFDF5' : '#FFF7ED';
             @endphp
 
-            <div class="border border-{{ $colorTheme }}-100 rounded-xl bg-{{ $colorTheme }}-50/50 p-4 flex items-center shadow-sm">
-                <div class="flex-1 flex items-center justify-center space-x-2 border-r border-{{ $colorTheme }}-200/60 pr-4">
+            <div class="border rounded-xl p-4 flex items-center shadow-sm {{ $isLunas ? 'border-emerald-100 bg-emerald-50/50' : 'border-orange-100 bg-orange-50/50' }}">
+                <div class="flex-1 flex items-center justify-center space-x-2 border-r pr-4 {{ $isLunas ? 'border-emerald-200/60' : 'border-orange-200/60' }}">
                     <div class="w-6 h-6 rounded-full bg-[{{ $hexColor }}] flex items-center justify-center text-white flex-shrink-0">
                         @if($isLunas)
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
@@ -98,11 +97,11 @@
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <span class="text-[13px] text-gray-600 font-medium">Tanggal Pembayaran</span>
-                        <span class="text-[13px] font-medium text-gray-900">{{ \Carbon\Carbon::parse($faktur->created_at)->translatedFormat('d M Y') }}</span>
+                        <span class="text-[13px] font-medium text-gray-900">{{ $faktur->tanggal_pembayaran ? \Carbon\Carbon::parse($faktur->tanggal_pembayaran)->translatedFormat('d M Y') : '-' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[13px] text-gray-600 font-medium">Tanggal Setor</span>
-                        <span class="text-[13px] font-medium text-gray-900">{{ \Carbon\Carbon::parse($faktur->created_at)->translatedFormat('d M Y') }}</span>
+                        <span class="text-[13px] font-medium text-gray-900">{{ $faktur->tanggal_pembayaran ? \Carbon\Carbon::parse($faktur->tanggal_pembayaran)->translatedFormat('d M Y') : '-' }}</span>
                     </div>
                 </div>
             </div>

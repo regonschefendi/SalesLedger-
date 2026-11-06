@@ -32,7 +32,7 @@
                     <span class="text-[13px] font-bold text-gray-900">Informasi Utama</span>
                 </div>
                 <div class="space-y-3 text-[13px]">
-                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Nama Toko</span><span class="font-bold text-gray-900">{{ $faktur->nama_toko }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Nama Toko</span><span class="font-bold text-gray-900">{{ $faktur->toko->nama_toko ?? '-' }}</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">No. Nota</span><span class="font-semibold text-gray-900">{{ $faktur->nomor_faktur }}</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Sales</span><span class="font-semibold text-gray-900">{{ $faktur->user->full_name ?? '-' }}</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Upload</span><span class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($faktur->created_at)->format('d M Y, H:i') }}</span></div>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="space-y-3 text-[13px]">
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Nota</span><span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($faktur->tanggal_nota)->format('d M Y') }}</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Setor</span><span class="font-semibold text-gray-900">{{ \Carbon\Carbon::parse($faktur->tanggal_nota)->format('d M Y') }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Setor</span><span class="font-semibold text-gray-900">{{ $faktur->tanggal_pembayaran ? \Carbon\Carbon::parse($faktur->tanggal_pembayaran)->format('d M Y') : '-' }}</span></div>
                 </div>
             </div>
 

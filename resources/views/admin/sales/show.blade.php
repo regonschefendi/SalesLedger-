@@ -31,10 +31,10 @@
                     <div class="space-y-1">
                         <h2 class="text-[20px] font-bold text-gray-900 leading-tight">{{ $sales->full_name }}</h2>
                         <p class="text-[12px] font-medium text-gray-500">Sales</p>
-                        @if($sales->no_telp)
+                        @if($sales->phone_number)
                         <div class="flex items-center space-x-1.5 text-[12px] font-semibold text-[#0F47A1] pt-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.72l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.72.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <span>{{ $sales->no_telp }}</span>
+                            <span>{{ $sales->phone_number }}</span>
                         </div>
                         @endif
                     </div>

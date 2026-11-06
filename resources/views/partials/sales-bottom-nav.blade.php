@@ -127,10 +127,12 @@
         const btnManual = document.getElementById('btn-lanjut-manual');
         btnManual.onclick = function() {
             // Buat data kosong sebagai fallback, pasang flag is_manual
+            const now = new Date();
+            const tanggalHariIni = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
             const fallbackData = {
                 nama_toko: '',
                 nomor_faktur: 'INV-' + Math.floor(10000 + Math.random() * 90000), // Random default INV
-                tanggal_nota: new Date().toISOString().split('T')[0], // Hari ini (YYYY-MM-DD)
+                tanggal_nota: tanggalHariIni, // Hari ini (dd/mm/yyyy)
                 total_tagihan: 0,
                 is_manual: true 
             };

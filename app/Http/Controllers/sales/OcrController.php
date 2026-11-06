@@ -5,12 +5,12 @@ namespace App\Http\Controllers\sales;
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
 use App\Models\Toko;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class OcrController extends Controller
 {
@@ -133,7 +133,7 @@ class OcrController extends Controller
             $uploadSukses = Storage::disk('supabase')->putFileAs('/', $file, $fileName, 'public');
             
             if ($uploadSukses) {
-                $fotoUrl = config('services.supabase.url') . '/storage/v1/object/public/' . env('SUPABASE_STORAGE_BUCKET') . '/' . $fileName;
+                $fotoUrl = config('services.supabase.url') . '/storage/v1/object/public/' . config('services.supabase.bucket') . '/' . $fileName;
             } else {
                 return response()->json(['success' => false, 'message' => 'Gagal mengunggah file ke Supabase. Cek Access Key di .env!']);
             }
@@ -144,10 +144,15 @@ class OcrController extends Controller
         $totalTagihan = (int) $request->total_tagihan;
         $totalDibayar = (int) ($request->total_dibayar ?? 0);
 
+        if ($totalDibayar > $totalTagihan) {
+            $totalDibayar = $totalTagihan;
+        }
+
         Faktur::create([
             'toko_id' => $request->toko_id,
             'nomor_faktur' => $request->nomor_faktur,
             'tanggal_nota' => $request->tanggal_nota,
+            'tanggal_pembayaran' => $totalDibayar > 0 ? Carbon::today()->toDateString() : null,
             'total_tagihan' => $totalTagihan,
             'total_dibayar' => $totalDibayar,
             'metode_bayar' => $request->metode_bayar,

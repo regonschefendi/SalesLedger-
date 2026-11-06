@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TokoRequest;
 use App\Models\Faktur;
 use App\Models\Toko;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class TokoController extends Controller
@@ -16,7 +16,12 @@ class TokoController extends Controller
     // ==========================================
     public function index()
 {
-    $tokos = Toko::with(['fakturs', 'sales'])->get()->map(function($toko) {
+    $salesIds = Auth::user()->sales()->pluck('id');
+
+    $tokos = Toko::with([
+        'fakturs' => fn ($q) => $q->whereIn('sales_id', $salesIds),
+        'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
+    ])->get()->map(function($toko) {
         
         // Kalkulasi status lunas/belum lunas dari seluruh faktur
         $totalTagihan = $toko->fakturs->sum('total_tagihan');
@@ -45,10 +50,16 @@ class TokoController extends Controller
     // ==========================================
     public function show($id)
     {
-        // Ambil data toko spesifik beserta riwayat fakturnya
-        $toko = Toko::with(['fakturs' => function($query) {
-            $query->orderBy('created_at', 'desc'); // Urutkan nota dari yang terbaru
-        }, 'fakturs.user'])->findOrFail($id);
+        $salesIds = Auth::user()->sales()->pluck('id');
+
+        // Ambil data toko spesifik beserta riwayat fakturnya (hanya milik tim admin ini)
+        $toko = Toko::with([
+            'fakturs' => function($query) use ($salesIds) {
+                $query->whereIn('sales_id', $salesIds)->orderBy('created_at', 'desc'); // Urutkan nota dari yang terbaru
+            },
+            'fakturs.user',
+            'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
+        ])->findOrFail($id);
 
         $salesPegangan = $toko->sales->map(function($sales) {
             return [
@@ -94,8 +105,10 @@ class TokoController extends Controller
     // Menampilkan Halaman Detail Nota Spesifik
     public function showNota($id)
     {
-        // Tarik data faktur beserta relasi toko dan sales-nya
-        $faktur = Faktur::with(['toko', 'user'])->findOrFail($id);
+        $salesIds = Auth::user()->sales()->pluck('id');
+
+        // Tarik data faktur beserta relasi toko dan sales-nya (hanya milik tim admin ini)
+        $faktur = Faktur::with(['toko', 'user'])->whereIn('sales_id', $salesIds)->findOrFail($id);
         
         return view('admin.toko.detail-faktur', compact('faktur'));
     }

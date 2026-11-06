@@ -8,7 +8,7 @@
     @vite('resources/css/app.css')
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-< class="bg-gray-50 text-gray-800 antialiased">
+<body class="bg-gray-50 text-gray-800 antialiased">
 
     <form action="{{ route('admin.profile.update') }}" method="POST" id="form-action" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         @csrf

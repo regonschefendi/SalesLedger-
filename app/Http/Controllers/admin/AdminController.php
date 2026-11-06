@@ -4,7 +4,6 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
-use App\Models\Toko;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +44,7 @@ class AdminController extends Controller
 
         // Ambil 5 Riwayat Faktur Terbaru
         // Tambahkan relasi 'user' agar nanti bisa nampilin nama sales yang input nota
-        $riwayat = (clone $query)->with('user')->latest()->take(5)->get();
+        $riwayat = (clone $query)->with(['user', 'toko'])->latest()->take(5)->get();
 
         return view('admin.dashboard', [
             'nama_admin' => $namaDepan,
@@ -70,14 +69,16 @@ class AdminController extends Controller
         
         // Isolasi data ketat hanya untuk Sales yang terikat Kode Referal Admin ini
         $salesIds = $admin->sales()->pluck('id');
-        $query = Faktur::whereIn('sales_id', $salesIds)->with('user');
+        $query = Faktur::whereIn('sales_id', $salesIds)->with(['user', 'toko']);
 
         // Fitur Search Box (Nama Toko / No Nota)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('nama_toko', 'LIKE', "%{$search}%")
-                  ->orWhere('nomor_faktur', 'LIKE', "%{$search}%");
+                $q->where('nomor_faktur', 'ILIKE', "%{$search}%")
+                  ->orWhereHas('toko', function($qToko) use ($search) {
+                      $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
+                  });
             });
         }
 
@@ -126,7 +127,7 @@ class AdminController extends Controller
         $salesIds = $admin->sales()->pluck('id');
 
         // Mencegah Admin luar menembak ID nota lewat URL manual
-        $faktur = Faktur::whereIn('sales_id', $salesIds)->with('user')->findOrFail($id);
+        $faktur = Faktur::whereIn('sales_id', $salesIds)->with(['user', 'toko'])->findOrFail($id);
 
         return view('admin.pembukuan.show', compact('faktur'));
     }

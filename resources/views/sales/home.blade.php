@@ -117,7 +117,7 @@
                         @foreach($riwayat as $item)
                         <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                             <div>
-                                <p class="text-[13px] font-bold text-gray-800">{{ $item->nama_toko }}</p>
+                                <p class="text-[13px] font-bold text-gray-800">{{ $item->toko->nama_toko ?? '-' }}</p>
                                 <p class="text-[11px] text-gray-500">{{ date('d M Y', strtotime($item->created_at)) }}</p>
                             </div>
                             <div class="text-right">

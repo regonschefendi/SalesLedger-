@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Faktur;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
     public function index(Request $request)
     {
         // Ambil user dengan role sales (Sesuaikan dengan nama kolom role di database lu)
-        $query = User::withCount('tokosPegangan')->where('role', 'sales');
+        $query = User::withCount('tokosPegangan')
+            ->where('role', 'sales')
+            ->where('parent_admin_id', Auth::id());
 
         // Fitur Pencarian
         if ($request->filled('q')) {
@@ -37,7 +40,10 @@ class SalesController extends Controller
 
     public function show($id)
     {
-        $sales = User::with('tokosPegangan')->where('role', 'sales')->findOrFail($id);
+        $sales = User::with('tokosPegangan')
+            ->where('role', 'sales')
+            ->where('parent_admin_id', Auth::id())
+            ->findOrFail($id);
         
         // Ambil faktur beserta relasi tokonya
         $fakturs = Faktur::with('toko')->where('sales_id', $sales->id)->get();

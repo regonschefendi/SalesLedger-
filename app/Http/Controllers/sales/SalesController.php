@@ -29,7 +29,7 @@ class SalesController extends Controller
         $belum_lunas = $fakturs->where('status', 'belum_lunas')->count();
 
         // Ambil 5 riwayat terbaru untuk list bawah
-        $riwayat = Faktur::where('sales_id', $user->id)->latest()->take(5)->get();
+        $riwayat = Faktur::with('toko')->where('sales_id', $user->id)->latest()->take(5)->get();
 
         // Ambil nama depan saja untuk sapaan
         $namaDepan = explode(' ', $user->full_name)[0];

@@ -46,7 +46,7 @@
                     <input type="tel" name="no_telp" value="{{ old('no_telp', $toko->no_telp) }}" 
                            class="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] text-[14px] text-gray-900 placeholder-gray-400 transition-colors"
                            placeholder="Masukkan nomor telepon">
-                    @error('no_') <span class="text-red-500 text-[11px] mt-1">{{ $message }}</span> @enderror
+                    @error('no_telp') <span class="text-red-500 text-[11px] mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Field Alamat -->

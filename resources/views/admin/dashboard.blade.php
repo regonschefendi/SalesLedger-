@@ -123,7 +123,7 @@
                         @foreach($riwayat as $item)
                         <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                             <div>
-                                <p class="text-[13px] font-bold text-gray-900">{{ $item->nama_toko }}</p>
+                                <p class="text-[13px] font-bold text-gray-900">{{ $item->toko->nama_toko ?? '-' }}</p>
                                 <div class="flex items-center space-x-1 mt-0.5">
                                     <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
                                     <p class="text-[10px] text-gray-500 font-medium">{{ $item->user->full_name ?? 'Sales' }} • {{ \Carbon\Carbon::parse($item->created_at)->format('H:i') }}</p>

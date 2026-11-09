@@ -14,6 +14,13 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
+    @if(session('error') || $errors->any())
+        <div id="flash-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[70] w-[calc(100%-2rem)] max-w-sm bg-red-50 border border-red-200 text-red-700 text-[12px] font-semibold px-4 py-3 rounded-xl shadow-lg flex items-start space-x-2">
+            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+            <span>{{ session('error') ?? $errors->first() }}</span>
+        </div>
+    @endif
+
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
         <div class="px-6 pt-12 pb-2 flex justify-between items-center bg-white">
@@ -21,9 +28,15 @@
                 <h1 class="text-[22px] font-bold text-gray-900">Pembukuan</h1>
                 <p class="text-[12px] text-gray-500 mt-0.5">Semua laporan nota dari sales</p>
             </div>
-            <button onclick="toggleBottomSheet(true)" class="w-10 h-10 bg-white rounded-full border border-gray-100 flex items-center justify-center text-[#2563EB] shadow-sm hover:bg-gray-50 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-            </button>
+            <div class="flex items-center space-x-2">
+                <button type="button" onclick="toggleExportModal(true)" class="flex items-center space-x-1.5 bg-[#2563EB] text-white px-5 py-2.5 rounded-full text-[11px] font-bold shadow-sm hover:bg-blue-700 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Export Excel</span>
+                </button>
+                <button type="button" onclick="toggleBottomSheet(true)" class="w-10 h-10 bg-white rounded-full border border-gray-100 flex items-center justify-center text-[#2563EB] shadow-sm hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                </button>
+            </div>
         </div>
 
         <form id="filter-form" action="{{ route('admin.pembukuan.index') }}" method="GET" class="px-5 space-y-3 pt-2">
@@ -133,6 +146,40 @@
         </div>
     </div>
 
+    <div id="export-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-black/40 backdrop-blur-xs">
+        <div class="bg-white w-full max-w-md rounded-t-[30px] p-6 pb-8 space-y-6 transform transition-transform duration-300">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-1" onclick="toggleExportModal(false)"></div>
+            <div>
+                <h3 class="text-[16px] font-bold text-gray-900">Export Pembukuan ke Excel</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Pilih rentang tanggal faktur yang ingin diexport.</p>
+            </div>
+
+            <form id="export-form" action="{{ route('admin.pembukuan.export') }}" method="GET" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] text-gray-400 font-bold mb-1">Tanggal Mulai</label>
+                    <input type="date" name="start_date" id="export-start" required
+                           value="{{ old('start_date', request('start_date', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d'))) }}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:ring-1 focus:ring-[#2563EB]">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-gray-400 font-bold mb-1">Tanggal Akhir</label>
+                    <input type="date" name="end_date" id="export-end" required
+                           value="{{ old('end_date', request('end_date', \Carbon\Carbon::now()->format('Y-m-d'))) }}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:ring-1 focus:ring-[#2563EB]">
+                </div>
+                <p class="text-[11px] text-gray-400">File akan diunduh dalam format .xlsx</p>
+
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <button type="button" onclick="toggleExportModal(false)" class="w-full border border-gray-300 text-gray-600 font-bold py-3.5 rounded-xl text-[13px] transition hover:bg-gray-50">Batal</button>
+                    <button type="submit" class="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-md hover:bg-blue-700 flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Export</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const form = document.getElementById('filter-form');
 
@@ -152,6 +199,21 @@
             const sheet = document.getElementById('bottom-sheet');
             if(show) { sheet.classList.remove('hidden'); sheet.classList.add('flex'); }
             else { sheet.classList.add('hidden'); sheet.classList.remove('flex'); }
+        }
+
+        function toggleExportModal(show) {
+            const modal = document.getElementById('export-modal');
+            if(show) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+        }
+
+        @if($errors->any())
+            toggleExportModal(true);
+        @endif
+
+        const flashToast = document.getElementById('flash-toast');
+        if (flashToast) {
+            setTimeout(() => flashToast.remove(), 5000);
         }
 
         function submitFormFilter() {

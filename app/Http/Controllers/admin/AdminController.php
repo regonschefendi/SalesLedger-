@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
+use App\Support\XlsxWriter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -114,6 +115,95 @@ class AdminController extends Controller
             'sisa_tagihan' => $sisa_tagihan,
             'filter_time' => $timeFilter,
             'filter_status' => $statusFilter
+        ]);
+    }
+
+    // ==========================================
+    // LAYER EXPORT: DOWNLOAD PEMBUKUAN KE EXCEL
+    // ==========================================
+    public function pembukuanExport(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ], [
+            'start_date.required'      => 'Tanggal mulai wajib diisi.',
+            'start_date.date'          => 'Format tanggal mulai tidak valid.',
+            'end_date.required'        => 'Tanggal akhir wajib diisi.',
+            'end_date.date'            => 'Format tanggal akhir tidak valid.',
+            'end_date.after_or_equal'  => 'Tanggal akhir tidak boleh sebelum tanggal mulai.',
+        ]);
+
+        /** @var \App\Models\User $admin */
+        $admin = Auth::user();
+        $salesIds = $admin->sales()->pluck('id');
+
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        $fakturs = Faktur::whereIn('sales_id', $salesIds)
+            ->with(['user', 'toko'])
+            ->whereBetween('tanggal_nota', [$startDate->toDateString(), $endDate->toDateString()])
+            ->orderBy('tanggal_nota')
+            ->get();
+
+        if ($fakturs->isEmpty()) {
+            return redirect()
+                ->route('admin.pembukuan.index')
+                ->with('error', 'Tidak ada data faktur pada rentang tanggal yang dipilih.');
+        }
+
+        $rows = [];
+        $totalTagihan = 0;
+        $totalDibayar = 0;
+
+        foreach ($fakturs as $index => $faktur) {
+            $sisa = (float) $faktur->total_tagihan - (float) $faktur->total_dibayar;
+            $totalTagihan += (float) $faktur->total_tagihan;
+            $totalDibayar += (float) $faktur->total_dibayar;
+
+            $rows[] = [
+                $index + 1,
+                $faktur->nomor_faktur ?? '-',
+                $faktur->tanggal_nota ? Carbon::parse($faktur->tanggal_nota)->format('d-m-Y') : '-',
+                $faktur->toko->nama_toko ?? '-',
+                $faktur->user->full_name ?? '-',
+                $faktur->metode_bayar ?? '-',
+                (float) $faktur->total_tagihan,
+                (float) $faktur->total_dibayar,
+                $sisa,
+                $faktur->status === 'lunas' ? 'Lunas' : 'Belum Lunas',
+                $faktur->tanggal_pembayaran ? Carbon::parse($faktur->tanggal_pembayaran)->format('d-m-Y') : '-',
+            ];
+        }
+
+        $content = XlsxWriter::make(
+            'Pembukuan',
+            'Laporan Pembukuan ' . $startDate->format('d/m/Y') . ' - ' . $endDate->format('d/m/Y'),
+            [
+                'No',
+                'Nomor Faktur',
+                'Tanggal Nota',
+                'Nama Toko',
+                'Sales',
+                'Metode Bayar',
+                'Total Tagihan',
+                'Total Dibayar',
+                'Sisa Tagihan',
+                'Status',
+                'Tanggal Setor',
+            ],
+            $rows,
+            [5, 20, 14, 26, 22, 16, 17, 17, 17, 14, 14],
+            [null, null, null, null, null, 'TOTAL', $totalTagihan, $totalDibayar, $totalTagihan - $totalDibayar, null, null]
+        );
+
+        $filename = 'Pembukuan_' . $startDate->format('Ymd') . '_sd_' . $endDate->format('Ymd') . '.xlsx';
+
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
     }
 

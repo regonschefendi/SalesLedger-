@@ -122,6 +122,7 @@ Route::middleware('auth')->group(function () {
 
             // Fitur Pembukuan
             Route::get('/pembukuan', [AdminController::class, 'pembukuanIndex'])->name('pembukuan.index');
+            Route::get('/pembukuan/export', [AdminController::class, 'pembukuanExport'])->name('pembukuan.export');
             Route::get('/pembukuan/{id}', [AdminController::class, 'pembukuanShow'])->name('pembukuan.show');
 
             // Fitur Manajemen Toko

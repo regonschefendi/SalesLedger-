@@ -16,13 +16,13 @@ class SalesRiwayatController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Faktur::with('toko')->forSales(Auth::user())->orderBy('created_at', 'desc');
+        $query = Faktur::forSales(Auth::user())->orderBy('fakturs.created_at', 'desc');
 
         // Filter search bar
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
-                $q->where('nomor_faktur', 'ILIKE', "%{$search}%")
+                $q->where('fakturs.nomor_faktur', 'ILIKE', "%{$search}%")
                     ->orWhereHas('toko', function ($qToko) use ($search) {
                         $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
                     });
@@ -31,10 +31,15 @@ class SalesRiwayatController extends Controller
 
         // Filter status (Lunas / Belum Lunas)
         if ($request->filled('status') && $request->status !== 'semua') {
-            $query->where('status', $request->status);
+            $query->where('fakturs.status', $request->status);
         }
 
-        $fakturs = $query->get();
+        $fakturs = $query
+            ->leftJoin('tokos', function ($join) {
+                $join->on('tokos.id', '=', 'fakturs.toko_id')->whereNull('tokos.deleted_at');
+            })
+            ->select('fakturs.*', 'tokos.nama_toko as toko_name')
+            ->get();
 
         // Mengelompokkan berdasarkan tanggal untuk UI
         $groupedFakturs = $fakturs->groupBy(function ($faktur) {

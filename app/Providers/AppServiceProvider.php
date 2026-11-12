@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Auth\CachedUserProvider;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Auth::provider('cached-eloquent', function (Application $app, array $config) {
+            return new CachedUserProvider($app['hash'], $config['model']);
+        });
     }
 
     /**

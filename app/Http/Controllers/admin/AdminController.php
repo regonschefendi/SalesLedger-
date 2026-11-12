@@ -25,25 +25,53 @@ class AdminController extends Controller
         $filterAktif = $request->query('filter', 'hari_ini');
 
         if ($filterAktif === 'hari_ini') {
-            $query->whereDate('created_at', Carbon::today());
+            $query->whereDate('fakturs.created_at', Carbon::today());
         } elseif ($filterAktif === 'bulan_ini') {
-            $query->whereMonth('created_at', Carbon::now()->month)
-                ->whereYear('created_at', Carbon::now()->year);
+            $query->whereMonth('fakturs.created_at', Carbon::now()->month)
+                ->whereYear('fakturs.created_at', Carbon::now()->year);
         }
 
-        // Kalkulasi langsung di level Database
-        $total_nota = $query->count();
-        $total_tagihan = (int) $query->sum('total_tagihan');
-        $total_dibayar = (int) $query->sum('total_dibayar');
+        // Satu query: 5 riwayat terbaru + agregat seluruh data terfilter lewat window function.
+        $riwayat = (clone $query)
+            ->leftJoin('users', 'users.id', '=', 'fakturs.sales_id')
+            ->leftJoin('tokos', function ($join) {
+                $join->on('tokos.id', '=', 'fakturs.toko_id')->whereNull('tokos.deleted_at');
+            })
+            ->select('fakturs.*', 'users.full_name as sales_name', 'tokos.nama_toko as toko_name')
+            ->selectRaw('count(fakturs.id) over () as stat_total_nota')
+            ->selectRaw('coalesce(sum(fakturs.total_tagihan) over (), 0) as stat_total_tagihan')
+            ->selectRaw('coalesce(sum(fakturs.total_dibayar) over (), 0) as stat_total_dibayar')
+            ->selectRaw("coalesce(sum(case when fakturs.status = 'lunas' then 1 else 0 end) over (), 0) as stat_lunas")
+            ->selectRaw("coalesce(sum(case when fakturs.status = 'belum_lunas' then 1 else 0 end) over (), 0) as stat_belum_lunas")
+            ->selectSub(function ($notificationQuery) use ($admin) {
+                $notificationQuery->from('notifications')
+                    ->selectRaw('count(*)')
+                    ->where('notifiable_type', $admin->getMorphClass())
+                    ->where('notifiable_id', $admin->getKey())
+                    ->whereNull('read_at');
+            }, 'unread_notifications')
+            ->latest('fakturs.created_at')
+            ->take(5)
+            ->get();
+
+        if ($riwayat->isEmpty()) {
+            $total_nota = 0;
+            $total_tagihan = 0;
+            $total_dibayar = 0;
+            $lunas = 0;
+            $belum_lunas = 0;
+            $unread_notifications = $admin->unreadNotifications()->count();
+        } else {
+            $summary = $riwayat->first();
+            $total_nota = (int) $summary->stat_total_nota;
+            $total_tagihan = (int) $summary->stat_total_tagihan;
+            $total_dibayar = (int) $summary->stat_total_dibayar;
+            $lunas = (int) $summary->stat_lunas;
+            $belum_lunas = (int) $summary->stat_belum_lunas;
+            $unread_notifications = (int) $summary->unread_notifications;
+        }
+
         $sisa_kredit = $total_tagihan - $total_dibayar;
-
-        // Gunakan fungsi (clone) agar filter tanggal tidak tertimpa saat menghitung status
-        $lunas = (clone $query)->where('status', 'lunas')->count();
-        $belum_lunas = (clone $query)->where('status', 'belum_lunas')->count();
-
-        // Ambil 5 Riwayat Faktur Terbaru
-        // Tambahkan relasi 'user' agar nanti bisa nampilin nama sales yang input nota
-        $riwayat = (clone $query)->with(['user', 'toko'])->latest()->take(5)->get();
 
         return view('admin.dashboard', [
             'nama_admin' => $namaDepan,
@@ -55,7 +83,7 @@ class AdminController extends Controller
             'lunas' => $lunas,
             'belum_lunas' => $belum_lunas,
             'riwayat' => $riwayat,
-            'unread_notifications' => $admin->unreadNotifications()->count(),
+            'unread_notifications' => $unread_notifications,
         ]);
     }
 
@@ -68,7 +96,7 @@ class AdminController extends Controller
         $admin = Auth::user();
 
         // Isolasi data ketat hanya untuk sales yang terikat kode referal admin ini.
-        $query = Faktur::forAdmin($admin)->with(['user', 'toko']);
+        $query = Faktur::forAdmin($admin);
 
         // Fitur Search Box (Nama Toko / No Nota)
         if ($request->filled('search')) {
@@ -100,12 +128,18 @@ class AdminController extends Controller
             $query->whereBetween('tanggal_nota', [$request->start_date, $request->end_date]);
         }
 
-        // Hitung total finansial secara realtime berdasarkan query yang sedang ter-filter
-        $total_tagihan = (int) (clone $query)->sum('total_tagihan');
-        $total_dibayar = (int) (clone $query)->sum('total_dibayar');
-        $sisa_tagihan = $total_tagihan - $total_dibayar;
+        $fakturs = $query
+            ->leftJoin('users', 'users.id', '=', 'fakturs.sales_id')
+            ->leftJoin('tokos', function ($join) {
+                $join->on('tokos.id', '=', 'fakturs.toko_id')->whereNull('tokos.deleted_at');
+            })
+            ->select('fakturs.*', 'users.full_name as sales_name', 'tokos.nama_toko as toko_name')
+            ->latest('fakturs.created_at')
+            ->get();
 
-        $fakturs = $query->latest()->get();
+        // Hitung total dari data yang sudah diambil agar tidak menambah roundtrip database.
+        $total_tagihan = (int) $fakturs->sum('total_tagihan');
+        $sisa_tagihan = $total_tagihan - (int) $fakturs->sum('total_dibayar');
 
         return view('admin.pembukuan.index', [
             'fakturs' => $fakturs,

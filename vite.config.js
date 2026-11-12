@@ -65,6 +65,11 @@ export default defineConfig({
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',
                         options: { cacheName: 'google-fonts-cache' }
+                    },
+                    {
+                        urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+                        handler: 'CacheFirst',
+                        options: { cacheName: 'google-fonts-cache' }
                     }
                 ]
             }

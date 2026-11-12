@@ -15,6 +15,7 @@ class SalesController extends Controller
         // Ambil user dengan role sales (Sesuaikan dengan nama kolom role di database lu)
         $query = User::withCount([
             'tokosPegangan as tokos_pegangan_count' => fn ($q) => $q->where('tokos.admin_id', Auth::id()),
+            'fakturs as belum_lunas_count' => fn ($q) => $q->where('status', 'belum_lunas'),
         ])
             ->where('role', 'sales')
             ->where('parent_admin_id', Auth::id());
@@ -24,15 +25,8 @@ class SalesController extends Controller
             $query->where('full_name', 'ILIKE', '%'.$request->q.'%');
         }
 
-        $salesUsers = $query->get()->map(function ($sales) {
-            // Ambil semua faktur milik sales ini
-            $fakturs = Faktur::where('sales_id', $sales->id)->get();
-
-            // Hitung statistik singkat
+        $salesUsers = $query->get()->each(function ($sales) {
             $sales->total_toko = $sales->tokos_pegangan_count;
-            $sales->belum_lunas_count = $fakturs->where('status', 'belum_lunas')->count();
-
-            return $sales;
         });
 
         $totalSales = $salesUsers->count();

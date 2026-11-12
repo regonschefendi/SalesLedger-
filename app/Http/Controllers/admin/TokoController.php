@@ -21,26 +21,33 @@ class TokoController extends Controller
     {
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->salesIds();
 
         // Admin hanya boleh melihat toko yang dia tambahkan sendiri.
-        $tokos = Toko::ownedByAdmin($admin)->with([
-            'fakturs' => fn ($q) => $q->forAdmin($admin),
-            'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
-        ])->get()->map(function ($toko) {
+        $tokos = Toko::ownedByAdmin($admin)
+            ->withSum(['fakturs as total_tagihan_sum' => fn ($q) => $q->forAdmin($admin)], 'total_tagihan')
+            ->withSum(['fakturs as total_dibayar_sum' => fn ($q) => $q->forAdmin($admin)], 'total_dibayar')
+            ->addSelect([
+                'sales_name' => User::query()
+                    ->select('users.full_name')
+                    ->join('sales_tokos', 'sales_tokos.user_id', '=', 'users.id')
+                    ->whereColumn('sales_tokos.toko_id', 'tokos.id')
+                    ->where('users.parent_admin_id', $admin->id)
+                    ->orderBy('users.id')
+                    ->limit(1),
+            ])
+            ->get()->map(function ($toko) {
 
-            // Kalkulasi status lunas/belum lunas dari seluruh faktur
-            $totalTagihan = $toko->fakturs->sum('total_tagihan');
-            $totalDibayar = $toko->fakturs->sum('total_dibayar');
-            $sisa = $totalTagihan - $totalDibayar;
+                // Kalkulasi status lunas/belum lunas dari seluruh faktur
+                $totalTagihan = (float) $toko->total_tagihan_sum;
+                $totalDibayar = (float) $toko->total_dibayar_sum;
+                $sisa = $totalTagihan - $totalDibayar;
 
-            $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
+                $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
 
-            // Cek dulu apakah toko ini punya sales (tidak null)
-            $toko->sales_name = $toko->sales->isNotEmpty() ? $toko->sales->first()->full_name : 'Belum ditugaskan';
+                $toko->sales_name = $toko->sales_name ?: 'Belum ditugaskan';
 
-            return $toko;
-        });
+                return $toko;
+            });
 
         // Hitung statistik global untuk kartu di atas list
         $stats = [
@@ -58,13 +65,15 @@ class TokoController extends Controller
     {
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->salesIds();
 
         // Ambil data toko spesifik beserta riwayat fakturnya (hanya milik admin ini)
         $toko = Toko::ownedByAdmin($admin)->with([
             'fakturs' => fn ($query) => $query->forAdmin($admin)->orderBy('created_at', 'desc'),
             'fakturs.user',
-            'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
+            'sales' => fn ($q) => $q->whereIn(
+                'users.id',
+                User::where('parent_admin_id', $admin->id)->select('id')
+            ),
         ])->findOrFail($id);
 
         $salesPegangan = $toko->sales->map(function ($sales) {

@@ -20,6 +20,9 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    // Lama cache data user yang sudah login (detik).
+    'user_cache_ttl' => (int) env('AUTH_USER_CACHE_TTL', 300),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -63,7 +66,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'cached-eloquent',
             'model' => env('AUTH_MODEL', User::class),
         ],
 

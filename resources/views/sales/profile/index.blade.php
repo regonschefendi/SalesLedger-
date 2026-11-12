@@ -1,24 +1,18 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Profile Sales - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.webmanifest">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Profile Sales - Sales Ledger" :manifest="true" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-50">
-            <button onclick="window.location.href='{{ route('sales.home') }}'" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Profile</h1>
-        </div>
+        <x-back-header
+            title="Profile"
+            :back-url="route('sales.home')"
+            border-class="border-b border-gray-50"
+        />
 
         <div class="px-5 pt-6 space-y-6 flex-grow overflow-y-auto no-scrollbar">
             
@@ -61,7 +55,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     </div>
                     <p class="text-[11px] font-bold text-gray-400 uppercase">Total Tagihan</p>
-                    <p class="text-[16px] font-bold text-emerald-600 mt-0.5">Rp{{ number_format($stats['total_tagihan'], 0, ',', '.') }}</p>
+                    <p class="text-[16px] font-bold text-emerald-600 mt-0.5">{{ Format::rupiah($stats['total_tagihan']) }}</p>
                 </div>
                 <div class="border border-gray-50 rounded-2xl p-4 bg-white shadow-sm">
                     <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center mb-3">

@@ -1,42 +1,25 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Detail Toko - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <x-head title="Detail Toko - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative">
-            <a href="{{ route('admin.toko.index') }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+        <x-back-header title="Detail Toko" :back-url="route('admin.toko.index')">
+            <a href="{{ route('admin.toko.edit', $toko->id) }}" class="text-slate-500 hover:text-blue-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Toko</h1>
-
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.toko.edit', $toko->id) }}" class="text-slate-500 hover:text-blue-600">
-                    <!-- Icon Pencil -->
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </a>
-                <form action="{{ route('admin.toko.destroy', $toko->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus toko ini? Data transaksi akan dipertahankan.');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-slate-500 hover:text-red-600">
-                        <!-- Icon Trash -->
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </form>
-            </div>
-        </div>
+            <form action="{{ route('admin.toko.destroy', $toko->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus toko ini? Data transaksi akan dipertahankan.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-slate-500 hover:text-red-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </form>
+        </x-back-header>
 
         <div class="px-5 pt-2 flex-grow overflow-y-auto no-scrollbar pb-10">
             
@@ -84,7 +67,7 @@
                         </div>
                         <p class="text-[11px] font-bold text-gray-500">Total Tagihan</p>
                     </div>
-                    <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($stats['total_tagihan'] ?? 0, 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($stats['total_tagihan'] ?? 0) }}</p>
                 </div>
                 
                 <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm flex flex-col justify-center space-y-2">
@@ -94,7 +77,7 @@
                         </div>
                         <p class="text-[11px] font-bold text-gray-500">Sudah Dibayar</p>
                     </div>
-                    <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($stats['sudah_dibayar'] ?? 0, 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($stats['sudah_dibayar'] ?? 0) }}</p>
                 </div>
                 
                 <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm flex flex-col justify-center space-y-2">
@@ -104,7 +87,7 @@
                         </div>
                         <p class="text-[11px] font-bold text-gray-500">Sisa Tagihan</p>
                     </div>
-                    <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($stats['sisa_tagihan'] ?? 0, 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($stats['sisa_tagihan'] ?? 0) }}</p>
                 </div>
             </div>
 

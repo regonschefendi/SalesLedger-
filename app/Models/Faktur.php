@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Faktur extends Model
@@ -17,7 +18,7 @@ class Faktur extends Model
         'total_dibayar',
         'status',
         'foto_url',
-        'sales_id'
+        'sales_id',
     ];
 
     public function user()
@@ -25,7 +26,30 @@ class Faktur extends Model
         return $this->belongsTo(User::class, 'sales_id', 'id');
     }
 
-    public function toko() {
+    public function toko()
+    {
         return $this->belongsTo(Toko::class);
+    }
+
+    public function scopeForAdmin(Builder $query, User|int $admin): Builder
+    {
+        $adminId = $admin instanceof User ? $admin->id : $admin;
+
+        return $query->whereIn(
+            'sales_id',
+            User::where('parent_admin_id', $adminId)->select('id')
+        );
+    }
+
+    public function scopeForSales(Builder $query, User|int $sales): Builder
+    {
+        return $query->where('sales_id', $sales instanceof User ? $sales->id : $sales);
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $user->role === 'admin'
+            ? $query->forAdmin($user)
+            : $query->forSales($user);
     }
 }

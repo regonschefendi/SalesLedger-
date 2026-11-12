@@ -47,16 +47,9 @@ class InvoiceController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $query = Faktur::with(['toko', 'user']);
-
-        if ($user->role === 'admin') {
-            $salesIds = $user->sales()->pluck('id');
-            $query->whereIn('sales_id', $salesIds);
-        } else {
-            $query->where('sales_id', $user->id);
-        }
-
-        return $query->findOrFail($id);
+        return Faktur::with(['toko', 'user'])
+            ->visibleTo($user)
+            ->findOrFail($id);
     }
 
     private function backUrl(Faktur $faktur): string

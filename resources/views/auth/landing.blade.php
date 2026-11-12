@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Welcome - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Welcome - Sales Ledger" />
 </head>
 <body class="bg-gray-100 antialiased">
 

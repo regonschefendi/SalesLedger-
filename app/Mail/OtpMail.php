@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Mail;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -7,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 class OtpMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $otpCode;
 
     public function __construct($otpCode)
@@ -17,6 +20,6 @@ class OtpMail extends Mailable
     public function build()
     {
         return $this->subject('Kode Verifikasi Sales Ledger')
-                    ->view('emails.otp');
+            ->view('emails.otp');
     }
 }

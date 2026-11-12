@@ -1,23 +1,19 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Detail Pembukuan - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Detail Pembukuan - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-20 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-50">
-            <a href="{{ route('admin.pembukuan.index') }}" class="text-blue-600 p-2 -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Pembukuan</h1>
-        </div>
+        <x-back-header
+            title="Detail Pembukuan"
+            :back-url="route('admin.pembukuan.index')"
+            color="text-blue-600"
+            border-class="border-b border-gray-50"
+        />
 
         <div class="px-5 pt-4 space-y-4 flex-grow overflow-y-auto no-scrollbar pb-10">
             
@@ -46,9 +42,9 @@
                 </div>
                 <div class="space-y-3 text-[13px]">
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Metode bayar</span><span class="font-semibold text-gray-900">{{ $faktur->metode_bayar ?? 'Transfer' }}</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Total Tagihan</span><span class="font-bold text-gray-900">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Sudah Dibayar</span><span class="font-bold text-gray-900">Rp{{ number_format($faktur->total_dibayar, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between border-t border-gray-50 pt-2"><span class="text-gray-400 font-bold">Sisa Tagihan</span><span class="font-bold text-orange-500">Rp{{ number_format(($faktur->total_tagihan - $faktur->total_dibayar), 0, ',', '.') }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Total Tagihan</span><span class="font-bold text-gray-900">{{ Format::rupiah($faktur->total_tagihan) }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Sudah Dibayar</span><span class="font-bold text-gray-900">{{ Format::rupiah($faktur->total_dibayar) }}</span></div>
+                    <div class="flex justify-between border-t border-gray-50 pt-2"><span class="text-gray-400 font-bold">Sisa Tagihan</span><span class="font-bold text-orange-500">{{ Format::rupiah(($faktur->total_tagihan - $faktur->total_dibayar)) }}</span></div>
                 </div>
             </div>
 
@@ -135,7 +131,7 @@
                 <img id="admin-preview-image" src="" alt="Faktur Full" 
                      class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300"
                      onload="document.getElementById('loading-admin-image').classList.add('hidden'); this.classList.remove('hidden');"
-                     onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '⚠️ Foto telah dihapus dari server atau koneksi terputus.';">
+                     onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '&#9888;&#65039; Foto telah dihapus dari server atau koneksi terputus.';">
             </div>
             
             <div class="p-6 bg-white space-y-3 pb-8 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-10">

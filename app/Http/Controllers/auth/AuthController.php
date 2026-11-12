@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -48,9 +46,9 @@ class AuthController extends Controller
     private function sendOtp($email)
     {
         $otp = rand(100000, 999999);
-        
+
         // SECURITY BEST PRACTICE: Simpan OTP di Cache, otomatis hancur dalam 2 menit
-        Cache::put('otp_' . $email, $otp, now()->addMinutes(2));
+        Cache::put('otp_'.$email, $otp, now()->addMinutes(2));
 
         // Kirim ke email
         Mail::to($email)->send(new OtpMail($otp));
@@ -65,6 +63,7 @@ class AuthController extends Controller
         }
 
         $this->sendOtp($user->email);
+
         return response()->json(['success' => true, 'message' => 'Kode baru telah dikirim!']);
     }
 
@@ -73,12 +72,12 @@ class AuthController extends Controller
     {
         $request->validate(['otp' => 'required|numeric']);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
-        $cachedOtp = Cache::get('otp_' . $user->email);
+        $cachedOtp = Cache::get('otp_'.$user->email);
 
-        if (!$cachedOtp) {
+        if (! $cachedOtp) {
             return response()->json(['success' => false, 'message' => 'Kode OTP sudah kadaluarsa (lebih dari 2 menit). Silakan minta kode baru.'], 400);
         }
 
@@ -87,8 +86,8 @@ class AuthController extends Controller
         }
 
         // Jika benar, hapus cache dan tandai user sebagai verified
-        Cache::forget('otp_' . $user->email);
-        
+        Cache::forget('otp_'.$user->email);
+
         $user->email_verified_at = now();
         $user->save();
 
@@ -118,12 +117,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             // Regenerasi ID Session agar kebal dari Session Fixation
             $request->session()->regenerate();
-            
-            /** @var \App\Models\User $user */
+
+            /** @var User $user */
             $user = Auth::user();
 
             // 4. Routing Berdasarkan Status & Role
-            if (!$user->email_verified_at) {
+            if (! $user->email_verified_at) {
                 // Kalau belum verifikasi OTP, lempar ke halaman verifikasi
                 return response()->json(['success' => true, 'redirect' => '/verify-email']);
             }
@@ -140,8 +139,8 @@ class AuthController extends Controller
 
         // Kalau password/email salah
         return response()->json([
-            'success' => false, 
-            'message' => 'Email/Username atau Password tidak cocok.'
+            'success' => false,
+            'message' => 'Email/Username atau Password tidak cocok.',
         ], 401);
     }
 
@@ -155,16 +154,16 @@ class AuthController extends Controller
         ]);
 
         $otp = rand(100000, 999999);
-        
+
         // Simpan OTP di Cache selama 5 Menit
-        Cache::put('reset_otp_' . $request->email, $otp, now()->addMinutes(5));
+        Cache::put('reset_otp_'.$request->email, $otp, now()->addMinutes(5));
 
         // Kirim OTP via Email
         Mail::to($request->email)->send(new ResetPasswordMail($otp));
 
         return response()->json([
-            'success' => true, 
-            'message' => 'Kode OTP pemulihan telah dikirim ke email.'
+            'success' => true,
+            'message' => 'Kode OTP pemulihan telah dikirim ke email.',
         ]);
     }
 
@@ -179,10 +178,10 @@ class AuthController extends Controller
             'password' => 'required|min:8|same:confirm_password',
         ]);
 
-        $cachedOtp = Cache::get('reset_otp_' . $request->email);
+        $cachedOtp = Cache::get('reset_otp_'.$request->email);
 
         // Validasi OTP
-        if (!$cachedOtp) {
+        if (! $cachedOtp) {
             return response()->json(['success' => false, 'message' => 'Kode OTP sudah kadaluarsa (lebih dari 5 menit).'], 400);
         }
 
@@ -196,12 +195,12 @@ class AuthController extends Controller
         $user->save();
 
         // Segera hapus OTP dari cache setelah berhasil digunakan
-        Cache::forget('reset_otp_' . $request->email);
+        Cache::forget('reset_otp_'.$request->email);
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'redirect' => '/login',
-            'message' => 'Password berhasil diubah! Silakan login kembali.'
+            'message' => 'Password berhasil diubah! Silakan login kembali.',
         ]);
     }
 
@@ -211,7 +210,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        
+
         // Hapus semua jejak sesi
         $request->session()->invalidate();
         $request->session()->regenerateToken();

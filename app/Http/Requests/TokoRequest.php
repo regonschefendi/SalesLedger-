@@ -36,7 +36,7 @@ class TokoRequest extends FormRequest
     {
         return [
             'nama_toko.required' => 'Nama toko wajib diisi, bos!',
-            'nama_toko.max'      => 'Nama toko kepanjangan, maksimal 255 karakter.',
+            'nama_toko.max' => 'Nama toko kepanjangan, maksimal 255 karakter.',
         ];
     }
 }

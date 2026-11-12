@@ -1,24 +1,11 @@
 <?php
 
-use App\Http\Controllers\admin\AdminController;
-use App\Http\Controllers\admin\SalesController as adminsalesctrl;
-use App\Http\Controllers\admin\TokoController;
-use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\ProfileChangePasswordController;
-use App\Http\Controllers\auth\RoleController;
-use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\sales\OcrController;
-use App\Http\Controllers\sales\SalesController;
-use App\Http\Controllers\sales\SalesRiwayatController;
-use App\Http\Controllers\sales\TokoPeganganController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// ==========================================
-// ROOT/LANDING ROUTE (Smart Redirect)
-// ==========================================
 Route::get('/', function () {
     if (Auth::check()) {
         /** @var User $user */
@@ -34,129 +21,29 @@ Route::get('/', function () {
             return redirect('/sales/home');
         }
 
-        // Kalau login via Google tapi belum milih role
         return redirect('/select-role');
     }
 
-    // Kalau belum login, tampilin halaman Landing (auth/landing.blade.php)
     return view('auth.landing');
 })->name('landing');
 
-// ==========================================
-// GUEST ROUTES (Hanya untuk yang belum login)
-// ==========================================
-Route::middleware('guest')->group(function () {
-    // UI Auth
-    Route::view('/signup', 'auth.signup')->name('register');
-    Route::view('/login', 'auth.login')->name('login');
-    Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
+require __DIR__.'/auth.php';
 
-    // API Auth
-    Route::post('/api/register', [AuthController::class, 'register']);
-    Route::post('/api/login', [AuthController::class, 'login']);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile/change-password', [ProfileChangePasswordController::class, 'edit'])->name('profile.password.edit');
+    Route::post('/profile/change-password', [ProfileChangePasswordController::class, 'update'])->name('profile.password.update');
 
-    // API Reset Password
-    Route::post('/api/forgot-password/send-otp', [AuthController::class, 'sendResetOtp']);
-    Route::post('/api/forgot-password/reset', [AuthController::class, 'resetPassword']);
-});
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-// ==========================================
-// AUTHENTICATED ROUTES (Wajib Login)
-// ==========================================
-Route::middleware('auth')->group(function () {
+    Route::middleware('role:sales')
+        ->prefix('sales')
+        ->name('sales.')
+        ->group(base_path('routes/sales.php'));
 
-    // Logout (KEMBALIKAN KE POST DEMI KEAMANAN CSRF!)
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    // Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    // Halaman & Proses Verifikasi Email
-    Route::view('/verify-email', 'auth.verify-email')->name('verification.notice');
-    Route::post('/api/verify-otp', [AuthController::class, 'verifyOtp']);
-    Route::post('/api/resend-otp', [AuthController::class, 'resendOtp']);
-
-    // ==========================================
-    // VERIFIED ROUTES (Wajib Login & Email Terverifikasi)
-    // ==========================================
-    Route::middleware('verified')->group(function () {
-
-        // Halaman & Proses Pilih Role
-        Route::view('/select-role', 'auth.select-role')->name('select-role');
-        Route::post('/api/set-admin', [RoleController::class, 'setAdmin']);
-        Route::post('/api/set-sales', [RoleController::class, 'setSales']);
-
-        // Fitur Ubah Password (Bisa diakses Admin & Sales)
-        Route::get('/profile/change-password', [ProfileChangePasswordController::class, 'edit'])->name('profile.password.edit');
-        Route::post('/profile/change-password', [ProfileChangePasswordController::class, 'update'])->name('profile.password.update');
-
-        // Fitur Notifikasi (Bisa diakses Admin & Sales)
-        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-
-        // ------------------------------------------
-        // ROLE: SALES AREA
-        // ------------------------------------------
-        Route::middleware('role:sales')->prefix('sales')->name('sales.')->group(function () {
-            Route::get('/home', [SalesController::class, 'index'])->name('home');
-
-            // Fitur Manajemen Pengguna
-            Route::get('/profile', [SalesController::class, 'profileIndex'])->name('profile.index');
-            Route::get('/profile/edit', [SalesController::class, 'profileEdit'])->name('profile.edit');
-            Route::post('/profile/update', [SalesController::class, 'profileUpdate'])->name('profile.update');
-
-            // OCR & Faktur
-            Route::get('/input', [OcrController::class, 'index'])->name('input');
-            Route::post('/api/scan', [OcrController::class, 'processApi'])->name('scan');
-            Route::post('/faktur/simpan', [OcrController::class, 'createFaktur'])->name('addFaktur');
-            Route::get('/toko/search', [OcrController::class, 'searchToko'])->name('toko.search');
-
-            // Riwayat Faktur
-            Route::get('/riwayat', [SalesRiwayatController::class, 'index'])->name('riwayat.index');
-            Route::get('/riwayat/{id}', [SalesRiwayatController::class, 'show'])->name('riwayat.show');
-            Route::get('/riwayat/{id}/invoice', [InvoiceController::class, 'show'])->name('riwayat.invoice');
-            Route::get('/riwayat/{id}/invoice/download', [InvoiceController::class, 'download'])->name('riwayat.invoice.download');
-            // Route::get('/riwayat/{id}/detail', [SalesRiwayatController::class, 'detail'])->name('riwayat.detail');
-            Route::get('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'editPembayaran'])->name('riwayat.edit');
-            Route::post('/riwayat/{id}/catat-pembayaran', [SalesRiwayatController::class, 'updatePembayaran'])->name('riwayat.update');
-
-            // Fitur Toko Pegangan
-            Route::get('/toko-pegangan', [TokoPeganganController::class, 'index'])->name('toko-pegangan.index');
-            Route::post('/toko-pegangan', [TokoPeganganController::class, 'sync'])->name('toko-pegangan.sync');
-        });
-
-        // ------------------------------------------
-        // ROLE: ADMIN AREA
-        // ------------------------------------------
-        Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-
-            // Fitur Pembukuan
-            Route::get('/pembukuan', [AdminController::class, 'pembukuanIndex'])->name('pembukuan.index');
-            Route::get('/pembukuan/export', [AdminController::class, 'pembukuanExport'])->name('pembukuan.export');
-            Route::get('/pembukuan/{id}', [AdminController::class, 'pembukuanShow'])->name('pembukuan.show');
-            Route::get('/pembukuan/{id}/invoice', [InvoiceController::class, 'show'])->name('pembukuan.invoice');
-            Route::get('/pembukuan/{id}/invoice/download', [InvoiceController::class, 'download'])->name('pembukuan.invoice.download');
-
-            // Fitur Manajemen Toko
-            Route::get('/toko', [TokoController::class, 'index'])->name('toko.index');
-            Route::get('/toko/tambah', [TokoController::class, 'create'])->name('toko.create');
-            Route::post('/toko/store', [TokoController::class, 'store'])->name('toko.store');
-            Route::get('/toko/{id}', [TokoController::class, 'show'])->name('toko.show');
-            Route::get('/toko/{toko}/edit', [TokoController::class, 'edit'])->name('toko.edit');
-            Route::put('/toko/{toko}', [TokoController::class, 'update'])->name('toko.update');
-            Route::delete('/toko/{toko}', [TokoController::class, 'destroy'])->name('toko.destroy');
-            Route::get('/nota/{id}', [TokoController::class, 'showNota'])->name('nota.show');
-
-            // Fitur Manajemen Pengguna
-            Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile.index');
-            Route::get('/profile/edit', [AdminController::class, 'profileEdit'])->name('profile.edit');
-            Route::post('/profile/update', [AdminController::class, 'profileUpdate'])->name('profile.update');
-            Route::get('/profile/custom-code', [AdminController::class, 'customCodeIndex'])->name('profile.custom_code');
-            Route::post('/profile/custom-code/update', [AdminController::class, 'customCodeUpdate'])->name('profile.custom-code.update');
-
-            // Fitur Manajemen Sales
-            Route::get('/sales', [adminsalesctrl::class, 'index'])->name('sales.index');
-            Route::get('/sales/{id}', [adminsalesctrl::class, 'show'])->name('sales.show');
-        });
-    });
+    Route::middleware('role:admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(base_path('routes/admin.php'));
 });

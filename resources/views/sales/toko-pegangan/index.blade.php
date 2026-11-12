@@ -1,23 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Toko Pegangan - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; } .no-scrollbar::-webkit-scrollbar { display: none; }</style>
+    <x-head title="Toko Pegangan - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-28 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative border-b border-gray-50">
-            <button onclick="goBack()" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <h1 id="header-title" class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Toko Pegangan</h1>
-        </div>
+        <x-back-header
+            title="Toko Pegangan"
+            back-action="goBack()"
+            title-id="header-title"
+            border-class="border-b border-gray-50"
+        />
 
         <div class="px-5 pt-4 flex-grow overflow-y-auto no-scrollbar pb-10">
 

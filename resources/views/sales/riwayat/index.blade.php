@@ -1,13 +1,8 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Riwayat - Sales Ledger</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; } .no-scrollbar::-webkit-scrollbar { display: none; }</style>
+    <x-head title="Riwayat - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -49,7 +44,7 @@
                                 </div>
                                 <div class="pl-3 text-right">
                                     <p class="text-[10px] text-gray-500 font-medium mb-0.5">Total Tagihan</p>
-                                    <p class="text-[13px] font-bold text-gray-900 mb-1">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</p>
+                                    <p class="text-[13px] font-bold text-gray-900 mb-1">{{ Format::rupiah($faktur->total_tagihan) }}</p>
                                     <span class="text-[9px] font-bold px-2 py-0.5 rounded {{ $faktur->status == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : 'bg-[#FFF7ED] text-[#F59E0B]' }}">
                                         {{ $faktur->status == 'lunas' ? 'Lunas' : 'Belum Lunas' }}
                                     </span>

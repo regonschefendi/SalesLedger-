@@ -1,27 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Custom Code - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Custom Code - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <form action="{{ route('admin.profile.custom-code.update') }}" method="POST" id="form-action" class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         @csrf
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100">
-            <a href="{{ route('admin.profile.index') }}" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center">Custom Code</h1>
+        <x-back-header
+            title="Custom Code"
+            :back-url="route('admin.profile.index')"
+            border-class="border-b border-gray-100"
+        >
             <button type="submit" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -mr-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             </button>
-        </div>
+        </x-back-header>
 
         <div class="px-5 pt-6 space-y-6 flex-grow overflow-y-auto">
             

@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Upload Nota - Sales Ledger</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Upload Nota - Sales Ledger" :csrf="true">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+    </x-head>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         
-        <div id="main-header" class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100 relative z-10">
-            <a href="{{ route('sales.home') }}" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Upload Nota</h1>
+        <div id="main-header">
+            <x-back-header
+                title="Upload Nota"
+                :back-url="route('sales.home')"
+                border-class="border-b border-gray-100"
+            />
         </div>
 
         <div class="px-5 pt-5 overflow-y-auto flex-grow relative">
@@ -167,11 +163,8 @@
             </div>
 
             <div id="view-success" class="hidden flex-col items-center pt-8 pb-10 h-full">
-                <div class="relative w-28 h-28 mb-6">
-                    <div class="absolute inset-0 bg-[#ECFDF5] rounded-full animate-ping opacity-75"></div>
-                    <div class="relative w-full h-full bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg border-8 border-[#ECFDF5]">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
+                <div class="mb-6">
+                    <x-success-icon />
                 </div>
 
                 <h2 class="text-[20px] font-bold text-gray-900 mb-1">Faktur Berhasil Disimpan</h2>

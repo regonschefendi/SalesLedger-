@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Faktur;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use App\Support\Format;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class SalesRiwayatController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Faktur::with('toko')->where('sales_id', Auth::id())->orderBy('created_at', 'desc');
+        $query = Faktur::with('toko')->forSales(Auth::user())->orderBy('created_at', 'desc');
 
         // Filter search bar
         if ($request->filled('q')) {
@@ -54,7 +55,7 @@ class SalesRiwayatController extends Controller
     public function show($id)
     {
         // Pastikan hanya bisa lihat faktur miliknya sendiri
-        $faktur = Faktur::with('toko')->where('sales_id', Auth::id())->findOrFail($id);
+        $faktur = Faktur::with('toko')->forSales(Auth::user())->findOrFail($id);
 
         return view('sales.riwayat.show', compact('faktur'));
     }
@@ -67,7 +68,7 @@ class SalesRiwayatController extends Controller
 
     public function editPembayaran($id)
     {
-        $faktur = Faktur::with('toko')->where('sales_id', Auth::id())->findOrFail($id);
+        $faktur = Faktur::with('toko')->forSales(Auth::user())->findOrFail($id);
 
         // Mencegah akses ke faktur yang sudah lunas
         if ($faktur->status === 'lunas') {
@@ -79,7 +80,7 @@ class SalesRiwayatController extends Controller
 
     public function updatePembayaran(Request $request, $id)
     {
-        $faktur = Faktur::where('sales_id', Auth::id())->findOrFail($id);
+        $faktur = Faktur::forSales(Auth::user())->findOrFail($id);
 
         $request->validate([
             'tanggal_pembayaran' => 'required|date',
@@ -116,7 +117,7 @@ class SalesRiwayatController extends Controller
                 new SystemNotification(
                     'Pembayaran Dicatat',
                     $sales->full_name.' mencatat pembayaran nota '.$faktur->nomor_faktur
-                        .' sebesar Rp'.number_format($request->nominal_pembayaran, 0, ',', '.').'.',
+                        .' sebesar '.Format::rupiah($request->nominal_pembayaran).'.',
                     route('admin.pembukuan.show', $faktur->id),
                     'pembayaran'
                 )

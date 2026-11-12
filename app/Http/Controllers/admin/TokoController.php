@@ -21,11 +21,11 @@ class TokoController extends Controller
     {
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->sales()->pluck('id');
+        $salesIds = $admin->salesIds();
 
         // Admin hanya boleh melihat toko yang dia tambahkan sendiri.
-        $tokos = Toko::where('admin_id', $admin->id)->with([
-            'fakturs' => fn ($q) => $q->whereIn('sales_id', $salesIds),
+        $tokos = Toko::ownedByAdmin($admin)->with([
+            'fakturs' => fn ($q) => $q->forAdmin($admin),
             'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
         ])->get()->map(function ($toko) {
 
@@ -58,13 +58,11 @@ class TokoController extends Controller
     {
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->sales()->pluck('id');
+        $salesIds = $admin->salesIds();
 
         // Ambil data toko spesifik beserta riwayat fakturnya (hanya milik admin ini)
-        $toko = Toko::where('admin_id', $admin->id)->with([
-            'fakturs' => function ($query) use ($salesIds) {
-                $query->whereIn('sales_id', $salesIds)->orderBy('created_at', 'desc'); // Urutkan nota dari yang terbaru
-            },
+        $toko = Toko::ownedByAdmin($admin)->with([
+            'fakturs' => fn ($query) => $query->forAdmin($admin)->orderBy('created_at', 'desc'),
             'fakturs.user',
             'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
         ])->findOrFail($id);
@@ -131,10 +129,11 @@ class TokoController extends Controller
     // Menampilkan Halaman Detail Nota Spesifik
     public function showNota($id)
     {
-        $salesIds = Auth::user()->sales()->pluck('id');
+        /** @var User $admin */
+        $admin = Auth::user();
 
         // Tarik data faktur beserta relasi toko dan sales-nya (hanya milik tim admin ini)
-        $faktur = Faktur::with(['toko', 'user'])->whereIn('sales_id', $salesIds)->findOrFail($id);
+        $faktur = Faktur::forAdmin($admin)->with(['toko', 'user'])->findOrFail($id);
 
         return view('admin.toko.detail-faktur', compact('faktur'));
     }
@@ -156,7 +155,7 @@ class TokoController extends Controller
         $toko->update($request->validated());
 
         // Beri tahu sales yang sedang memegang toko ini.
-        $salesIds = Auth::user()->sales()->pluck('id');
+        $salesIds = Auth::user()->salesIds();
         $pemegang = $toko->sales()->whereIn('users.id', $salesIds)->get();
 
         if ($pemegang->isNotEmpty()) {
@@ -181,7 +180,7 @@ class TokoController extends Controller
         Gate::authorize('delete', $toko);
 
         // Beri tahu sales yang memegang toko ini sebelum toko dihapus.
-        $salesIds = Auth::user()->sales()->pluck('id');
+        $salesIds = Auth::user()->salesIds();
         $pemegang = $toko->sales()->whereIn('users.id', $salesIds)->get();
 
         if ($pemegang->isNotEmpty()) {

@@ -1,22 +1,15 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pembaruan Sukses</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Pembaruan Sukses" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-32 shadow-2xl overflow-hidden pt-8">
         
         <div class="flex flex-col items-center pt-4 px-5 flex-grow">
-            <div class="relative w-28 h-28 mb-6">
-                <div class="absolute inset-0 bg-[#ECFDF5] rounded-full animate-ping opacity-75"></div>
-                <div class="relative w-full h-full bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg border-8 border-[#ECFDF5]">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                </div>
+            <div class="mb-6">
+                <x-success-icon />
             </div>
             
             <h2 class="text-[20px] font-bold text-gray-900 mb-1">Faktur Berhasil Dicatat</h2>
@@ -40,7 +33,7 @@
 
                 <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span class="text-[13px] font-bold text-gray-800">Total Dibayar</span>
-                    <span class="text-[13px] font-bold text-gray-800">Rp{{ number_format($faktur->total_dibayar, 0, ',', '.') }}</span>
+                    <span class="text-[13px] font-bold text-gray-800">{{ Format::rupiah($faktur->total_dibayar) }}</span>
                 </div>
                 <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span class="text-[13px] font-bold text-gray-800">Tanggal Pembayaran</span>
@@ -52,7 +45,7 @@
                 </div>
                 <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span class="text-[13px] font-bold text-gray-800">Sisa Tagihan</span>
-                    <span class="text-[13px] text-gray-800">Rp{{ number_format(max(0, $faktur->total_tagihan - $faktur->total_dibayar), 0, ',', '.') }}</span>
+                    <span class="text-[13px] text-gray-800">{{ Format::rupiah(max(0, $faktur->total_tagihan - $faktur->total_dibayar)) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-[13px] font-bold text-gray-800">Status</span>

@@ -1,23 +1,14 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Detail Nota - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Detail Nota - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative">
-            <a href="{{ route('admin.toko.show', $faktur->toko_id) }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Nota</h1>
-        </div>
+        <x-back-header title="Detail Nota" :back-url="route('admin.toko.show', $faktur->toko_id)" />
 
         <div class="px-5 pt-2 flex-grow overflow-y-auto no-scrollbar pb-10 space-y-4">
             
@@ -42,7 +33,7 @@
                 </div>
                 <div class="flex-1 flex flex-col justify-center pl-4 text-center">
                     <span class="text-[11px] font-bold text-gray-800 leading-tight">Sisa Tagihan:</span>
-                    <span class="text-[15px] font-bold text-[{{ $hexColor }}]">Rp{{ number_format(max(0, $sisaTagihan), 0, ',', '.') }}</span>
+                    <span class="text-[15px] font-bold text-[{{ $hexColor }}]">{{ Format::rupiah(max(0, $sisaTagihan)) }}</span>
                 </div>
             </div>
 
@@ -69,7 +60,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[13px] text-gray-600 font-medium">Total Tagihan</span>
-                        <span class="text-[14px] font-bold text-gray-900">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</span>
+                        <span class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($faktur->total_tagihan) }}</span>
                     </div>
                 </div>
             </div>
@@ -89,11 +80,11 @@
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <span class="text-[13px] text-gray-600 font-medium">Sudah Dibayar</span>
-                        <span class="text-[13px] font-medium text-gray-900">Rp{{ number_format($faktur->total_dibayar, 0, ',', '.') }}</span>
+                        <span class="text-[13px] font-medium text-gray-900">{{ Format::rupiah($faktur->total_dibayar) }}</span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <span class="text-[13px] text-gray-600 font-medium">Sisa Tagihan</span>
-                        <span class="text-[13px] font-bold text-[#F59E0B]">Rp{{ number_format(max(0, $sisaTagihan), 0, ',', '.') }}</span>
+                        <span class="text-[13px] font-bold text-[#F59E0B]">{{ Format::rupiah(max(0, $sisaTagihan)) }}</span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <span class="text-[13px] text-gray-600 font-medium">Tanggal Pembayaran</span>
@@ -148,7 +139,7 @@
                 <img id="admin-preview-image" src="" alt="Faktur Full" 
                      class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300"
                      onload="document.getElementById('loading-admin-image').classList.add('hidden'); this.classList.remove('hidden');"
-                     onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '⚠️ Foto tidak dapat dimuat.';">
+                     onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '&#9888;&#65039; Foto tidak dapat dimuat.';">
             </div>
             
             <div class="p-5 bg-white pb-8 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-10">

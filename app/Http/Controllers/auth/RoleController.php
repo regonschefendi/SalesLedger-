@@ -13,10 +13,10 @@ class RoleController extends Controller
     public function setAdmin(Request $request)
     {
         $request->validate([
-            'admin_code' => 'required|string|unique:users,admin_code' // Wajib unik se-database
+            'admin_code' => 'required|string|unique:users,admin_code', // Wajib unik se-database
         ]);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
         $user->role = 'admin';
         $user->admin_code = $request->admin_code;
@@ -29,19 +29,19 @@ class RoleController extends Controller
     public function setSales(Request $request)
     {
         $request->validate([
-            'admin_code' => 'required|string|exists:users,admin_code'
+            'admin_code' => 'required|string|exists:users,admin_code',
         ], [
-            'admin_code.exists' => 'Kode Referal tidak ditemukan! Pastikan lu minta kode yang benar ke Admin lu.'
+            'admin_code.exists' => 'Kode Referal tidak ditemukan! Pastikan lu minta kode yang benar ke Admin lu.',
         ]);
 
         // Cek apakah kode admin tersebut ada di database?
         $admin = User::where('admin_code', $request->admin_code)->first();
 
-        if (!$admin) {
+        if (! $admin) {
             return response()->json(['success' => false, 'message' => 'Kode Admin tidak ditemukan!'], 404);
         }
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
         $user->role = 'sales';
         $user->parent_admin_id = $admin->id; // Hubungkan Sales ke Admin

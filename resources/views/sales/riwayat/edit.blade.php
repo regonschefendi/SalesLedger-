@@ -1,22 +1,17 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Catat Pembayaran</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <x-head title="Catat Pembayaran" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-32 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 border-b border-gray-50">
-            <a href="{{ route('sales.riwayat.show', $faktur->id) }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Upload Nota</h1>
-        </div>
+        <x-back-header
+            title="Upload Nota"
+            :back-url="route('sales.riwayat.show', $faktur->id)"
+            border-class="border-b border-gray-50"
+        />
 
         <div class="px-5 pt-5 flex-grow overflow-y-auto">
             <div class="border border-gray-100 rounded-xl p-4 bg-white shadow-sm flex items-start space-x-4 mb-6">
@@ -30,7 +25,7 @@
                 </div>
                 <div class="text-right border-l border-gray-100 pl-4">
                     <p class="text-[10px] font-medium text-gray-500">Sisa Tagihan</p>
-                    <p class="text-[14px] font-bold text-[#F59E0B] mt-0.5">Rp{{ number_format(max(0, $faktur->total_tagihan - $faktur->total_dibayar), 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-[#F59E0B] mt-0.5">{{ Format::rupiah(max(0, $faktur->total_tagihan - $faktur->total_dibayar)) }}</p>
                 </div>
             </div>
 

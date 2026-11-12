@@ -98,7 +98,7 @@ class OcrController extends Controller
         }
 
         // Sales hanya bisa mencari toko yang ditambahkan admin terkait.
-        $tokos = Toko::where('admin_id', $sales->parent_admin_id)
+        $tokos = Toko::ownedByAdmin($sales->parent_admin_id)
             ->where('nama_toko', 'ILIKE', "%{$keyword}%")
             ->select('id', 'nama_toko', 'alamat')
             ->limit(5)

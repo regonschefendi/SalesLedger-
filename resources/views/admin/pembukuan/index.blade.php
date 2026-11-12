@@ -1,16 +1,8 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pembukuan - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <x-head title="Pembukuan - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -69,7 +61,7 @@
                     </div>
                     <div>
                         <p class="text-[11px] text-gray-400 font-bold">Total Tagihan</p>
-                        <p class="text-[15px] font-bold text-gray-900">Rp{{ number_format($total_tagihan, 0, ',', '.') }}</p>
+                        <p class="text-[15px] font-bold text-gray-900">{{ Format::rupiah($total_tagihan) }}</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3 border-l border-gray-100 pl-4">
@@ -78,7 +70,7 @@
                     </div>
                     <div>
                         <p class="text-[11px] text-gray-400 font-bold">Sisa Tagihan</p>
-                        <p class="text-[15px] font-bold text-gray-900">Rp{{ number_format($sisa_tagihan, 0, ',', '.') }}</p>
+                        <p class="text-[15px] font-bold text-gray-900">{{ Format::rupiah($sisa_tagihan) }}</p>
                     </div>
                 </div>
             </div>
@@ -92,18 +84,18 @@
                         </div>
                         <div>
                             <h3 class="text-[14px] font-bold text-gray-900">{{ $item->toko->nama_toko ?? '-' }}</h3>
-                            <p class="text-[11px] text-gray-500 font-medium mt-0.5">Sales: {{ $item->user->full_name ?? 'Sales' }} • {{ $item->nomor_faktur }}</p>
+                            <p class="text-[11px] text-gray-500 font-medium mt-0.5">Sales: {{ $item->user->full_name ?? 'Sales' }} &bull; {{ $item->nomor_faktur }}</p>
                             <p class="text-[11px] text-gray-400 mt-0.5">Bayar {{ \Carbon\Carbon::parse($item->tanggal_nota)->format('d M Y') }}</p>
                         </div>
                     </div>
                     <div class="text-right flex items-center space-x-3">
                         <div>
-                            <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($item->total_tagihan, 0, ',', '.') }}</p>
+                            <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($item->total_tagihan) }}</p>
                             <span class="inline-block text-[9px] font-bold px-2 py-0.5 rounded mt-1 {{ $item->status == 'lunas' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600' }}">
                                 {{ $item->status == 'lunas' ? 'Lunas' : 'Belum Lunas' }}
                             </span>
                             @if($item->status !== 'lunas')
-                                <p class="text-[10px] text-gray-400 font-medium mt-1">Sisa Rp{{ number_format(($item->total_tagihan - $item->total_dibayar), 0, ',', '.') }}</p>
+                                <p class="text-[10px] text-gray-400 font-medium mt-1">Sisa {{ Format::rupiah(($item->total_tagihan - $item->total_dibayar)) }}</p>
                             @endif
                         </div>
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>

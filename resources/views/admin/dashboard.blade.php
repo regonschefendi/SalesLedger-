@@ -1,16 +1,8 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Dashboard - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <x-head title="Admin Dashboard - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -67,7 +59,7 @@
                             </div>
                             <p class="text-[12px] text-gray-800 font-semibold">Total Tagihan</p>
                         </div>
-                        <p class="text-[16px] font-bold text-gray-900">Rp{{ number_format($total_tagihan, 0, ',', '.') }}</p>
+                        <p class="text-[16px] font-bold text-gray-900">{{ Format::rupiah($total_tagihan) }}</p>
                     </div>
                     <div class="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white">
                         <div class="flex items-center space-x-2 mb-2">
@@ -76,7 +68,7 @@
                             </div>
                             <p class="text-[12px] text-gray-800 font-semibold">Total Dibayar</p>
                         </div>
-                        <p class="text-[16px] font-bold text-gray-900">Rp{{ number_format($total_dibayar, 0, ',', '.') }}</p>
+                        <p class="text-[16px] font-bold text-gray-900">{{ Format::rupiah($total_dibayar) }}</p>
                     </div>
                 </div>
 
@@ -86,7 +78,7 @@
                     </div>
                     <div>
                         <p class="text-[12px] text-gray-800 font-semibold mb-0.5">Sisa Kredit/ Piutang</p>
-                        <p class="text-[16px] font-bold text-gray-900">Rp{{ number_format($sisa_kredit, 0, ',', '.') }}</p>
+                        <p class="text-[16px] font-bold text-gray-900">{{ Format::rupiah($sisa_kredit) }}</p>
                     </div>
                 </div>
             </div>
@@ -135,7 +127,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-[13px] font-bold text-[#10B981]">Rp{{ number_format($item->total_tagihan, 0, ',', '.') }}</p>
+                                <p class="text-[13px] font-bold text-[#10B981]">{{ Format::rupiah($item->total_tagihan) }}</p>
                                 <p class="text-[10px] font-bold {{ $item->status == 'lunas' ? 'text-[#10B981]' : 'text-[#F59E0B]' }} mt-0.5">{{ strtoupper(str_replace('_', ' ', $item->status)) }}</p>
                             </div>
                         </div>

@@ -31,7 +31,7 @@ class TokoPeganganController extends Controller
         $assignedTokoIds = $assignedTokos->pluck('id')->toArray();
 
         // Halaman "Pilih Toko" juga hanya menampilkan toko dari admin terkait.
-        $allTokos = Toko::where('admin_id', $adminId)
+        $allTokos = Toko::ownedByAdmin($adminId)
             ->orderBy('nama_toko', 'asc')
             ->get();
 

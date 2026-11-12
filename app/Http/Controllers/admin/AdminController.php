@@ -18,11 +18,8 @@ class AdminController extends Controller
         $admin = Auth::user();
         $namaDepan = explode(' ', $admin->full_name)[0];
 
-        // Ambil HANYA ID Sales yang terhubung dengan Admin ini
-        $salesIds = $admin->sales()->pluck('id');
-
-        // Buat Base Query Faktur khusus untuk tim Sales tersebut
-        $query = Faktur::whereIn('sales_id', $salesIds);
+        // Query faktur hanya untuk sales yang terhubung dengan admin ini.
+        $query = Faktur::forAdmin($admin);
 
         // Logic Filter Waktu (Hari Ini & Bulan Ini)
         $filterAktif = $request->query('filter', 'hari_ini');
@@ -70,9 +67,8 @@ class AdminController extends Controller
         /** @var User $admin */
         $admin = Auth::user();
 
-        // Isolasi data ketat hanya untuk Sales yang terikat Kode Referal Admin ini
-        $salesIds = $admin->sales()->pluck('id');
-        $query = Faktur::whereIn('sales_id', $salesIds)->with(['user', 'toko']);
+        // Isolasi data ketat hanya untuk sales yang terikat kode referal admin ini.
+        $query = Faktur::forAdmin($admin)->with(['user', 'toko']);
 
         // Fitur Search Box (Nama Toko / No Nota)
         if ($request->filled('search')) {
@@ -138,12 +134,11 @@ class AdminController extends Controller
 
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->sales()->pluck('id');
 
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
 
-        $fakturs = Faktur::whereIn('sales_id', $salesIds)
+        $fakturs = Faktur::forAdmin($admin)
             ->with(['user', 'toko'])
             ->whereBetween('tanggal_nota', [$startDate->toDateString(), $endDate->toDateString()])
             ->orderBy('tanggal_nota')
@@ -216,10 +211,9 @@ class AdminController extends Controller
     {
         /** @var User $admin */
         $admin = Auth::user();
-        $salesIds = $admin->sales()->pluck('id');
 
-        // Mencegah Admin luar menembak ID nota lewat URL manual
-        $faktur = Faktur::whereIn('sales_id', $salesIds)->with(['user', 'toko'])->findOrFail($id);
+        // Mencegah admin luar menembak ID nota lewat URL manual.
+        $faktur = Faktur::forAdmin($admin)->with(['user', 'toko'])->findOrFail($id);
 
         return view('admin.pembukuan.show', compact('faktur'));
     }

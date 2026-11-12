@@ -1,20 +1,11 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sales Home - Sales Ledger</title>
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <x-head title="Sales Home - Sales Ledger" :manifest="true" :csrf="true">
+        <meta name="theme-color" content="#ffffff">
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    </x-head>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -64,7 +55,7 @@
                             </div>
                             <p class="text-[12px] text-gray-800 font-medium">Total Tagihan</p>
                         </div>
-                        <p class="text-[15px] font-bold text-[#10B981]">Rp{{ number_format($total_tagihan, 0, ',', '.') }}</p>
+                        <p class="text-[15px] font-bold text-[#10B981]">{{ Format::rupiah($total_tagihan) }}</p>
                     </div>
                     <div class="border border-gray-100 rounded-2xl p-3 shadow-sm bg-white flex flex-col justify-center">
                         <div class="flex items-center space-x-2 mb-2">
@@ -73,7 +64,7 @@
                             </div>
                             <p class="text-[12px] text-gray-800 font-medium">Total Dibayar</p>
                         </div>
-                        <p class="text-[15px] font-bold text-[#0F47A1]">Rp{{ number_format($total_dibayar, 0, ',', '.') }}</p>
+                        <p class="text-[15px] font-bold text-[#0F47A1]">{{ Format::rupiah($total_dibayar) }}</p>
                     </div>
                 </div>
 
@@ -83,7 +74,7 @@
                     </div>
                     <div>
                         <p class="text-[13px] text-gray-800 font-medium">Sisa Kredit/ Piutang</p>
-                        <p class="text-[16px] font-bold text-[#F59E0B]">Rp{{ number_format($sisa_kredit, 0, ',', '.') }}</p>
+                        <p class="text-[16px] font-bold text-[#F59E0B]">{{ Format::rupiah($sisa_kredit) }}</p>
                     </div>
                 </div>
 
@@ -126,7 +117,7 @@
                                 <p class="text-[11px] text-gray-500">{{ date('d M Y', strtotime($item->created_at)) }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[13px] font-bold text-[#10B981]">Rp{{ number_format($item->total_tagihan, 0, ',', '.') }}</p>
+                                <p class="text-[13px] font-bold text-[#10B981]">{{ Format::rupiah($item->total_tagihan) }}</p>
                                 <p class="text-[10px] font-semibold {{ $item->status == 'lunas' ? 'text-green-500' : 'text-orange-500' }}">{{ strtoupper(str_replace('_', ' ', $item->status)) }}</p>
                             </div>
                         </div>

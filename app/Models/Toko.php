@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,5 +34,10 @@ class Toko extends Model
     public function sales()
     {
         return $this->belongsToMany(User::class, 'sales_tokos', 'toko_id', 'user_id');
+    }
+
+    public function scopeOwnedByAdmin(Builder $query, User|int $admin): Builder
+    {
+        return $query->where('admin_id', $admin instanceof User ? $admin->id : $admin);
     }
 }

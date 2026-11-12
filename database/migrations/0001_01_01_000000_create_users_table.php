@@ -19,12 +19,12 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            
+
             // Role & Relasi Admin-Sales
             $table->enum('role', ['admin', 'sales'])->nullable();
             $table->string('admin_code')->unique()->nullable();
             $table->foreignId('parent_admin_id')->nullable()->constrained('users');
-            
+
             $table->rememberToken();
             $table->timestamps();
         });

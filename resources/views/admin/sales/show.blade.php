@@ -1,23 +1,14 @@
+@use('App\Support\Format')
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Detail Sales - Sales Ledger</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-    <style>body { font-family: 'Inter', sans-serif; } .no-scrollbar::-webkit-scrollbar { display: none; }</style>
+    <x-head title="Detail Sales - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
-        <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative">
-            <a href="{{ route('admin.sales.index') }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Sales</h1>
-        </div>
+        <x-back-header title="Detail Sales" :back-url="route('admin.sales.index')" />
 
         <div class="px-5 pt-2 flex-grow overflow-y-auto no-scrollbar pb-10">
             
@@ -69,7 +60,7 @@
                         </div>
                         <p class="text-[11px] font-bold text-gray-500">Total Tagihan</p>
                     </div>
-                    <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($stats['total_tagihan'], 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($stats['total_tagihan']) }}</p>
                 </div>
 
                 <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm flex flex-col justify-center space-y-2">
@@ -79,7 +70,7 @@
                         </div>
                         <p class="text-[11px] font-bold text-gray-500">Sisa Tagihan</p>
                     </div>
-                    <p class="text-[14px] font-bold text-gray-900">Rp{{ number_format($stats['sisa_tagihan'], 0, ',', '.') }}</p>
+                    <p class="text-[14px] font-bold text-gray-900">{{ Format::rupiah($stats['sisa_tagihan']) }}</p>
                 </div>
             </div>
 

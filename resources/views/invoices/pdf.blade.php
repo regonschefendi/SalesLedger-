@@ -1,12 +1,9 @@
+@use('App\Support\Format')
 @php
     $isLunas = $faktur->status === 'lunas';
     $sisaTagihan = max(0, (float) $faktur->total_tagihan - (float) $faktur->total_dibayar);
-    $tanggalNota = $faktur->tanggal_nota
-        ? \Carbon\Carbon::parse($faktur->tanggal_nota)->translatedFormat('d F Y')
-        : '-';
-    $tanggalSetor = $faktur->tanggal_pembayaran
-        ? \Carbon\Carbon::parse($faktur->tanggal_pembayaran)->translatedFormat('d F Y')
-        : '-';
+    $tanggalNota = Format::date($faktur->tanggal_nota, 'd F Y');
+    $tanggalSetor = Format::date($faktur->tanggal_pembayaran, 'd F Y');
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -169,8 +166,8 @@
                     @endif
                 </td>
                 <td class="right">1</td>
-                <td class="right">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</td>
-                <td class="right" style="font-weight: bold;">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</td>
+                <td class="right">{{ Format::rupiah($faktur->total_tagihan) }}</td>
+                <td class="right" style="font-weight: bold;">{{ Format::rupiah($faktur->total_tagihan) }}</td>
             </tr>
         </tbody>
     </table>
@@ -178,15 +175,15 @@
     <table class="totals">
         <tr>
             <td class="total-label" style="width: 70%;">Total Tagihan</td>
-            <td class="total-value">Rp{{ number_format($faktur->total_tagihan, 0, ',', '.') }}</td>
+            <td class="total-value">{{ Format::rupiah($faktur->total_tagihan) }}</td>
         </tr>
         <tr>
             <td class="total-label">Sudah Dibayar</td>
-            <td class="total-value" style="color: #047857;">Rp{{ number_format($faktur->total_dibayar, 0, ',', '.') }}</td>
+            <td class="total-value" style="color: #047857;">{{ Format::rupiah($faktur->total_dibayar) }}</td>
         </tr>
         <tr>
             <td class="grand-label">Sisa Tagihan</td>
-            <td class="grand-value">Rp{{ number_format($sisaTagihan, 0, ',', '.') }}</td>
+            <td class="grand-value">{{ Format::rupiah($sisaTagihan) }}</td>
         </tr>
     </table>
 

@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\OtpMail;
-use App\Mail\ResetPasswordMail;
 use App\Models\User;
+use App\Services\BrevoMailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
+use Throwable;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly BrevoMailService $mailer) {}
+
     // ==========================================
     // PROSES SIGNUP & VERIFIKASI EMAIL
     // ==========================================
@@ -36,22 +39,42 @@ class AuthController extends Controller
         // Login secara otomatis, tapi statusnya belum verified
         Auth::login($user);
 
-        // Kirim OTP
-        $this->sendOtp($user->email);
+        // Kirim OTP. Kalau email gagal terkirim, akun tetap dibuat agar user
+        // bisa memakai tombol "Kirim Ulang Kode" di halaman verifikasi.
+        try {
+            $this->sendOtp($user->email);
+        } catch (Throwable) {
+            return response()->json([
+                'success' => true,
+                'redirect' => '/verify-email?mail_failed=1',
+            ]);
+        }
 
         return response()->json(['success' => true, 'redirect' => '/verify-email']);
     }
 
     // 2. Fungsi Generate & Kirim OTP (Reusable)
-    private function sendOtp($email)
+    private function sendOtp(string $email): void
     {
-        $otp = rand(100000, 999999);
+        if (blank(config('services.brevo.key'))
+            && config('mail.default') === 'smtp'
+            && (blank(config('mail.mailers.smtp.username')) || blank(config('mail.mailers.smtp.password')))) {
+            throw new RuntimeException('Konfigurasi email belum lengkap. Isi BREVO_API_KEY atau MAIL_USERNAME/MAIL_PASSWORD.');
+        }
+
+        $otp = random_int(100000, 999999);
 
         // SECURITY BEST PRACTICE: Simpan OTP di Cache, otomatis hancur dalam 2 menit
         Cache::put('otp_'.$email, $otp, now()->addMinutes(2));
 
-        // Kirim ke email
-        Mail::to($email)->send(new OtpMail($otp));
+        try {
+            $this->mailer->sendVerificationCode($email, $otp);
+        } catch (Throwable $e) {
+            Cache::forget('otp_'.$email);
+            Log::error('Gagal mengirim OTP verifikasi.', ['email' => $email, 'error' => $e->getMessage()]);
+
+            throw new RuntimeException('Gagal mengirim kode OTP ke email. Silakan coba lagi.', 0, $e);
+        }
     }
 
     // 3. Proses Resend OTP
@@ -62,7 +85,14 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email sudah diverifikasi'], 400);
         }
 
-        $this->sendOtp($user->email);
+        try {
+            $this->sendOtp($user->email);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
 
         return response()->json(['success' => true, 'message' => 'Kode baru telah dikirim!']);
     }
@@ -153,13 +183,23 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email', // Pastikan email terdaftar
         ]);
 
-        $otp = rand(100000, 999999);
+        $otp = random_int(100000, 999999);
 
         // Simpan OTP di Cache selama 5 Menit
         Cache::put('reset_otp_'.$request->email, $otp, now()->addMinutes(5));
 
         // Kirim OTP via Email
-        Mail::to($request->email)->send(new ResetPasswordMail($otp));
+        try {
+            $this->mailer->sendResetCode($request->email, $otp);
+        } catch (Throwable $e) {
+            Cache::forget('reset_otp_'.$request->email);
+            Log::error('Gagal mengirim OTP reset password.', ['email' => $request->email, 'error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim kode OTP ke email. Silakan coba lagi.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,

@@ -53,10 +53,11 @@
     <script>
         let timeLeft = 120; // 2 Menit dalam hitungan detik
         let timerInterval;
+        const mailFailed = new URLSearchParams(window.location.search).has('mail_failed');
 
-        function startTimer() {
+        function startTimer(seconds = 120) {
             clearInterval(timerInterval);
-            timeLeft = 120;
+            timeLeft = seconds;
             document.getElementById('timer-text').classList.remove('hidden');
             document.getElementById('btn-resend').classList.add('hidden');
             document.getElementById('btn-resend').disabled = true;
@@ -83,7 +84,17 @@
         }
 
         // Jalankan timer pas halaman kelar di-load
-        window.onload = startTimer;
+        window.onload = function() {
+            if (mailFailed) {
+                const errorBox = document.getElementById('error-box');
+                errorBox.innerText = 'Kode OTP gagal dikirim ke email. Periksa konfigurasi email atau klik "Kirim Ulang Kode".';
+                errorBox.classList.remove('hidden');
+                startTimer(0);
+                return;
+            }
+
+            startTimer();
+        };
 
         // AJAX: Submit OTP
         document.getElementById('otpForm').addEventListener('submit', async function(e) {

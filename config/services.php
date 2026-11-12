@@ -43,4 +43,9 @@ return [
         'url' => env('SUPABASE_PROJECT_URL'),
         'bucket' => env('SUPABASE_STORAGE_BUCKET'),
     ],
+
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+        'timeout' => env('BREVO_TIMEOUT', 15),
+    ],
 ];

@@ -13,9 +13,9 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-20 shadow-2xl overflow-hidden">
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-50">
-            <button onclick="window.history.back()" class="text-blue-600 p-2 -ml-2">
+            <a href="{{ route('admin.pembukuan.index') }}" class="text-blue-600 p-2 -ml-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Pembukuan</h1>
         </div>
 
@@ -104,7 +104,13 @@
         </div>
 
         <div class="p-4 bg-white border-t border-gray-100 fixed bottom-0 inset-x-0 max-w-md mx-auto z-40">
-            <button onclick="window.history.back()" class="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-[14px] shadow-md transition duration-150">Kembali</button>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{{ route('admin.pembukuan.invoice', $faktur->id) }}" class="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-[14px] shadow-md transition duration-150 flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Lihat Invoice</span>
+                </a>
+                <a href="{{ route('admin.pembukuan.index') }}" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl text-[14px] transition duration-150 flex items-center justify-center">Kembali</a>
+            </div>
         </div>
     </div>
 

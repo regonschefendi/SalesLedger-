@@ -85,10 +85,16 @@
         </div>
 
         <div class="fixed bottom-0 max-w-md mx-auto inset-x-0 bg-white border-t border-gray-100 p-5 z-20 space-y-3">
-            <button onclick="window.location.href='{{ route('sales.riwayat.index') }}'" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-3.5 rounded-full shadow-md transition text-[14px]">Kembali</button>
             @if($faktur->status === 'belum_lunas')
                 <button onclick="window.location.href='{{ route('sales.riwayat.edit', $faktur->id) }}'" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-bold py-3.5 rounded-full transition text-[14px]">Catat Pembayaran</button>
             @endif
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{{ route('sales.riwayat.invoice', $faktur->id) }}" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-3.5 rounded-full shadow-md transition text-[14px] flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Lihat Invoice</span>
+                </a>
+                <button onclick="window.location.href='{{ route('sales.riwayat.index') }}'" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-full transition text-[14px]">Kembali</button>
+            </div>
         </div>
     </div>
 

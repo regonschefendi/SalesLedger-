@@ -36,6 +36,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(User::class, 'parent_admin_id', 'id');
     }
 
+    // Sales terhubung ke satu Admin
+    public function parentAdmin()
+    {
+        return $this->belongsTo(User::class, 'parent_admin_id', 'id');
+    }
+
     public function tokosPegangan()
     {
         return $this->belongsToMany(Toko::class, 'sales_tokos', 'user_id', 'toko_id');

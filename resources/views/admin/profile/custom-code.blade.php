@@ -14,9 +14,9 @@
         @csrf
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100">
-            <button type="button" onclick="window.history.back()" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
+            <a href="{{ route('admin.profile.index') }}" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center">Custom Code</h1>
             <button type="submit" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -mr-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>

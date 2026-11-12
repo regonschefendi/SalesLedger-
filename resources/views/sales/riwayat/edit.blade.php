@@ -12,9 +12,9 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-32 shadow-2xl overflow-hidden">
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 border-b border-gray-50">
-            <button onclick="window.history.back()" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
+            <a href="{{ route('sales.riwayat.show', $faktur->id) }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Upload Nota</h1>
         </div>
 
@@ -60,7 +60,7 @@
 
                 <div class="fixed bottom-0 max-w-md mx-auto inset-x-0 bg-white p-5 z-20 space-y-3">
                     <button type="submit" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-3.5 rounded-full shadow-md transition text-[14px]">Simpan Pembayaran</button>
-                    <button type="button" onclick="window.history.back()" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-bold py-3.5 rounded-full transition text-[14px]">Batalkan</button>
+                    <a href="{{ route('sales.riwayat.show', $faktur->id) }}" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-bold py-3.5 rounded-full transition text-[14px] flex items-center justify-center">Batalkan</a>
                 </div>
             </form>
 

@@ -74,15 +74,15 @@
                 </div>
             </div>
 
-            <div id="view-success" class="hidden flex-col items-center pt-4">
-                <div class="relative w-24 h-24 mb-4">
+            <div id="view-success" class="hidden flex-col items-center pt-8 pb-10 w-full">
+                <div class="relative w-28 h-28 mb-6">
                     <div class="absolute inset-0 bg-[#ECFDF5] rounded-full animate-ping opacity-75"></div>
-                    <div class="relative w-full h-full bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg border-[6px] border-[#ECFDF5]">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                    <div class="relative w-full h-full bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg border-8 border-[#ECFDF5]">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
-                <h2 class="text-[20px] font-bold text-gray-900 mb-1">Toko Berhasil Disimpan</h2>
-                <p class="text-[13px] text-gray-500 mb-6">Data Toko Berhasil disimpan.</p>
+                <h2 class="text-[20px] font-bold text-gray-900 mb-1 text-center">Toko Berhasil Disimpan</h2>
+                <p class="text-[13px] text-gray-500 mb-6 text-center">Data Toko Berhasil disimpan.</p>
                 
                 <div class="w-full border border-gray-100 rounded-2xl p-5 bg-white shadow-sm space-y-4" id="success-summary">
                     </div>
@@ -130,14 +130,14 @@
                 submitData();
             }
             else if (currentState === 'success') {
-                window.location.href = "/admin/toko"; // Kembali ke list toko
+                window.location.href = "{{ route('admin.toko.index') }}"; // Kembali ke list toko
             }
         }
 
         function handleBack() {
-            if (currentState === 'form') { window.history.back(); }
+            if (currentState === 'form') { window.location.href = "{{ route('admin.toko.index') }}"; }
             else if (currentState === 'verify') { switchView('form'); }
-            else if (currentState === 'success') { window.location.href = "/admin/toko"; }
+            else if (currentState === 'success') { window.location.href = "{{ route('admin.toko.index') }}"; }
         }
 
         function switchView(state) {
@@ -145,6 +145,7 @@
             document.getElementById('view-form').classList.add('hidden');
             document.getElementById('view-verify').classList.add('hidden');
             document.getElementById('view-success').classList.add('hidden');
+            document.getElementById('view-success').classList.remove('flex');
             
             const btn = document.getElementById('btn-action');
             const title = document.getElementById('header-title');
@@ -153,13 +154,16 @@
                 document.getElementById('view-form').classList.remove('hidden');
                 btn.innerText = 'Simpan';
                 title.innerText = 'Tambah Toko';
+                title.classList.remove('hidden');
             } else if (state === 'verify') {
                 document.getElementById('view-verify').classList.remove('hidden');
                 btn.innerText = 'Simpan';
                 title.innerText = 'Detail Toko';
+                title.classList.remove('hidden');
             } else if (state === 'success') {
-                document.getElementById('view-success').classList.remove('hidden');
                 document.getElementById('success-summary').innerHTML = document.querySelector('#view-verify .bg-white').innerHTML;
+                document.getElementById('view-success').classList.remove('hidden');
+                document.getElementById('view-success').classList.add('flex');
                 btn.innerText = 'Selesai';
                 title.classList.add('hidden'); // Sembunyikan title di header pas sukses
             }

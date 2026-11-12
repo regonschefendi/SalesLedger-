@@ -17,9 +17,9 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
         <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative">
-            <button onclick="window.history.back()" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
+            <a href="{{ route('admin.toko.index') }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Detail Toko</h1>
 
             <div class="flex items-center space-x-4">
@@ -134,7 +134,7 @@
         </div>
 
         <div class="fixed bottom-0 max-w-md mx-auto inset-x-0 bg-white border-t border-gray-100 p-5 z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
-            <button onclick="window.history.back()" class="w-full bg-[#2563EB] hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md transition duration-200 text-[14px]">Kembali</button>
+            <a href="{{ route('admin.toko.index') }}" class="w-full bg-[#2563EB] hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md transition duration-200 text-[14px] flex items-center justify-center">Kembali</a>
         </div>
     </div>
 </body>

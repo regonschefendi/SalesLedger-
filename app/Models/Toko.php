@@ -7,18 +7,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Toko extends Model
 {
-
     use SoftDeletes;
 
     protected $fillable = [
+        'admin_id',
         'nama_toko',
         'no_telp',
         'alamat',
         'provinsi',
         'kota',
         'kode_pos',
-        'sales_id'
+        'sales_id',
     ];
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
 
     public function fakturs()
     {

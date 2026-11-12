@@ -4,9 +4,12 @@ namespace App\Http\Controllers\sales;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class SalesRiwayatController extends Controller
 {
@@ -17,11 +20,11 @@ class SalesRiwayatController extends Controller
         // Filter search bar
         if ($request->filled('q')) {
             $search = $request->q;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nomor_faktur', 'ILIKE', "%{$search}%")
-                  ->orWhereHas('toko', function($qToko) use ($search) {
-                      $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
-                  });
+                    ->orWhereHas('toko', function ($qToko) use ($search) {
+                        $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
+                    });
             });
         }
 
@@ -33,10 +36,15 @@ class SalesRiwayatController extends Controller
         $fakturs = $query->get();
 
         // Mengelompokkan berdasarkan tanggal untuk UI
-        $groupedFakturs = $fakturs->groupBy(function($faktur) {
+        $groupedFakturs = $fakturs->groupBy(function ($faktur) {
             $date = Carbon::parse($faktur->created_at)->startOfDay();
-            if ($date->isToday()) return 'Hari ini';
-            if ($date->isYesterday()) return 'Kemarin';
+            if ($date->isToday()) {
+                return 'Hari ini';
+            }
+            if ($date->isYesterday()) {
+                return 'Kemarin';
+            }
+
             return $date->translatedFormat('d F Y');
         });
 
@@ -47,7 +55,7 @@ class SalesRiwayatController extends Controller
     {
         // Pastikan hanya bisa lihat faktur miliknya sendiri
         $faktur = Faktur::with('toko')->where('sales_id', Auth::id())->findOrFail($id);
-        
+
         return view('sales.riwayat.show', compact('faktur'));
     }
 
@@ -60,7 +68,7 @@ class SalesRiwayatController extends Controller
     public function editPembayaran($id)
     {
         $faktur = Faktur::with('toko')->where('sales_id', Auth::id())->findOrFail($id);
-        
+
         // Mencegah akses ke faktur yang sudah lunas
         if ($faktur->status === 'lunas') {
             return redirect()->route('sales.riwayat.show', $id)->with('error', 'Faktur sudah lunas.');
@@ -81,7 +89,7 @@ class SalesRiwayatController extends Controller
 
         // Hitung total dibayar yang baru (Pembayaran lama + Nominal baru)
         $totalDibayarBaru = $faktur->total_dibayar + $request->nominal_pembayaran;
-        
+
         // Cegah kelebihan bayar
         if ($totalDibayarBaru > $faktur->total_tagihan) {
             $totalDibayarBaru = $faktur->total_tagihan;
@@ -96,6 +104,24 @@ class SalesRiwayatController extends Controller
             'tanggal_pembayaran' => $request->tanggal_pembayaran,
             'status' => $statusBaru,
         ]);
+
+        // Notifikasi untuk admin bahwa sales mencatat pembayaran.
+        /** @var User $sales */
+        $sales = Auth::user();
+        $admin = $sales->parentAdmin;
+
+        if ($admin) {
+            Notification::send(
+                $admin,
+                new SystemNotification(
+                    'Pembayaran Dicatat',
+                    $sales->full_name.' mencatat pembayaran nota '.$faktur->nomor_faktur
+                        .' sebesar Rp'.number_format($request->nominal_pembayaran, 0, ',', '.').'.',
+                    route('admin.pembukuan.show', $faktur->id),
+                    'pembayaran'
+                )
+            );
+        }
 
         // Redirect ke halaman khusus success update
         return view('sales.riwayat.success-update', compact('faktur'));

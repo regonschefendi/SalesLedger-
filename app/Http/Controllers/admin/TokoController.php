@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TokoRequest;
 use App\Models\Faktur;
 use App\Models\Toko;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 
 class TokoController extends Controller
 {
@@ -15,53 +18,58 @@ class TokoController extends Controller
     // TAMPILAN INDEX TOKO
     // ==========================================
     public function index()
-{
-    $salesIds = Auth::user()->sales()->pluck('id');
+    {
+        /** @var User $admin */
+        $admin = Auth::user();
+        $salesIds = $admin->sales()->pluck('id');
 
-    $tokos = Toko::with([
-        'fakturs' => fn ($q) => $q->whereIn('sales_id', $salesIds),
-        'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
-    ])->get()->map(function($toko) {
-        
-        // Kalkulasi status lunas/belum lunas dari seluruh faktur
-        $totalTagihan = $toko->fakturs->sum('total_tagihan');
-        $totalDibayar = $toko->fakturs->sum('total_dibayar');
-        $sisa = $totalTagihan - $totalDibayar;
-        
-        $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
+        // Admin hanya boleh melihat toko yang dia tambahkan sendiri.
+        $tokos = Toko::where('admin_id', $admin->id)->with([
+            'fakturs' => fn ($q) => $q->whereIn('sales_id', $salesIds),
+            'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
+        ])->get()->map(function ($toko) {
 
-        // Cek dulu apakah toko ini punya sales (tidak null)
-        $toko->sales_name = $toko->sales->isNotEmpty() ? $toko->sales->first()->full_name : 'Belum ditugaskan';
-        
-        return $toko;
-    });
+            // Kalkulasi status lunas/belum lunas dari seluruh faktur
+            $totalTagihan = $toko->fakturs->sum('total_tagihan');
+            $totalDibayar = $toko->fakturs->sum('total_dibayar');
+            $sisa = $totalTagihan - $totalDibayar;
 
-    // Hitung statistik global untuk kartu di atas list
-    $stats = [
-        'total' => $tokos->count(),
-        'belum_lunas' => $tokos->where('status_pembayaran', 'belum_lunas')->count(),
-    ];
+            $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
 
-    return view('admin.toko.index', compact('tokos', 'stats'));
-}
+            // Cek dulu apakah toko ini punya sales (tidak null)
+            $toko->sales_name = $toko->sales->isNotEmpty() ? $toko->sales->first()->full_name : 'Belum ditugaskan';
+
+            return $toko;
+        });
+
+        // Hitung statistik global untuk kartu di atas list
+        $stats = [
+            'total' => $tokos->count(),
+            'belum_lunas' => $tokos->where('status_pembayaran', 'belum_lunas')->count(),
+        ];
+
+        return view('admin.toko.index', compact('tokos', 'stats'));
+    }
 
     // ==========================================
     // MENAMPILKAN HALAMAN DETAIL TOKO (SHOW)
     // ==========================================
     public function show($id)
     {
-        $salesIds = Auth::user()->sales()->pluck('id');
+        /** @var User $admin */
+        $admin = Auth::user();
+        $salesIds = $admin->sales()->pluck('id');
 
-        // Ambil data toko spesifik beserta riwayat fakturnya (hanya milik tim admin ini)
-        $toko = Toko::with([
-            'fakturs' => function($query) use ($salesIds) {
+        // Ambil data toko spesifik beserta riwayat fakturnya (hanya milik admin ini)
+        $toko = Toko::where('admin_id', $admin->id)->with([
+            'fakturs' => function ($query) use ($salesIds) {
                 $query->whereIn('sales_id', $salesIds)->orderBy('created_at', 'desc'); // Urutkan nota dari yang terbaru
             },
             'fakturs.user',
             'sales' => fn ($q) => $q->whereIn('users.id', $salesIds),
         ])->findOrFail($id);
 
-        $salesPegangan = $toko->sales->map(function($sales) {
+        $salesPegangan = $toko->sales->map(function ($sales) {
             return [
                 'nama' => $sales->full_name,
             ];
@@ -70,7 +78,7 @@ class TokoController extends Controller
         // Kalkulasi Statistik Keuangan Toko
         $totalTagihan = $toko->fakturs->sum('total_tagihan');
         $totalDibayar = $toko->fakturs->sum('total_dibayar');
-        
+
         $stats = [
             'total_nota' => $toko->fakturs->count(),
             'total_tagihan' => $totalTagihan,
@@ -95,7 +103,25 @@ class TokoController extends Controller
     public function store(TokoRequest $request)
     {
         try {
-            Toko::create($request->validated());
+            /** @var User $admin */
+            $admin = Auth::user();
+
+            $toko = Toko::create([
+                ...$request->validated(),
+                'admin_id' => $admin->id,
+            ]);
+
+            // Beri tahu semua sales di bawah admin ini kalau ada toko baru.
+            Notification::send(
+                $admin->sales()->get(),
+                new SystemNotification(
+                    'Toko Baru',
+                    $admin->full_name.' menambahkan toko "'.$toko->nama_toko.'".',
+                    route('sales.toko-pegangan.index'),
+                    'toko'
+                )
+            );
+
             return response()->json(['success' => true, 'message' => 'Toko berhasil ditambahkan!']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Gagal menyimpan data sistem.']);
@@ -109,15 +135,15 @@ class TokoController extends Controller
 
         // Tarik data faktur beserta relasi toko dan sales-nya (hanya milik tim admin ini)
         $faktur = Faktur::with(['toko', 'user'])->whereIn('sales_id', $salesIds)->findOrFail($id);
-        
+
         return view('admin.toko.detail-faktur', compact('faktur'));
     }
 
     // Menampilkan Form Edit
     public function edit(Toko $toko)
     {
-        Gate::authorize('update', $toko); 
-        
+        Gate::authorize('update', $toko);
+
         return view('admin.toko.edit', compact('toko'));
     }
 
@@ -129,8 +155,24 @@ class TokoController extends Controller
         // Data sudah otomatis divalidasi oleh TokoRequest
         $toko->update($request->validated());
 
+        // Beri tahu sales yang sedang memegang toko ini.
+        $salesIds = Auth::user()->sales()->pluck('id');
+        $pemegang = $toko->sales()->whereIn('users.id', $salesIds)->get();
+
+        if ($pemegang->isNotEmpty()) {
+            Notification::send(
+                $pemegang,
+                new SystemNotification(
+                    'Informasi Toko Diperbarui',
+                    'Data toko "'.$toko->nama_toko.'" telah diperbarui oleh admin.',
+                    route('sales.toko-pegangan.index'),
+                    'toko'
+                )
+            );
+        }
+
         return redirect()->route('admin.toko.show', $toko->id)
-                         ->with('success', 'Informasi toko berhasil diperbarui.');
+            ->with('success', 'Informasi toko berhasil diperbarui.');
     }
 
     // Memproses Soft Delete
@@ -138,9 +180,25 @@ class TokoController extends Controller
     {
         Gate::authorize('delete', $toko);
 
+        // Beri tahu sales yang memegang toko ini sebelum toko dihapus.
+        $salesIds = Auth::user()->sales()->pluck('id');
+        $pemegang = $toko->sales()->whereIn('users.id', $salesIds)->get();
+
+        if ($pemegang->isNotEmpty()) {
+            Notification::send(
+                $pemegang,
+                new SystemNotification(
+                    'Toko Dihapus',
+                    'Toko "'.$toko->nama_toko.'" telah dihapus oleh admin.',
+                    route('sales.toko-pegangan.index'),
+                    'toko'
+                )
+            );
+        }
+
         $toko->delete(); // Akan mengisi kolom deleted_at berkat SoftDeletes
 
         return redirect()->route('admin.toko.index')
-                         ->with('success', 'Toko berhasil dihapus dari daftar aktif.');
+            ->with('success', 'Toko berhasil dihapus dari daftar aktif.');
     }
 }

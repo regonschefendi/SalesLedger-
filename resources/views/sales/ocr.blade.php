@@ -16,9 +16,9 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         
         <div id="main-header" class="px-6 pt-12 pb-4 flex items-center bg-white border-b border-gray-100 relative z-10">
-            <button onclick="window.history.back()" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
+            <a href="{{ route('sales.home') }}" class="text-[#0F47A1] hover:text-blue-900 transition p-2 -ml-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Upload Nota</h1>
         </div>
 

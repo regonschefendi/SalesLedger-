@@ -12,10 +12,15 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-10 shadow-2xl overflow-hidden">
         
         <!-- HEADER -->
+        @php
+            $profileUrl = Auth::user()->role === 'admin'
+                ? route('admin.profile.index')
+                : route('sales.profile.index');
+        @endphp
         <div class="px-6 pt-12 pb-4 flex items-center bg-white z-10 relative">
-            <button onclick="window.history.back()" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
+            <a href="{{ $profileUrl }}" class="text-[#0F47A1] p-2 -ml-2 hover:text-blue-900 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
+            </a>
             <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Ubah Password</h1>
         </div>
 

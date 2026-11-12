@@ -13,23 +13,25 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         // Ambil user dengan role sales (Sesuaikan dengan nama kolom role di database lu)
-        $query = User::withCount('tokosPegangan')
+        $query = User::withCount([
+            'tokosPegangan as tokos_pegangan_count' => fn ($q) => $q->where('tokos.admin_id', Auth::id()),
+        ])
             ->where('role', 'sales')
             ->where('parent_admin_id', Auth::id());
 
         // Fitur Pencarian
         if ($request->filled('q')) {
-            $query->where('full_name', 'ILIKE', '%' . $request->q . '%'); 
+            $query->where('full_name', 'ILIKE', '%'.$request->q.'%');
         }
 
-        $salesUsers = $query->get()->map(function($sales) {
+        $salesUsers = $query->get()->map(function ($sales) {
             // Ambil semua faktur milik sales ini
             $fakturs = Faktur::where('sales_id', $sales->id)->get();
-            
+
             // Hitung statistik singkat
             $sales->total_toko = $sales->tokos_pegangan_count;
             $sales->belum_lunas_count = $fakturs->where('status', 'belum_lunas')->count();
-            
+
             return $sales;
         });
 
@@ -40,11 +42,13 @@ class SalesController extends Controller
 
     public function show($id)
     {
-        $sales = User::with('tokosPegangan')
+        $sales = User::with([
+            'tokosPegangan' => fn ($q) => $q->where('tokos.admin_id', Auth::id()),
+        ])
             ->where('role', 'sales')
             ->where('parent_admin_id', Auth::id())
             ->findOrFail($id);
-        
+
         // Ambil faktur beserta relasi tokonya
         $fakturs = Faktur::with('toko')->where('sales_id', $sales->id)->get();
 
@@ -53,8 +57,8 @@ class SalesController extends Controller
             'total_toko' => $sales->tokosPegangan->count(),
             'total_nota' => $fakturs->count(),
             'total_tagihan' => $fakturs->sum('total_tagihan'),
-            'sisa_tagihan' => $fakturs->sum(function($f) { 
-                return max(0, $f->total_tagihan - $f->total_dibayar); 
+            'sisa_tagihan' => $fakturs->sum(function ($f) {
+                return max(0, $f->total_tagihan - $f->total_dibayar);
             }),
             'lunas_count' => $fakturs->where('status', 'lunas')->count(),
             'belum_lunas_count' => $fakturs->where('status', 'belum_lunas')->count(),
@@ -62,13 +66,13 @@ class SalesController extends Controller
 
         // Kelompokkan faktur berdasarkan toko untuk list "Toko Pegangan"
         // Looping toko yang sedang dipegang dari relasi pivot
-        $tokoPegangan = $sales->tokosPegangan->map(function($toko) use ($fakturs) {
+        $tokoPegangan = $sales->tokosPegangan->map(function ($toko) use ($fakturs) {
             // Cari faktur yang sesuai sama toko ini aja untuk ngitung status tagihan
             $faktursToko = $fakturs->where('toko_id', $toko->id);
-            $sisa = $faktursToko->sum(function($f) { 
-                return max(0, $f->total_tagihan - $f->total_dibayar); 
+            $sisa = $faktursToko->sum(function ($f) {
+                return max(0, $f->total_tagihan - $f->total_dibayar);
             });
-            
+
             return (object) [
                 'id' => $toko->id,
                 'nama_toko' => $toko->nama_toko,

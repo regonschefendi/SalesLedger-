@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
+use App\Models\User;
 use App\Support\XlsxWriter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        /** @var \App\Models\User $admin */
+        /** @var User $admin */
         $admin = Auth::user();
         $namaDepan = explode(' ', $admin->full_name)[0];
 
@@ -25,12 +26,12 @@ class AdminController extends Controller
 
         // Logic Filter Waktu (Hari Ini & Bulan Ini)
         $filterAktif = $request->query('filter', 'hari_ini');
-        
+
         if ($filterAktif === 'hari_ini') {
             $query->whereDate('created_at', Carbon::today());
         } elseif ($filterAktif === 'bulan_ini') {
             $query->whereMonth('created_at', Carbon::now()->month)
-                  ->whereYear('created_at', Carbon::now()->year);
+                ->whereYear('created_at', Carbon::now()->year);
         }
 
         // Kalkulasi langsung di level Database
@@ -56,7 +57,8 @@ class AdminController extends Controller
             'sisa_kredit' => $sisa_kredit,
             'lunas' => $lunas,
             'belum_lunas' => $belum_lunas,
-            'riwayat' => $riwayat
+            'riwayat' => $riwayat,
+            'unread_notifications' => $admin->unreadNotifications()->count(),
         ]);
     }
 
@@ -65,9 +67,9 @@ class AdminController extends Controller
     // ==========================================
     public function pembukuanIndex(Request $request)
     {
-        /** @var \App\Models\User $admin */
+        /** @var User $admin */
         $admin = Auth::user();
-        
+
         // Isolasi data ketat hanya untuk Sales yang terikat Kode Referal Admin ini
         $salesIds = $admin->sales()->pluck('id');
         $query = Faktur::whereIn('sales_id', $salesIds)->with(['user', 'toko']);
@@ -75,20 +77,20 @@ class AdminController extends Controller
         // Fitur Search Box (Nama Toko / No Nota)
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nomor_faktur', 'ILIKE', "%{$search}%")
-                  ->orWhereHas('toko', function($qToko) use ($search) {
-                      $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
-                  });
+                    ->orWhereHas('toko', function ($qToko) use ($search) {
+                        $qToko->where('nama_toko', 'ILIKE', "%{$search}%");
+                    });
             });
         }
 
         // Fitur Filter Waktu dari Chips
         $timeFilter = $request->query('time', 'semua');
         if ($timeFilter === 'hari_ini') {
-            $query->whereDate('tanggal_nota', \Carbon\Carbon::today());
+            $query->whereDate('tanggal_nota', Carbon::today());
         } elseif ($timeFilter === 'minggu_ini') {
-            $query->whereBetween('tanggal_nota', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()]);
+            $query->whereBetween('tanggal_nota', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
         }
 
         // Fitur Filter Status dari Chips
@@ -114,7 +116,7 @@ class AdminController extends Controller
             'total_tagihan' => $total_tagihan,
             'sisa_tagihan' => $sisa_tagihan,
             'filter_time' => $timeFilter,
-            'filter_status' => $statusFilter
+            'filter_status' => $statusFilter,
         ]);
     }
 
@@ -125,16 +127,16 @@ class AdminController extends Controller
     {
         $request->validate([
             'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ], [
-            'start_date.required'      => 'Tanggal mulai wajib diisi.',
-            'start_date.date'          => 'Format tanggal mulai tidak valid.',
-            'end_date.required'        => 'Tanggal akhir wajib diisi.',
-            'end_date.date'            => 'Format tanggal akhir tidak valid.',
-            'end_date.after_or_equal'  => 'Tanggal akhir tidak boleh sebelum tanggal mulai.',
+            'start_date.required' => 'Tanggal mulai wajib diisi.',
+            'start_date.date' => 'Format tanggal mulai tidak valid.',
+            'end_date.required' => 'Tanggal akhir wajib diisi.',
+            'end_date.date' => 'Format tanggal akhir tidak valid.',
+            'end_date.after_or_equal' => 'Tanggal akhir tidak boleh sebelum tanggal mulai.',
         ]);
 
-        /** @var \App\Models\User $admin */
+        /** @var User $admin */
         $admin = Auth::user();
         $salesIds = $admin->sales()->pluck('id');
 
@@ -179,7 +181,7 @@ class AdminController extends Controller
 
         $content = XlsxWriter::make(
             'Pembukuan',
-            'Laporan Pembukuan ' . $startDate->format('d/m/Y') . ' - ' . $endDate->format('d/m/Y'),
+            'Laporan Pembukuan '.$startDate->format('d/m/Y').' - '.$endDate->format('d/m/Y'),
             [
                 'No',
                 'Nomor Faktur',
@@ -198,7 +200,7 @@ class AdminController extends Controller
             [null, null, null, null, null, 'TOTAL', $totalTagihan, $totalDibayar, $totalTagihan - $totalDibayar, null, null]
         );
 
-        $filename = 'Pembukuan_' . $startDate->format('Ymd') . '_sd_' . $endDate->format('Ymd') . '.xlsx';
+        $filename = 'Pembukuan_'.$startDate->format('Ymd').'_sd_'.$endDate->format('Ymd').'.xlsx';
 
         return response()->streamDownload(function () use ($content) {
             echo $content;
@@ -212,7 +214,7 @@ class AdminController extends Controller
     // ==========================================
     public function pembukuanShow($id)
     {
-        /** @var \App\Models\User $admin */
+        /** @var User $admin */
         $admin = Auth::user();
         $salesIds = $admin->sales()->pluck('id');
 
@@ -228,6 +230,7 @@ class AdminController extends Controller
     public function profileIndex()
     {
         $user = Auth::user();
+
         return view('admin.profile.index', compact('user'));
     }
 
@@ -237,6 +240,7 @@ class AdminController extends Controller
     public function profileEdit()
     {
         $user = Auth::user();
+
         return view('admin.profile.edit', compact('user'));
     }
 
@@ -245,19 +249,19 @@ class AdminController extends Controller
     // ==========================================
     public function profileUpdate(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
-            'full_name'    => 'required|string|max:255',
-            'phone_number' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/'
+            'full_name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
         ], [
             'full_name.required' => 'Nama tidak boleh kosong.',
-            'phone_number.regex' => 'Format nomor telepon tidak valid.'
+            'phone_number.regex' => 'Format nomor telepon tidak valid.',
         ]);
 
         $user->update([
-            'full_name'    => $request->full_name,
+            'full_name' => $request->full_name,
             'phone_number' => $request->phone_number,
         ]);
 
@@ -270,6 +274,7 @@ class AdminController extends Controller
     public function customCodeIndex()
     {
         $user = Auth::user();
+
         return view('admin.profile.custom-code', compact('user'));
     }
 
@@ -278,19 +283,19 @@ class AdminController extends Controller
     // ==========================================
     public function customCodeUpdate(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
-            'admin_code' => 'required|string|max:50|alpha_dash|unique:users,admin_code,' . $user->id,
+            'admin_code' => 'required|string|max:50|alpha_dash|unique:users,admin_code,'.$user->id,
         ], [
-            'admin_code.required'   => 'Kode referal tidak boleh kosong.',
+            'admin_code.required' => 'Kode referal tidak boleh kosong.',
             'admin_code.alpha_dash' => 'Kode hanya boleh berisi huruf, angka, dan tanda strip.',
-            'admin_code.unique'     => 'Kode referal ini sudah dipakai oleh Admin lain. Cari kode lain!'
+            'admin_code.unique' => 'Kode referal ini sudah dipakai oleh Admin lain. Cari kode lain!',
         ]);
 
         $user->update([
-            'admin_code' => strtoupper($request->admin_code)
+            'admin_code' => strtoupper($request->admin_code),
         ]);
 
         return redirect()->route('admin.profile.index')->with('success', 'Custom Code berhasil diperbarui!');

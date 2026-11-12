@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Toko;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TokoPolicy
 {
@@ -13,7 +12,7 @@ class TokoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return in_array($user->role, ['admin', 'sales'], true);
     }
 
     /**
@@ -21,7 +20,13 @@ class TokoPolicy
      */
     public function view(User $user, Toko $toko): bool
     {
-        return false;
+        if ($user->role === 'admin') {
+            return $toko->admin_id === $user->id;
+        }
+
+        return $user->role === 'sales'
+            && $user->parent_admin_id !== null
+            && $toko->admin_id === $user->parent_admin_id;
     }
 
     /**
@@ -29,7 +34,7 @@ class TokoPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->role === 'admin';
     }
 
     /**
@@ -37,7 +42,7 @@ class TokoPolicy
      */
     public function update(User $user, Toko $toko): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'admin' && $toko->admin_id === $user->id;
     }
 
     /**
@@ -45,7 +50,7 @@ class TokoPolicy
      */
     public function delete(User $user, Toko $toko): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'admin' && $toko->admin_id === $user->id;
     }
 
     /**

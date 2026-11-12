@@ -4,6 +4,7 @@ namespace App\Http\Controllers\sales;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,9 +12,9 @@ class SalesController extends Controller
 {
     public function index()
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
-        if (!$user->parent_admin_id) {
+        if (! $user->parent_admin_id) {
             return redirect('/select-role')->with('error', 'Lu harus masukin Kode Referal Admin dulu!');
         }
 
@@ -24,7 +25,7 @@ class SalesController extends Controller
         $total_tagihan = $fakturs->sum('total_tagihan');
         $total_dibayar = $fakturs->sum('total_dibayar');
         $sisa_kredit = $total_tagihan - $total_dibayar;
-        
+
         $lunas = $fakturs->where('status', 'lunas')->count();
         $belum_lunas = $fakturs->where('status', 'belum_lunas')->count();
 
@@ -42,7 +43,8 @@ class SalesController extends Controller
             'sisa_kredit' => $sisa_kredit,
             'lunas' => $lunas,
             'belum_lunas' => $belum_lunas,
-            'riwayat' => $riwayat
+            'riwayat' => $riwayat,
+            'unread_notifications' => $user->unreadNotifications()->count(),
         ];
 
         return view('sales.home', $data);
@@ -50,13 +52,15 @@ class SalesController extends Controller
 
     public function profileIndex()
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         // Hitung statistik langsung dari database
         $stats = [
-            // Hitung berapa toko unik yang pernah diinput sales ini
-            'total_toko' => $user->tokosPegangan()->count(),
+            // Hitung toko pegangan yang memang milik admin terkait
+            'total_toko' => $user->tokosPegangan()
+                ->where('tokos.admin_id', $user->parent_admin_id)
+                ->count(),
             // Hitung total nota yang pernah dikirim
             'total_nota' => Faktur::where('sales_id', $user->id)->count(),
             // Hitung total nominal uang dari semua nota
@@ -71,17 +75,18 @@ class SalesController extends Controller
     public function profileEdit()
     {
         $user = Auth::user();
+
         return view('sales.profile.edit', compact('user'));
     }
 
     public function profileUpdate(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
             'full_name' => 'required|string|max:255',
-            'phone_number' => 'nullable|string|max:20'
+            'phone_number' => 'nullable|string|max:20',
         ]);
 
         $user->update($request->only('full_name', 'phone_number'));

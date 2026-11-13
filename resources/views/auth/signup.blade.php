@@ -63,7 +63,7 @@
         </div>
 
         <div class="text-center text-xs text-gray-500 pt-6">
-            Don't have an account? <a href="/login" class="font-bold text-[#0F47A1] hover:underline">Sign Up</a>
+            Already have an account? <a href="/login" class="font-bold text-[#0F47A1] hover:underline">Sign In</a>
         </div>
     </div>
 

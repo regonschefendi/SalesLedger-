@@ -9,18 +9,47 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
+    // Tampilkan halaman pilih role, atau langsung lempar user yang sudah punya role.
+    public function showSelectRole()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect('/admin/dashboard');
+        }
+
+        if ($user->role === 'sales') {
+            return redirect('/sales/home');
+        }
+
+        return view('auth.select-role');
+    }
+
     // Proses jika user pilih Admin
     public function setAdmin(Request $request)
     {
-        $request->validate([
-            'admin_code' => 'required|string|unique:users,admin_code', // Wajib unik se-database
-        ]);
-
         /** @var User $user */
         $user = Auth::user();
-        $user->role = 'admin';
-        $user->admin_code = $request->admin_code;
-        $user->save();
+
+        if ($user->role !== null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Role sudah dipilih dan tidak dapat diubah.',
+            ], 409);
+        }
+
+        $request->merge(['admin_code' => strtoupper(trim((string) $request->admin_code))]);
+
+        $request->validate([
+            'admin_code' => 'required|string|max:50|alpha_dash|unique:users,admin_code', // Wajib unik se-database
+        ]);
+
+        $user->update([
+            'role' => 'admin',
+            'admin_code' => $request->admin_code,
+            'parent_admin_id' => null,
+        ]);
 
         return response()->json(['success' => true, 'redirect' => '/admin/dashboard']);
     }
@@ -28,24 +57,42 @@ class RoleController extends Controller
     // Proses jika user pilih Sales
     public function setSales(Request $request)
     {
-        $request->validate([
-            'admin_code' => 'required|string|exists:users,admin_code',
-        ], [
-            'admin_code.exists' => 'Kode Referal tidak ditemukan! Pastikan lu minta kode yang benar ke Admin lu.',
-        ]);
-
-        // Cek apakah kode admin tersebut ada di database?
-        $admin = User::where('admin_code', $request->admin_code)->first();
-
-        if (! $admin) {
-            return response()->json(['success' => false, 'message' => 'Kode Admin tidak ditemukan!'], 404);
-        }
-
         /** @var User $user */
         $user = Auth::user();
-        $user->role = 'sales';
-        $user->parent_admin_id = $admin->id; // Hubungkan Sales ke Admin
-        $user->save();
+
+        if ($user->role !== null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Role sudah dipilih dan tidak dapat diubah.',
+            ], 409);
+        }
+
+        $request->merge(['admin_code' => strtoupper(trim((string) $request->admin_code))]);
+
+        $request->validate([
+            'admin_code' => 'required|string|max:50',
+        ], [
+            'admin_code.required' => 'Kode Referal wajib diisi.',
+        ]);
+
+        // Hanya boleh terhubung ke user yang benar-benar berperan sebagai admin.
+        $admin = User::where('admin_code', $request->admin_code)
+            ->where('role', 'admin')
+            ->where('id', '!=', $user->id)
+            ->first();
+
+        if (! $admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode Referal tidak ditemukan! Pastikan kode benar.',
+            ], 404);
+        }
+
+        $user->update([
+            'role' => 'sales',
+            'parent_admin_id' => $admin->id, // Hubungkan Sales ke Admin
+            'admin_code' => null,
+        ]);
 
         return response()->json(['success' => true, 'redirect' => '/sales/home']);
     }

@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
         // Pakai HTTPS kalau lagi di production (Railway)
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
+
+            // Cookie sesi hanya dikirim lewat HTTPS agar tidak bisa dicuri
+            // saat koneksi HTTP (session hijacking).
+            config(['session.secure' => true]);
         }
     }
 }

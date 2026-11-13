@@ -23,7 +23,7 @@
 
             <form id="otpForm" class="space-y-6 pt-4">
                 <div>
-                    <input type="text" id="otp-input" name="otp" maxlength="6" placeholder="000000" required 
+                    <input type="text" id="otp-input" name="otp" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" placeholder="000000" required 
                            class="w-full bg-[#F3F4F6] border-0 rounded-2xl px-4 py-4 text-center text-2xl font-bold tracking-[10px] focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-300">
                 </div>
 
@@ -77,7 +77,7 @@
                     document.getElementById('timer-text').classList.add('hidden');
                     document.getElementById('btn-resend').classList.remove('hidden');
                     document.getElementById('btn-resend').disabled = false;
-                    document.getElementById('otp-input').disabled = true; // Kunci input jika expired
+                    // Input tetap aktif; kedaluwarsa OTP tetap divalidasi oleh server.
                 }
                 timeLeft--;
             }, 1000);

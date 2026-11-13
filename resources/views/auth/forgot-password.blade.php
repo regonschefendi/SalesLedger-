@@ -42,7 +42,7 @@
             <form id="resetPasswordForm" class="space-y-4 pt-2 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1 text-center">Kode OTP (Cek Email)</label>
-                    <input type="text" name="otp" maxlength="6" placeholder="000000" required 
+                    <input type="text" name="otp" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" placeholder="000000" required 
                            class="w-full bg-[#F3F4F6] border-0 rounded-2xl px-4 py-4 text-center text-2xl font-bold tracking-[10px] focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-300">
                 </div>
 

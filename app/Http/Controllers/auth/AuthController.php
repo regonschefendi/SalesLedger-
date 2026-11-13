@@ -49,7 +49,19 @@ class AuthController extends Controller
 
         $request->validate([
             'full_name' => 'required|string|max:255',
-            'username' => 'required|string|min:3|max:50|unique:users,username',
+            'username' => [
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+                function (string $attribute, $value, \Closure $fail) {
+                    // PostgreSQL membedakan huruf besar/kecil pada unique index,
+                    // jadi cek manual agar "Adminapp" dan "adminapp" dianggap sama.
+                    if (User::whereRaw('LOWER(username) = ?', [mb_strtolower(trim((string) $value))])->exists()) {
+                        $fail('Nama pengguna sudah digunakan.');
+                    }
+                },
+            ],
             'email' => [
                 'required',
                 'string',

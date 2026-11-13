@@ -96,6 +96,30 @@ class AuthFlowTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_registration_rejects_username_that_differs_only_by_case(): void
+    {
+        User::factory()->create(['username' => 'Adminapp']);
+
+        $this->postJson('/api/register', $this->registerPayload([
+            'username' => 'adminapp',
+            'email' => 'new@example.com',
+        ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('username');
+    }
+
+    public function test_registration_rejects_email_that_differs_only_by_case(): void
+    {
+        User::factory()->create(['email' => 'Admin@Example.com']);
+
+        $this->postJson('/api/register', $this->registerPayload([
+            'username' => 'newuser',
+            'email' => 'admin@example.com',
+        ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('email');
+    }
+
     public function test_otp_is_locked_after_too_many_wrong_attempts(): void
     {
         $otp = $this->registerAndGetOtp();

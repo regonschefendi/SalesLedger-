@@ -105,7 +105,7 @@
             const btnSubmit = document.getElementById('btn-submit');
             const errorBox = document.getElementById('error-box');
 
-            btnText.innerText = "Verifying...";
+            btnText.innerText = "Memverifikasi...";
             btnSubmit.disabled = true;
             errorBox.classList.add('hidden');
 

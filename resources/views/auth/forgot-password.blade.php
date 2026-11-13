@@ -142,7 +142,6 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    Loading.hide();
                     alert(result.message); // Native alert biar jelas
                     window.location.href = result.redirect; // Lempar ke halaman Login
                 } else {
@@ -156,6 +155,8 @@
                 showNotif("Terjadi kesalahan jaringan.");
                 btn.disabled = false;
                 btn.innerText = "Simpan Kata Sandi Baru";
+            } finally {
+                Loading.hide();
             }
         });
     </script>

@@ -121,6 +121,7 @@
                 errorBox.innerHTML = "Gagal terhubung ke server. Periksa koneksi internet.";
                 errorBox.classList.remove('hidden');
             } finally {
+                Loading.hide();
                 btnText.innerText = "Buat Akun";
                 btnSubmit.disabled = false;
             }

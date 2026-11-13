@@ -22,7 +22,7 @@ export default defineConfig({
                 start_url: '/',
                 name: 'Sales Ledger App',
                 short_name: 'SalesLedger',
-                description: 'Aplikasi Scan Faktur AI untuk Tim Sales',
+                description: 'Aplikasi Pindai Faktur AI untuk Tim Sales',
                 theme_color: '#4A89F3',
                 background_color: '#F8F9FE',
                 display: 'standalone',

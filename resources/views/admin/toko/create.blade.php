@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Tambah Toko - Sales Ledger" :csrf="true" />
 </head>
@@ -33,7 +33,7 @@
 
                 <div class="flex items-center space-x-3 bg-blue-50 border border-blue-100 p-4 rounded-xl mt-6">
                     <div class="w-6 h-6 border-2 border-[#0F47A1] text-[#0F47A1] rounded-full flex items-center justify-center font-bold text-[12px] flex-shrink-0">!</div>
-                    <p class="text-[12px] font-bold text-[#0F47A1]">Lengkapi Data toko dengan benar sebelum disimpan.</p>
+                    <p class="text-[12px] font-bold text-[#0F47A1]">Lengkapi data toko dengan benar sebelum disimpan.</p>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@
                     <x-success-icon />
                 </div>
                 <h2 class="text-[20px] font-bold text-gray-900 mb-1 text-center">Toko Berhasil Disimpan</h2>
-                <p class="text-[13px] text-gray-500 mb-6 text-center">Data Toko Berhasil disimpan.</p>
+                <p class="text-[13px] text-gray-500 mb-6 text-center">Data toko berhasil disimpan.</p>
                 
                 <div class="w-full border border-gray-100 rounded-2xl p-5 bg-white shadow-sm space-y-4" id="success-summary">
                     </div>

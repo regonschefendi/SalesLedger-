@@ -9,7 +9,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice {{ $nomorInvoice }}</title>
+    <title>Faktur {{ $nomorInvoice }}</title>
     <style>
         @page { margin: 34px 40px; }
         * { box-sizing: border-box; }
@@ -89,10 +89,10 @@
         <tr>
             <td style="width: 60%;">
                 <div class="brand">Sales Ledger</div>
-                <div class="brand-title">Invoice Tagihan</div>
+                <div class="brand-title">Faktur Tagihan</div>
             </td>
             <td style="width: 40%;">
-                <div class="invoice-title">INVOICE</div>
+                <div class="invoice-title">FAKTUR</div>
                 <div class="invoice-number">{{ $nomorInvoice }}</div>
                 <div style="text-align: right;">
                     <span class="status {{ $isLunas ? 'status-lunas' : 'status-belum' }}">
@@ -188,7 +188,7 @@
     </table>
 
     <div class="footer">
-        Invoice ini dibuat otomatis oleh Sales Ledger pada {{ now()->translatedFormat('d F Y, H:i') }}.
+        Faktur ini dibuat otomatis oleh Sales Ledger pada {{ now()->translatedFormat('d F Y, H:i') }}.
     </div>
 </body>
 </html>

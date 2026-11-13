@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Select Role - Sales Ledger" :csrf="true" />
+    <x-head title="Pilih Peran - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -9,9 +9,9 @@
         
         <div class="space-y-6">
             <div class="space-y-2 text-center">
-                <h2 class="text-[26px] font-bold text-gray-900">Pilih Role Anda</h2>
+                <h2 class="text-[26px] font-bold text-gray-900">Pilih Peran Anda</h2>
                 <p class="text-xs text-gray-500 px-2 leading-relaxed">
-                    Tentukan peran anda di aplikasi ini. Peran yang dipilih tidak dapat diubah kembali demi keamanan data.
+                    Tentukan peran Anda di aplikasi ini. Peran yang dipilih tidak dapat diubah kembali demi keamanan data.
                 </p>
             </div>
 
@@ -21,7 +21,7 @@
                     <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0F47A1] mb-3 shadow-sm">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                     </div>
-                    <span class="text-sm font-bold text-[#0F47A1]">Owner / Admin</span>
+                    <span class="text-sm font-bold text-[#0F47A1]">Pemilik / Admin</span>
                 </div>
 
                 <div id="card-sales" onclick="toggleRole('sales')" 
@@ -35,11 +35,11 @@
 
             <form id="roleForm" class="space-y-4 pt-4">
                 <div>
-                    <label id="input-label" class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Bikin Kode Khusus Admin</label>
+                    <label id="input-label" class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Buat Kode Khusus Admin</label>
                     <input type="text" id="code-input" name="admin_code" placeholder="Contoh: ADM-COMPANY" required 
                            class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                     <p id="input-desc" class="text-[11px] text-gray-400 mt-1.5 pl-1 leading-relaxed">
-                        Kode unik ini nantinya wajib dibagikan ke tim sales anda agar mereka dapat terhubung langsung.
+                        Kode unik ini nantinya wajib dibagikan ke tim sales Anda agar mereka dapat terhubung langsung.
                     </p>
                 </div>
 
@@ -47,14 +47,14 @@
 
                 <div class="text-center pt-4">
                     <button type="submit" id="btn-submit" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm">
-                        <span id="btn-text">Confirm as Admin</span>
+                        <span id="btn-text">Konfirmasi sebagai Admin</span>
                     </button>
                 </div>
             </form>
         </div>
 
         <div class="text-center text-xs text-gray-400">
-            Sales Ledger System Relation
+            Sistem Relasi Sales Ledger
         </div>
     </div>
 
@@ -78,10 +78,10 @@
                 cardSales.className = "border border-gray-200 bg-white rounded-2xl p-5 text-center cursor-pointer transition transform active:scale-95 flex flex-col items-center";
                 
                 // Content Switch
-                label.innerText = "Bikin Kode Khusus Admin";
+                label.innerText = "Buat Kode Khusus Admin";
                 input.placeholder = "Contoh: ADM-COMPANY";
-                desc.innerText = "Kode unik ini nantinya wajib dibagikan ke tim sales anda agar mereka dapat terhubung langsung.";
-                btnText.innerText = "Confirm as Admin";
+                desc.innerText = "Kode unik ini nantinya wajib dibagikan ke tim sales Anda agar mereka dapat terhubung langsung.";
+                btnText.innerText = "Konfirmasi sebagai Admin";
             } else {
                 // Style Active Sales
                 cardSales.className = "border-2 border-[#0F47A1] bg-[#F0F5FF] rounded-2xl p-5 text-center cursor-pointer transition transform active:scale-95 flex flex-col items-center";
@@ -89,9 +89,9 @@
                 
                 // Content Switch
                 label.innerText = "Masukkan Kode Referral Admin";
-                input.placeholder = "Masukkan kode bos/admin anda...";
-                desc.innerText = "Minta kode khusus ke atasan/admin anda untuk mensinkronisasi data laporan.";
-                btnText.innerText = "Connect to Admin";
+                input.placeholder = "Masukkan kode admin Anda...";
+                desc.innerText = "Minta kode khusus ke atasan/admin Anda untuk mensinkronisasi data laporan.";
+                btnText.innerText = "Hubungkan ke Admin";
             }
         }
 

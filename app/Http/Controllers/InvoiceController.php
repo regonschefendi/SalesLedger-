@@ -34,7 +34,7 @@ class InvoiceController extends Controller
         $pdf->setPaper('A4', 'portrait');
         $pdf->render();
 
-        $filename = 'Invoice-'.preg_replace('/[^A-Za-z0-9_-]/', '-', $nomorInvoice).'.pdf';
+        $filename = 'Faktur-'.preg_replace('/[^A-Za-z0-9_-]/', '-', $nomorInvoice).'.pdf';
 
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',

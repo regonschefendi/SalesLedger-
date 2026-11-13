@@ -28,7 +28,7 @@ class BrevoMailService
     {
         $this->send(
             $email,
-            'Kode Reset Password - Sales Ledger',
+            'Kode Atur Ulang Kata Sandi - Sales Ledger',
             'emails.reset-password',
             ['otpCode' => $code],
             new ResetPasswordMail($code)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Upload Nota - Sales Ledger" :csrf="true">
+    <x-head title="Unggah Nota - Sales Ledger" :csrf="true">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
     </x-head>
@@ -12,7 +12,7 @@
         
         <div id="main-header">
             <x-back-header
-                title="Upload Nota"
+                title="Unggah Nota"
                 :back-url="route('sales.home')"
                 border-class="border-b border-gray-100"
             />
@@ -26,8 +26,8 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                     <div>
-                        <p class="text-[12px] font-bold text-[#10B981]">Scan nota berhasil dibaca</p>
-                        <p class="text-[10px] text-gray-500">Data toko bisa di edit sebelum disimpan.</p>
+                        <p class="text-[12px] font-bold text-[#10B981]">Nota berhasil dipindai</p>
+                        <p class="text-[10px] text-gray-500">Data toko bisa diubah sebelum disimpan.</p>
                     </div>
                 </div>
 
@@ -55,15 +55,15 @@
                 <div class="border border-gray-100 rounded-2xl p-5 shadow-sm bg-white space-y-4">
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <div class="flex items-center space-x-3 text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[13px] font-bold">Nama Toko</span></div>
-                        <span id="txt-nama" class="text-[13px] font-bold text-gray-900 text-right">Loading...</span>
+                        <span id="txt-nama" class="text-[13px] font-bold text-gray-900 text-right">Memuat...</span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <div class="flex items-center space-x-3 text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span class="text-[13px] font-bold">Nomor Faktur</span></div>
-                        <span id="txt-nofaktur" class="text-[13px] font-medium text-gray-900 text-right">Loading...</span>
+                        <span id="txt-nofaktur" class="text-[13px] font-medium text-gray-900 text-right">Memuat...</span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <div class="flex items-center space-x-3 text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-[13px] font-bold">Tanggal Faktur</span></div>
-                        <span id="txt-tanggal" class="text-[13px] font-medium text-gray-900 text-right">Loading...</span>
+                        <span id="txt-tanggal" class="text-[13px] font-medium text-gray-900 text-right">Memuat...</span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
                         <div class="flex items-center space-x-3 text-gray-600"><svg class="w-5 h-5 text-[#0F47A1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg><span class="text-[13px] font-bold">Total Tagihan</span></div>
@@ -86,7 +86,7 @@
                 
                 <div id="alert-toko-review" class="hidden flex items-center justify-center space-x-2 text-red-500 text-[12px] font-medium pt-1">
                     <div class="w-4 h-4 border border-red-500 rounded-full flex items-center justify-center font-bold text-[10px]">!</div>
-                    <span id="alert-toko-msg">Toko tidak ditemukan. Klik Edit Faktur.</span>
+                    <span id="alert-toko-msg">Toko tidak ditemukan. Klik Ubah Faktur.</span>
                 </div>
 
                 <div class="border border-gray-100 rounded-2xl p-4 bg-white shadow-sm">
@@ -94,7 +94,7 @@
                     <div class="flex justify-center space-x-8">
                         <label class="flex items-center space-x-2 cursor-pointer select-none">
                             <input type="radio" name="review_metode" value="Cash" onchange="setMetodePembayaran(this.value)" class="w-4 h-4 text-[#0F47A1] focus:ring-[#0F47A1]">
-                            <span class="text-[13px] font-semibold text-gray-800 flex items-center">💵 Cash</span>
+                            <span class="text-[13px] font-semibold text-gray-800 flex items-center">💵 Tunai</span>
                         </label>
                         <label class="flex items-center space-x-2 cursor-pointer select-none">
                             <input type="radio" name="review_metode" value="Transfer" onchange="setMetodePembayaran(this.value)" class="w-4 h-4 text-[#0F47A1] focus:ring-[#0F47A1]">
@@ -104,7 +104,7 @@
                 </div>
 
                 <div class="space-y-3 pt-2">
-                    <button onclick="switchView('edit')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Edit Faktur</button>
+                    <button onclick="switchView('edit')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Ubah Faktur</button>
                     <button id="btn-save-database" disabled class="w-full bg-slate-400 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px] cursor-not-allowed">Simpan Data</button>
                 </div>
 
@@ -158,7 +158,7 @@
 
                 <div class="space-y-3 pt-2">
                     <button onclick="saveEdit()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3.5 rounded-full shadow-md transition duration-200 text-[14px]">Simpan Perubahan</button>
-                    <button onclick="switchView('review')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Batalkan</button>
+                    <button onclick="switchView('review')" class="w-full bg-white border-2 border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-3.5 rounded-full transition duration-200 text-[14px]">Batal</button>
                 </div>
             </div>
 
@@ -168,7 +168,7 @@
                 </div>
 
                 <h2 class="text-[20px] font-bold text-gray-900 mb-1">Faktur Berhasil Disimpan</h2>
-                <p class="text-[13px] text-gray-500 mb-6">Data Faktur Berhasil disimpan.</p>
+                <p class="text-[13px] text-gray-500 mb-6">Data faktur berhasil disimpan.</p>
 
                 <div class="w-full border border-gray-100 rounded-2xl p-5 shadow-sm bg-white space-y-4 mb-8">
                     <div class="flex justify-between items-center border-b border-gray-50 pb-3">
@@ -236,7 +236,7 @@
                 <img id="preview-image" src="" alt="Faktur" 
                      class="max-w-full max-h-full rounded-xl shadow-md object-contain relative z-10 hidden"
                      onload="document.getElementById('loading-image').classList.add('hidden'); this.classList.remove('hidden');"
-                     onerror="this.classList.add('hidden'); document.getElementById('loading-image').innerHTML = '⚠️ Gagal memuat gambar.<br><span class=\'text-[10px] font-normal\'>URL tidak valid atau file terhapus.</span>';">
+                     onerror="this.classList.add('hidden'); document.getElementById('loading-image').innerHTML = '⚠️ Gagal memuat gambar.<br><span class=\'text-[10px] font-normal\'>Tautan tidak valid atau file terhapus.</span>';">
             </div>
             
             <div class="p-6 bg-white space-y-3 pb-8">
@@ -289,13 +289,13 @@
                 && date.getDate() === day;
         }
 
-        // INIT PAGE & BACA SESSION (Pencegah "Loading..." abadi)
+        // INIT PAGE & BACA SESSION (Pencegah "Memuat..." abadi)
         window.addEventListener('DOMContentLoaded', () => {
             const ocrDataString = safeSessionGet('ocrData');
 
             // Jika data kosong, beri tahu user daripada macet
             if (!ocrDataString) {
-                alert("Data hasil scan tidak ditemukan di memori! Silakan kembali dan scan ulang fotonya.");
+                alert("Data hasil pindai tidak ditemukan di memori! Silakan kembali dan pindai ulang fotonya.");
                 return;
             }
 
@@ -309,7 +309,7 @@
                 currentData.total_dibayar = 0;
 
                 updateCalculations();
-                renderReview(); // Fungsi ini yang mengubah teks "Loading..." jadi data asli
+                renderReview(); // Fungsi ini yang mengubah teks "Memuat..." jadi data asli
 
                 if (parsed.is_manual === true) {
                     // Ganti teks banner biru di halaman edit biar relevan
@@ -318,7 +318,7 @@
                         editBanner.innerText = "Mode Input Manual: Silakan isi nomor faktur dan total tagihan dari foto.";
                     }
                     
-                    // Langsung otomatis buka form edit tanpa harus klik "Edit Faktur"
+                    // Langsung otomatis buka form edit tanpa harus klik "Ubah Faktur"
                     switchView('edit');
                     
                     // Kasih info ringan ke user
@@ -334,7 +334,7 @@
                 }
             } catch (e) {
                 console.error("Gagal membaca data JSON:", e);
-                alert("Data hasil scan tidak dapat dibaca. Silakan masukkan data faktur secara manual.");
+                alert("Data hasil pindai tidak dapat dibaca. Silakan masukkan data faktur secara manual.");
                 
                 // Paksa render UI kosong dan buka form edit
                 currentData.tanggal_nota = currentData.tanggal_nota || formatTanggalHariIni();
@@ -684,7 +684,7 @@
             }
 
             if (!isValidDateDmy(currentData.tanggal_nota)) {
-                alert('Tanggal faktur tidak valid. Perbaiki lewat tombol Edit Faktur.');
+                alert('Tanggal faktur tidak valid. Perbaiki lewat tombol Ubah Faktur.');
                 switchView('edit');
                 return;
             }
@@ -697,22 +697,22 @@
 
                 // Pengecekan ketat memori foto
                 if (!ocrImage || ocrImage.length < 100) {
-                    alert("Foto tidak ditemukan di memori! Silakan kembali dan ulangi proses scan.");
+                    alert("Foto tidak ditemukan di memori! Silakan kembali dan ulangi proses pindai.");
                     return;
                 }
 
                 let fotoBlob;
 
                 try {
-                    // Foto sudah dikompres saat proses scan, jadi cukup
+                    // Foto sudah dikompres saat proses pindai, jadi cukup
                     // dikonversi ke Blob tanpa dikompres ulang.
                     fotoBlob = base64ToBlob(ocrImage, 'image/jpeg');
                 } catch (e) {
-                    throw new Error('Foto di memori rusak. Silakan ulangi proses scan.');
+                    throw new Error('Foto di memori rusak. Silakan ulangi proses pindai.');
                 }
 
                 if (!fotoBlob || fotoBlob.size < 100) {
-                    throw new Error('Foto di memori rusak. Silakan ulangi proses scan.');
+                    throw new Error('Foto di memori rusak. Silakan ulangi proses pindai.');
                 }
 
                 const formData = new FormData();

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Forgot Password - Sales Ledger" :csrf="true" />
+    <x-head title="Lupa Kata Sandi - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -13,11 +13,11 @@
                 <a href="/login" class="text-gray-800 hover:text-black">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                 </a>
-                <h2 class="text-[26px] font-bold text-gray-900">Reset Password</h2>
+                <h2 class="text-[26px] font-bold text-gray-900">Atur Ulang Kata Sandi</h2>
             </div>
 
             <p id="instruction-text" class="text-xs text-gray-500 leading-relaxed pl-1">
-                Masukkan email akun anda. Kami akan mengirimkan 6 digit kode OTP untuk mengatur ulang kata sandi.
+                Masukkan email akun Anda. Kami akan mengirimkan 6 digit kode OTP untuk mengatur ulang kata sandi.
             </p>
 
             <!-- Error/Success Notif -->
@@ -38,7 +38,7 @@
                 </div>
             </form>
 
-            <!-- Form Reset Password -->
+            <!-- Form Atur Ulang Kata Sandi -->
             <form id="resetPasswordForm" class="space-y-4 pt-2 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1 text-center">Kode OTP (Cek Email)</label>
@@ -47,20 +47,20 @@
                 </div>
 
                 <div class="pt-2">
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Password Baru</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Kata Sandi Baru</label>
                     <input type="password" name="password" placeholder="Minimal 8 karakter" required 
                            class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Konfirmasi Password Baru</label>
-                    <input type="password" name="confirm_password" placeholder="Ketik ulang password" required 
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" name="confirm_password" placeholder="Ketik ulang kata sandi" required
                            class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                 </div>
 
                 <div class="text-center pt-4">
                     <button type="submit" id="btn-reset" class="w-full bg-[#10B981] hover:bg-green-600 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm">
-                        Simpan Password Baru
+                        Simpan Kata Sandi Baru
                     </button>
                 </div>
             </form>
@@ -102,7 +102,7 @@
 
                 if (response.ok && result.success) {
                     showNotif(result.message, false);
-                    document.getElementById('instruction-text').innerText = "Masukkan kode yang baru saja kami kirimkan ke email anda, beserta password baru.";
+                    document.getElementById('instruction-text').innerText = "Masukkan kode yang baru saja kami kirimkan ke email Anda, beserta kata sandi baru.";
                     
                     // Transisi UI (Sembunyikan form minta email, munculkan form input OTP)
                     document.getElementById('requestOtpForm').classList.add('hidden');
@@ -121,7 +121,7 @@
 
         // Submit OTP & Sandi Baru
         document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
-            Loading.show('Menyimpan password baru...');
+            Loading.show('Menyimpan kata sandi baru...');
             e.preventDefault();
             const btn = document.getElementById('btn-reset');
             const email = document.getElementById('email-input').value; // Ambil email
@@ -150,12 +150,12 @@
                     if(result.errors) errorMsg = Object.values(result.errors).flat().join('<br>');
                     showNotif(errorMsg, true);
                     btn.disabled = false;
-                    btn.innerText = "Simpan Password Baru";
+                    btn.innerText = "Simpan Kata Sandi Baru";
                 }
             } catch (error) {
                 showNotif("Terjadi kesalahan jaringan.");
                 btn.disabled = false;
-                btn.innerText = "Simpan Password Baru";
+                btn.innerText = "Simpan Kata Sandi Baru";
             }
         });
     </script>

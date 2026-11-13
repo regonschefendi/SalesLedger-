@@ -256,7 +256,7 @@ class AuthController extends Controller
         if (! $authenticated) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email/Username atau Password tidak cocok.',
+                'message' => 'Email/Nama Pengguna atau Kata Sandi tidak cocok.',
             ], 401);
         }
 
@@ -295,7 +295,7 @@ class AuthController extends Controller
     }
 
     // ==========================================
-    // LUPA PASSWORD (KIRIM OTP)
+    // LUPA KATA SANDI (KIRIM OTP)
     // ==========================================
     public function sendResetOtp(Request $request)
     {
@@ -340,7 +340,7 @@ class AuthController extends Controller
         } catch (Throwable $e) {
             Cache::forget('reset_otp_'.$email);
             Cache::forget('reset_otp_attempts_'.$email);
-            Log::error('Gagal mengirim OTP reset password.', ['email' => $email, 'error' => $e->getMessage()]);
+            Log::error('Gagal mengirim OTP atur ulang kata sandi.', ['email' => $email, 'error' => $e->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -352,7 +352,7 @@ class AuthController extends Controller
     }
 
     // ==========================================
-    // RESET PASSWORD BARU
+    // ATUR ULANG KATA SANDI BARU
     // ==========================================
     public function resetPassword(Request $request)
     {
@@ -412,7 +412,7 @@ class AuthController extends Controller
             return $invalidResponse;
         }
 
-        // OTP Benar -> Update Password di Database
+        // OTP Benar -> Perbarui Kata Sandi di Database
         $user->password = Hash::make($request->password);
         $user->setRememberToken(Str::random(60));
         $user->save();
@@ -425,7 +425,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'redirect' => '/login',
-            'message' => 'Password berhasil diubah! Silakan login kembali.',
+            'message' => 'Kata sandi berhasil diubah! Silakan masuk kembali.',
         ]);
     }
 

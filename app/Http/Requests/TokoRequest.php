@@ -35,8 +35,8 @@ class TokoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nama_toko.required' => 'Nama toko wajib diisi, bos!',
-            'nama_toko.max' => 'Nama toko kepanjangan, maksimal 255 karakter.',
+            'nama_toko.required' => 'Nama toko wajib diisi.',
+            'nama_toko.max' => 'Nama toko terlalu panjang, maksimal 255 karakter.',
         ];
     }
 }

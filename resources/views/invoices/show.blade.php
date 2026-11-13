@@ -9,13 +9,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <x-head :title="'Invoice '.$nomorInvoice.' - Sales Ledger'" />
+    <x-head :title="'Faktur '.$nomorInvoice.' - Sales Ledger'" />
 </head>
 <body class="bg-gray-100 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-gray-50 relative shadow-2xl">
         <x-back-header
-            title="Invoice"
+            title="Faktur"
             :back-url="$backUrl"
             border-class="border-b border-gray-100"
         />
@@ -26,7 +26,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-[11px] font-bold tracking-[0.2em] text-blue-100 uppercase">Sales Ledger</p>
-                            <h2 class="text-[28px] font-extrabold tracking-tight mt-1">INVOICE</h2>
+                            <h2 class="text-[28px] font-extrabold tracking-tight mt-1">FAKTUR</h2>
                         </div>
                         <div class="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="mt-5 flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] text-blue-100 font-medium">Nomor Invoice</p>
+                            <p class="text-[10px] text-blue-100 font-medium">Nomor Faktur</p>
                             <p class="text-[15px] font-bold mt-0.5">{{ $nomorInvoice }}</p>
                         </div>
                         <span class="text-[10px] font-bold px-3 py-1.5 rounded-full {{ $isLunas ? 'bg-emerald-400/20 text-emerald-50' : 'bg-orange-400/20 text-orange-50' }}">
@@ -112,7 +112,7 @@
 
                 <div class="px-5 pb-5">
                     <p class="text-[10px] text-gray-400 leading-relaxed">
-                        Invoice ini dibuat otomatis oleh Sales Ledger pada {{ now()->translatedFormat('d F Y, H:i') }}.
+                        Faktur ini dibuat otomatis oleh Sales Ledger pada {{ now()->translatedFormat('d F Y, H:i') }}.
                     </p>
                 </div>
             </div>
@@ -120,7 +120,7 @@
             <div class="space-y-3 pb-6">
                 <a href="{{ $downloadUrl }}" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-3.5 rounded-full shadow-md transition text-[14px] flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>Download Invoice PDF</span>
+                    <span>Unduh Faktur PDF</span>
                 </a>
                 <a href="{{ $backUrl }}" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-full transition text-[14px] flex items-center justify-center">
                     Kembali

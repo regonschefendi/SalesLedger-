@@ -2,14 +2,14 @@
     
     <a href="{{ route('sales.home') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('sales.home') ? 'text-[#0F47A1]' : 'text-gray-400 hover:text-gray-700' }}">
         <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
-        <span class="text-[10px] font-bold">Home</span>
+        <span class="text-[10px] font-bold">Beranda</span>
     </a>
 
     <div class="relative flex flex-col items-center w-24">
         <button onclick="toggleUploadModal()" class="absolute -top-[45px] bg-[#0F47A1] text-white rounded-full p-[14px] border-[6px] border-white hover:bg-blue-800 transition transform hover:scale-105 shadow-md z-50">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3"></circle></svg>
         </button>
-        <span class="text-[10px] font-bold text-[#0F47A1] absolute top-[20px] whitespace-nowrap">Upload Nota Baru</span>
+        <span class="text-[10px] font-bold text-[#0F47A1] absolute top-[20px] whitespace-nowrap">Unggah Nota Baru</span>
     </div>
 
     <a href="{{ route('sales.riwayat.index') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('sales.riwayat.*') ? 'text-[#0F47A1]' : 'text-gray-400 hover:text-gray-700' }}">
@@ -57,7 +57,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <h3 class="text-[16px] font-bold text-gray-900 mb-1">Gagal Membaca Faktur</h3>
-        <p class="text-[12px] text-gray-500 mb-6 leading-relaxed">AI sedang sibuk atau foto kurang jelas. Kamu tetap bisa melanjutkan proses dengan mengisi data faktur secara manual.</p>
+        <p class="text-[12px] text-gray-500 mb-6 leading-relaxed">AI sedang sibuk atau foto kurang jelas. Anda tetap bisa melanjutkan proses dengan mengisi data faktur secara manual.</p>
         <div class="flex space-x-3">
             <button onclick="closeOcrFailModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-[13px] transition">Kembali</button>
             <button id="btn-lanjut-manual" class="w-1/2 bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-3 rounded-xl text-[13px] shadow-md transition">Lanjut Manual</button>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Toko Pegangan - Sales Ledger" />
 </head>
@@ -173,7 +173,7 @@
 
         // Fungsi Navigasi Back
         function goBack() {
-            // Kalau lagi di List Pegangan, berarti balik ke halaman Profile
+            // Kalau lagi di List Pegangan, berarti balik ke halaman Profil
             if (currentState === 'assigned' && document.getElementById('view-detail').classList.contains('hidden')) {
                 window.location.href = "{{ route('sales.profile.index') }}";
             } 

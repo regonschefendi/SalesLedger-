@@ -14,22 +14,22 @@ class ProfileChangePasswordController extends Controller
     }
 
     /**
-     * Memproses update password
+     * Memproses pembaruan kata sandi
      */
     public function update(Request $request)
     {
-        // Validasi Best Practice Laravel
+        // Validasi sesuai praktik terbaik Laravel
         $request->validate([
-            // 'current_password' otomatis mengecek kecocokan dengan password lama di database
+            // 'current_password' otomatis mengecek kecocokan dengan kata sandi lama di database
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'current_password.current_password' => 'Password lama yang Anda masukkan salah.',
-            'password.min' => 'Password baru minimal 8 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'current_password.current_password' => 'Kata sandi lama yang Anda masukkan salah.',
+            'password.min' => 'Kata sandi baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
-        // Update password yang sudah di-Hash demi keamanan (Good Security)
+        // Perbarui kata sandi yang sudah di-hash demi keamanan
         $request->user()->update([
             'password' => Hash::make($request->password),
         ]);

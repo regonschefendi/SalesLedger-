@@ -1,6 +1,6 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Pembukuan - Sales Ledger" />
 </head>
@@ -23,7 +23,7 @@
             <div class="flex items-center space-x-2">
                 <button type="button" onclick="toggleExportModal(true)" class="flex items-center space-x-1.5 bg-[#2563EB] text-white px-5 py-2.5 rounded-full text-[11px] font-bold shadow-sm hover:bg-blue-700 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>Export Excel</span>
+                    <span>Ekspor Excel</span>
                 </button>
                 <button type="button" onclick="toggleBottomSheet(true)" class="w-10 h-10 bg-white rounded-full border border-gray-100 flex items-center justify-center text-[#2563EB] shadow-sm hover:bg-gray-50 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
@@ -111,8 +111,8 @@
         <div class="bg-white w-full max-w-md rounded-t-[30px] p-6 pb-8 space-y-6 transform transition-transform duration-300">
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-1" onclick="toggleBottomSheet(false)"></div>
             <div class="flex items-center justify-between">
-                <h3 class="text-[16px] font-bold text-gray-900">Filter Pembukuan</h3>
-                <button type="button" onclick="toggleBottomSheet(false)" aria-label="Tutup filter"
+                <h3 class="text-[16px] font-bold text-gray-900">Penyaring Pembukuan</h3>
+                <button type="button" onclick="toggleBottomSheet(false)" aria-label="Tutup penyaring"
                         class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition inline-flex items-center justify-center">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -130,11 +130,11 @@
                         <input type="date" id="sheet-end" value="{{ request('end_date') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:ring-1 focus:ring-[#2563EB]">
                     </div>
                 </div>
-                <p class="text-[11px] text-gray-400">Filter berdasarkan tanggal upload</p>
+                <p class="text-[11px] text-gray-400">Saring berdasarkan tanggal unggah</p>
             </div>
 
             <div class="grid grid-cols-2 gap-4 pt-2">
-                <button type="button" onclick="resetFormFilter()" class="w-full border border-blue-600 text-blue-600 font-bold py-3.5 rounded-xl text-[13px] transition hover:bg-blue-50">Reset</button>
+                <button type="button" onclick="resetFormFilter()" class="w-full border border-blue-600 text-blue-600 font-bold py-3.5 rounded-xl text-[13px] transition hover:bg-blue-50">Atur Ulang</button>
                 <button type="button" onclick="submitFormFilter()" class="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-md hover:bg-blue-700">Terapkan</button>
             </div>
         </div>
@@ -144,8 +144,8 @@
         <div class="bg-white w-full max-w-md rounded-t-[30px] p-6 pb-8 space-y-6 transform transition-transform duration-300">
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-1" onclick="toggleExportModal(false)"></div>
             <div>
-                <h3 class="text-[16px] font-bold text-gray-900">Export Pembukuan ke Excel</h3>
-                <p class="text-[11px] text-gray-400 mt-1">Pilih rentang tanggal faktur yang ingin diexport.</p>
+                <h3 class="text-[16px] font-bold text-gray-900">Ekspor Pembukuan ke Excel</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Pilih rentang tanggal faktur yang ingin diekspor.</p>
             </div>
 
             <form id="export-form" action="{{ route('admin.pembukuan.export') }}" method="GET" class="space-y-4">
@@ -167,7 +167,7 @@
                     <button type="button" onclick="toggleExportModal(false)" class="w-full border border-gray-300 text-gray-600 font-bold py-3.5 rounded-xl text-[13px] transition hover:bg-gray-50">Batal</button>
                     <button type="submit" class="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-md hover:bg-blue-700 flex items-center justify-center space-x-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <span>Export</span>
+                        <span>Ekspor</span>
                     </button>
                 </div>
             </form>

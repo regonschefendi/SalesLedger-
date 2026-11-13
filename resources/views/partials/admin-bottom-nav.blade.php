@@ -2,7 +2,7 @@
     
     <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('admin.dashboard') ? 'text-[#2563EB]' : 'text-gray-400 hover:text-gray-700' }}">
         <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
-        <span class="text-[10px] font-bold">Home</span>
+        <span class="text-[10px] font-bold">Beranda</span>
     </a>
     
     <a href="{{ route('admin.pembukuan.index') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('admin.pembukuan.*') ? 'text-[#2563EB]' : 'text-gray-400 hover:text-gray-700' }}">

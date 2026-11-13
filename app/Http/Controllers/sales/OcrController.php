@@ -59,7 +59,7 @@ class OcrController extends Controller
             $base64Image = base64_encode(file_get_contents($imagePath));
 
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
-            $prompt = 'Kamu adalah asisten admin data entry. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor invoice/nota). Cari "Tanggal Nota" (Tanggal faktur). Cari "Total Tagihan" (Jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
+            $prompt = 'Anda adalah asisten admin entri data. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor faktur/nota). Cari "Tanggal Nota" (tanggal faktur). Cari "Total Tagihan" (jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
 
             $response = Http::connectTimeout(10)
                 ->timeout(60)
@@ -88,7 +88,7 @@ class OcrController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Layanan AI sedang tidak tersedia. Silakan input manual.',
+                    'message' => 'Layanan AI sedang tidak tersedia. Silakan masukkan secara manual.',
                 ], 502);
             }
 
@@ -103,7 +103,7 @@ class OcrController extends Controller
             if (! is_array($extractedData)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'AI tidak dapat membaca faktur. Silakan input manual.',
+                    'message' => 'AI tidak dapat membaca faktur. Silakan masukkan secara manual.',
                 ], 422);
             }
 
@@ -129,7 +129,7 @@ class OcrController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Koneksi ke layanan AI timeout. Silakan coba lagi atau input manual.',
+                'message' => 'Koneksi ke layanan AI melewati batas waktu. Silakan coba lagi atau masukkan secara manual.',
             ], 504);
         } catch (\Throwable $e) {
             Log::error('OCR error tidak terduga.', ['error' => $e->getMessage()]);
@@ -197,7 +197,7 @@ class OcrController extends Controller
                 },
             ],
         ], [
-            'toko_id.exists' => 'Toko yang dipilih bukan milik admin kamu.',
+            'toko_id.exists' => 'Toko yang dipilih bukan milik admin Anda.',
         ]);
 
         $request['tanggal_nota'] = Carbon::createFromFormat('d/m/Y', $request->tanggal_nota)->format('Y-m-d');
@@ -205,7 +205,7 @@ class OcrController extends Controller
         if (! $request->hasFile('foto_file')) {
             return response()->json([
                 'success' => false,
-                'message' => 'GAGAL: Server tidak menerima file foto. Hal ini biasanya karena ukuran file melebihi limit server (upload_max_filesize) atau proses kompresi gagal.',
+                'message' => 'GAGAL: Server tidak menerima berkas foto. Hal ini biasanya karena ukuran berkas melebihi batas server (upload_max_filesize) atau proses kompresi gagal.',
             ]);
         }
 
@@ -215,7 +215,7 @@ class OcrController extends Controller
         if (! $file->isValid()) {
             return response()->json([
                 'success' => false,
-                'message' => 'GAGAL: File rusak saat diunggah. Kode error: '.$file->getErrorMessage(),
+                'message' => 'GAGAL: Berkas rusak saat diunggah. Kode galat: '.$file->getErrorMessage(),
             ]);
         }
 
@@ -228,10 +228,10 @@ class OcrController extends Controller
             if ($uploadSukses) {
                 $fotoUrl = config('services.supabase.url').'/storage/v1/object/public/'.config('services.supabase.bucket').'/'.$fileName;
             } else {
-                return response()->json(['success' => false, 'message' => 'Gagal mengunggah file ke Supabase. Cek Access Key di .env!']);
+                return response()->json(['success' => false, 'message' => 'Gagal mengunggah berkas ke Supabase. Periksa Access Key di .env!']);
             }
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error Server Cloud: '.$e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Galat Server Cloud: '.$e->getMessage()]);
         }
 
         $totalTagihan = (int) $request->total_tagihan;
@@ -280,7 +280,7 @@ class OcrController extends Controller
                     $admin,
                     new SystemNotification(
                         'Nota Baru',
-                        $sales->full_name.' menginput nota '.$faktur->nomor_faktur
+                        $sales->full_name.' memasukkan nota '.$faktur->nomor_faktur
                             .' untuk toko "'.($toko->nama_toko ?? '-').'".',
                         route('admin.pembukuan.show', $faktur->id),
                         'faktur'

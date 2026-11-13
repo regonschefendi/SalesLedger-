@@ -336,6 +336,6 @@ class AdminController extends Controller
             'admin_code' => strtoupper($request->admin_code),
         ]);
 
-        return redirect()->route('admin.profile.index')->with('success', 'Custom Code berhasil diperbarui!');
+        return redirect()->route('admin.profile.index')->with('success', 'Kode Kustom berhasil diperbarui!');
     }
 }

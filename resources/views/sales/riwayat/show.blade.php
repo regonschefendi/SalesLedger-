@@ -1,6 +1,6 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Detail Faktur - Sales Ledger" />
 </head>
@@ -13,7 +13,7 @@
             <div class="flex flex-col items-center pt-4">
                 @php 
                     $isLunas = $faktur->status === 'lunas'; 
-                    $colorClass = $isLunas ? 'emerald' : 'emerald'; // Kita pakai ikon checklist sukses hijau untuk keduanya sesuai gambar lu
+                    $colorClass = $isLunas ? 'emerald' : 'emerald'; // Kita pakai ikon checklist sukses hijau untuk keduanya sesuai gambar Anda
                 @endphp
                 <div class="mb-6">
                     <x-success-icon />
@@ -84,7 +84,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <a href="{{ route('sales.riwayat.invoice', $faktur->id) }}" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-bold py-3.5 rounded-full shadow-md transition text-[14px] flex items-center justify-center space-x-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Lihat Invoice</span>
+                    <span>Lihat Faktur</span>
                 </a>
                 <button onclick="window.location.href='{{ route('sales.riwayat.index') }}'" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-full transition text-[14px]">Kembali</button>
             </div>
@@ -101,7 +101,7 @@
                 <h1 class="text-[18px] font-bold text-gray-900 flex-grow text-center pr-8">Foto Nota</h1>
             </div>
             <div class="flex-grow bg-[#E5E7EB] flex items-center justify-center overflow-hidden relative p-4">
-                <img id="preview-image" src="" alt="Faktur Full" class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300" onload="this.classList.remove('hidden');" onerror="if(this.src && this.src !== window.location.href) { this.classList.add('hidden'); }">
+                <img id="preview-image" src="" alt="Faktur Lengkap" class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300" onload="this.classList.remove('hidden');" onerror="if(this.src && this.src !== window.location.href) { this.classList.add('hidden'); }">
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Create Account - Sales Ledger" :csrf="true" />
+    <x-head title="Buat Akun - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -12,18 +12,18 @@
                 <a href="/login" class="text-gray-800 hover:text-black">
                     <svg class="w-6 " fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                 </a>
-                <h2 class="text-[26px] font-bold text-gray-900">Create Account</h2>
+                <h2 class="text-[26px] font-bold text-gray-900">Buat Akun</h2>
             </div>
 
             <form id="registerForm" class="space-y-4 pt-2">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Full Name</label>
-                    <input type="text" name="full_name" placeholder="Full Name" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Nama Lengkap</label>
+                    <input type="text" name="full_name" placeholder="Nama Lengkap" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Username</label>
-                    <input type="text" name="username" placeholder="Username" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Nama Pengguna</label>
+                    <input type="text" name="username" placeholder="Nama Pengguna" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                 </div>
 
                 <div>
@@ -32,9 +32,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Password</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Kata Sandi</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                        <input type="password" id="password" name="password" placeholder="Kata Sandi" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                         <button type="button" onclick="togglePasswordVisibility('password')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
@@ -43,9 +43,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Confirm Password</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 pl-1">Konfirmasi Kata Sandi</label>
                     <div class="relative">
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Konfirmasi Password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Konfirmasi Kata Sandi" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                         <button type="button" onclick="togglePasswordVisibility('confirm_password')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
@@ -56,21 +56,21 @@
 
                 <div class="text-center pt-4">
                     <button type="submit" id="btn-submit" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm flex items-center justify-center">
-                        <span id="btn-text">Create Account</span>
+                        <span id="btn-text">Buat Akun</span>
                     </button>
                 </div>
             </form>
         </div>
 
         <div class="text-center text-xs text-gray-500 pt-6">
-            Already have an account? <a href="/login" class="font-bold text-[#0F47A1] hover:underline">Sign In</a>
+            Sudah punya akun? <a href="/login" class="font-bold text-[#0F47A1] hover:underline">Masuk</a>
         </div>
     </div>
 
     @include('partials.loading')
 
     <script>
-        // Fungsi Toggle Mata Password
+        // Fungsi Toggle Visibilitas Kata Sandi
         function togglePasswordVisibility(inputId) {
             const pwd = document.getElementById(inputId);
             if (pwd) {
@@ -89,7 +89,7 @@
             const errorBox = document.getElementById('error-box');
 
             // Set Loading state
-            btnText.innerText = "Processing...";
+            btnText.innerText = "Memproses...";
             btnSubmit.disabled = true;
             errorBox.classList.add('hidden');
 
@@ -109,7 +109,7 @@
                     // Redirect otomatis ke halaman verifikasi email OTP bawaan Controller
                     window.location.href = result.redirect;
                 } else {
-                    // Handle validasi error dari Laravel (Password ga sama, email duplikat, dll)
+                    // Handle validasi error dari Laravel (kata sandi tidak sama, email duplikat, dll)
                     let errorMsg = result.message || "Terjadi kesalahan registrasi.";
                     if(result.errors) {
                         errorMsg = Object.values(result.errors).flat().join('<br>');
@@ -121,7 +121,7 @@
                 errorBox.innerHTML = "Gagal terhubung ke server. Periksa koneksi internet.";
                 errorBox.classList.remove('hidden');
             } finally {
-                btnText.innerText = "Create Account";
+                btnText.innerText = "Buat Akun";
                 btnSubmit.disabled = false;
             }
         });

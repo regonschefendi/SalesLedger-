@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head :title="$title" />
 </head>
@@ -9,7 +9,7 @@
         @csrf
 
         <x-back-header
-            title="Edit"
+            title="Ubah"
             :back-url="$backUrl"
             border-class="border-b border-gray-100"
         >
@@ -39,12 +39,12 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-[12px] font-bold text-gray-900 mb-1.5 pl-1">Nama</label>
+                    <label class="block text-[12px] font-bold text-gray-900 mb-1.5 pl-1">Nama Lengkap</label>
                     <input type="text" name="full_name" value="{{ old('full_name', $user->full_name) }}"
                            class="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-[14px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-[12px] font-bold text-gray-900 mb-1.5 pl-1">No. tlp</label>
+                    <label class="block text-[12px] font-bold text-gray-900 mb-1.5 pl-1">No. Telepon</label>
                     <input type="text" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}" placeholder="Contoh: 081234567890"
                            class="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-[14px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition">
                 </div>

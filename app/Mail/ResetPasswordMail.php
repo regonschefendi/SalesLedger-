@@ -19,7 +19,7 @@ class ResetPasswordMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Kode Reset Password - Sales Ledger')
+        return $this->subject('Kode Atur Ulang Kata Sandi - Sales Ledger')
             ->view('emails.reset-password');
     }
 }

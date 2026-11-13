@@ -1,8 +1,8 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Admin Dashboard - Sales Ledger" />
+    <x-head title="Dasbor Admin - Sales Ledger" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -11,7 +11,7 @@
         <div class="px-6 pt-12 pb-4 flex justify-between items-center bg-white">
             <div>
                 <h1 class="text-[22px] font-bold text-gray-900">Halo, {{ $nama_admin }}</h1>
-                <p class="text-[13px] text-gray-500 mt-1">Pantau Laporan hari ini</p>
+                <p class="text-[13px] text-gray-500 mt-1">Pantau laporan hari ini</p>
             </div>
             <div class="flex items-center space-x-3">
                 <a href="{{ route('notifications.index') }}" class="relative w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-800 shadow-sm hover:bg-gray-50 transition">
@@ -77,7 +77,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     </div>
                     <div>
-                        <p class="text-[12px] text-gray-800 font-semibold mb-0.5">Sisa Kredit/ Piutang</p>
+                        <p class="text-[12px] text-gray-800 font-semibold mb-0.5">Sisa Kredit/Piutang</p>
                         <p class="text-[16px] font-bold text-gray-900">{{ Format::rupiah($sisa_kredit) }}</p>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                         </svg>
                         <p class="text-[14px] font-bold text-gray-900 mb-1">Belum ada laporan nota</p>
                         <p class="text-[12px] text-gray-500 text-center px-4 leading-relaxed">
-                            Kamu belum mengupload data tagihan.<br>Upload nota pertama kamu untuk mulai<br>mencatat data.
+                            Anda belum mengunggah data tagihan.<br>Unggah nota pertama Anda untuk mulai<br>mencatat data.
                         </p>
                     </div>
                 @endif

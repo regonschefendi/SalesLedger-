@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Sign In - Sales Ledger" :csrf="true" />
+    <x-head title="Masuk - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -13,20 +13,20 @@
             
             <div class="space-y-6">
                 <div class="text-center mb-8">
-                    <h2 class="text-[28px] font-bold text-gray-900">Welcome Back</h2>
+                    <h2 class="text-[28px] font-bold text-gray-900">Selamat Datang Kembali</h2>
                 </div>
 
                 <form id="loginForm" class="space-y-4">
                     {{-- @csrf --}}
                     <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Email / Username</label>
-                        <input type="text" name="login_id" placeholder="email/username" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Email / Nama Pengguna</label>
+                        <input type="text" name="login_id" placeholder="email/nama pengguna" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Password</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1.5 pl-1">Kata Sandi</label>
                         <div class="relative">
-                            <input type="password" id="password" name="password" placeholder="password" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400 pr-10">
+                            <input type="password" id="password" name="password" placeholder="kata sandi" required class="w-full bg-[#F3F4F6] border-0 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#0F47A1] focus:outline-none transition placeholder-gray-400 pr-10">
                             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                             </button>
@@ -35,18 +35,18 @@
 
                     <div class="text-center pt-1">
                         <button type="submit" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm flex items-center justify-center">
-                            <span id="btn-text">Sign In</span>
+                            <span id="btn-text">Masuk</span>
                         </button>
                     </div>
                 </form>
 
                 <div class="text-center">
-                    <a href="/forgot-password" class="text-xs font-semibold text-[#0F47A1] hover:underline">Forgot Password?</a>
+                    <a href="/forgot-password" class="text-xs font-semibold text-[#0F47A1] hover:underline">Lupa Kata Sandi?</a>
                 </div>
             </div>
 
             <div class="text-center text-xs text-gray-500 pt-6">
-                Don't have an account? <a href="/signup" class="font-bold text-[#0F47A1] hover:underline">Sign Up</a>
+                Belum punya akun? <a href="/signup" class="font-bold text-[#0F47A1] hover:underline">Daftar</a>
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@
     @include('partials.loading')
 
     <script>
-        // Fungsi Toggle Mata Password
+        // Fungsi Toggle Visibilitas Kata Sandi
         function togglePasswordVisibility() {
             const pwd = document.getElementById('password');
             pwd.type = pwd.type === 'password' ? 'text' : 'password';
@@ -75,7 +75,7 @@
             if(oldError) oldError.remove();
 
             // Ubah tombol jadi mode loading
-            btnText.innerText = "Authenticating...";
+            btnText.innerText = "Mengautentikasi...";
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
 
@@ -107,7 +107,7 @@
             } finally {
                 // Kembalikan tombol ke semula
                 Loading.hide();
-                btnText.innerText = "Sign In";
+                btnText.innerText = "Masuk";
                 btn.disabled = false;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
             }

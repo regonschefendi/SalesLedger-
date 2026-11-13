@@ -35,7 +35,7 @@ class RoleController extends Controller
         if ($user->role !== null) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role sudah dipilih dan tidak dapat diubah.',
+                'message' => 'Peran sudah dipilih dan tidak dapat diubah.',
             ], 409);
         }
 
@@ -63,7 +63,7 @@ class RoleController extends Controller
         if ($user->role !== null) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role sudah dipilih dan tidak dapat diubah.',
+                'message' => 'Peran sudah dipilih dan tidak dapat diubah.',
             ], 409);
         }
 

@@ -12,7 +12,7 @@ class SalesController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil user dengan role sales (Sesuaikan dengan nama kolom role di database lu)
+        // Ambil user dengan role sales (Sesuaikan dengan nama kolom role di database Anda)
         $query = User::withCount([
             'tokosPegangan as tokos_pegangan_count' => fn ($q) => $q->where('tokos.admin_id', Auth::id()),
             'fakturs as belum_lunas_count' => fn ($q) => $q->where('status', 'belum_lunas'),

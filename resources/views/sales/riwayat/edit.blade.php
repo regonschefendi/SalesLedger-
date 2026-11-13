@@ -1,6 +1,6 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Catat Pembayaran" />
 </head>
@@ -8,7 +8,7 @@
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-32 shadow-2xl overflow-hidden">
         
         <x-back-header
-            title="Upload Nota"
+            title="Catat Pembayaran"
             :back-url="route('sales.riwayat.show', $faktur->id)"
             border-class="border-b border-gray-50"
         />
@@ -49,7 +49,7 @@
                     <label class="block text-[13px] font-bold text-gray-900 mb-1.5">Metode Pembayaran</label>
                     <select name="metode_pembayaran" required class="w-full border border-gray-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:ring-2 focus:ring-[#0F47A1] focus:outline-none bg-white">
                         <option value="Transfer" {{ $faktur->metode_bayar == 'Transfer' ? 'selected' : '' }}>Transfer Bank</option>
-                        <option value="Cash" {{ $faktur->metode_bayar == 'Cash' ? 'selected' : '' }}>Cash</option>
+                        <option value="Cash" {{ $faktur->metode_bayar == 'Cash' ? 'selected' : '' }}>Tunai</option>
                     </select>
                 </div>
 

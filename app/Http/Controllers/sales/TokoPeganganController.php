@@ -17,7 +17,7 @@ class TokoPeganganController extends Controller
         $sales = Auth::user();
 
         if (! $sales->parent_admin_id) {
-            return redirect('/select-role')->with('error', 'Lu harus masukin Kode Referal Admin dulu!');
+            return redirect('/select-role')->with('error', 'Anda harus memasukkan Kode Referal Admin terlebih dahulu!');
         }
 
         $adminId = $sales->parent_admin_id;
@@ -44,7 +44,7 @@ class TokoPeganganController extends Controller
         $sales = Auth::user();
 
         if (! $sales->parent_admin_id) {
-            return redirect('/select-role')->with('error', 'Lu harus masukin Kode Referal Admin dulu!');
+            return redirect('/select-role')->with('error', 'Anda harus memasukkan Kode Referal Admin terlebih dahulu!');
         }
 
         $adminId = $sales->parent_admin_id;
@@ -58,7 +58,7 @@ class TokoPeganganController extends Controller
                 ),
             ],
         ], [
-            'toko_ids.*.exists' => 'Ada toko yang bukan milik admin kamu.',
+            'toko_ids.*.exists' => 'Ada toko yang bukan milik admin Anda.',
         ]);
 
         // Fungsi sync() otomatis nambah dan ngehapus data di tabel pivot.

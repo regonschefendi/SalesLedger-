@@ -4,7 +4,7 @@
         : route('sales.home');
 @endphp
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Notifikasi - Sales Ledger" :manifest="true" />
 </head>

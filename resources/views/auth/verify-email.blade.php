@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Verify Email - Sales Ledger" :csrf="true" />
+    <x-head title="Verifikasi Email - Sales Ledger" :csrf="true" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -15,9 +15,9 @@
             </div>
 
             <div class="space-y-2">
-                <h2 class="text-[24px] font-bold text-gray-900">Verify Your Email</h2>
+                <h2 class="text-[24px] font-bold text-gray-900">Verifikasi Email Anda</h2>
                 <p class="text-xs text-gray-500 px-4 leading-relaxed">
-                    Masukkan 6 digit kode verifikasi rahasia yang dikirim ke email akun anda.
+                    Masukkan 6 digit kode verifikasi rahasia yang dikirim ke email akun Anda.
                 </p>
             </div>
 
@@ -38,13 +38,13 @@
                 </div>
 
                 <button type="submit" id="btn-submit" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm">
-                    <span id="btn-text">Verify & Continue</span>
+                    <span id="btn-text">Verifikasi & Lanjutkan</span>
                 </button>
             </form>
         </div>
 
         <div class="text-center text-xs text-gray-400">
-            Sales Ledger Security System
+            Sistem Keamanan Sales Ledger
         </div>
     </div>
 
@@ -122,7 +122,7 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    window.location.href = result.redirect; // Lanjut ke halaman Select Role
+                    window.location.href = result.redirect; // Lanjut ke halaman Pilih Peran
                 } else {
                     errorBox.innerText = result.message || "Kode OTP salah.";
                     errorBox.classList.remove('hidden');
@@ -131,7 +131,7 @@
                 errorBox.innerText = "Terjadi kesalahan sistem jaringan.";
                 errorBox.classList.remove('hidden');
             } finally {
-                btnText.innerText = "Verify & Continue";
+                btnText.innerText = "Verifikasi & Lanjutkan";
                 btnSubmit.disabled = false;
                 Loading.hide();
             }
@@ -154,7 +154,7 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    alert('Kode baru berhasil dikirim ke email anda!');
+                    alert('Kode baru berhasil dikirim ke email Anda!');
                     startTimer(); // Reset countdown biar mulai dari 2 menit lagi
                 } else {
                     alert(result.message || 'Gagal mengirim ulang kode.');

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Profile - Sales Ledger" :manifest="true" />
+    <x-head title="Profil - Sales Ledger" :manifest="true" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative shadow-2xl overflow-hidden pb-10">
         
         <x-back-header
-            title="Profile"
+            title="Profil"
             :back-url="route('admin.dashboard')"
             border-class="border-b border-gray-50"
         />
@@ -41,7 +41,7 @@
                 
                 <a href="{{ route('admin.profile.edit') }}" class="absolute top-4 right-4 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-[11px] font-bold text-[#0F47A1] hover:bg-gray-50 flex items-center space-x-1 shadow-xs transition">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    <span>Edit Profil</span>
+                        <span>Ubah Profil</span>
                 </a>
             </div>
 
@@ -52,7 +52,7 @@
                     <a href="{{ route('admin.profile.custom_code') }}" class="flex justify-between items-center p-4 hover:bg-slate-50/80 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
-                            <span class="text-[14px] font-bold text-gray-800">Custom Code</span>
+                            <span class="text-[14px] font-bold text-gray-800">Kode Kustom</span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                     </a>
@@ -60,7 +60,7 @@
                     <a href="{{ route('profile.password.edit') }}" class="flex justify-between items-center p-4 hover:bg-slate-50/80 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
-                            <span class="text-[14px] font-bold text-gray-800">Ubah Password</span>
+                            <span class="text-[14px] font-bold text-gray-800">Ubah Kata Sandi</span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                     </a>
@@ -72,7 +72,7 @@
                     <div class="w-9 h-9 bg-[#EBF1FF] text-[#0F47A1] rounded-xl flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     </div>
-                    <span class="text-[14px] font-bold text-gray-900">Install Aplikasi</span>
+                    <span class="text-[14px] font-bold text-gray-900">Pasang Aplikasi</span>
                 </button>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>

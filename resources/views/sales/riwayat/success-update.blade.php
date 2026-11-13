@@ -1,6 +1,6 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Pembaruan Sukses" />
 </head>

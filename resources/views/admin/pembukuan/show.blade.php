@@ -1,6 +1,6 @@
 @use('App\Support\Format')
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <x-head title="Detail Pembukuan - Sales Ledger" />
 </head>
@@ -31,7 +31,7 @@
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Nama Toko</span><span class="font-bold text-gray-900">{{ $faktur->toko->nama_toko ?? '-' }}</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">No. Nota</span><span class="font-semibold text-gray-900">{{ $faktur->nomor_faktur }}</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 font-medium">Sales</span><span class="font-semibold text-gray-900">{{ $faktur->user->full_name ?? '-' }}</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Upload</span><span class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($faktur->created_at)->format('d M Y, H:i') }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 font-medium">Tanggal Unggah</span><span class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($faktur->created_at)->format('d M Y, H:i') }}</span></div>
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
                 
                 <div class="w-full h-48 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden relative">
                     @if($faktur->foto_url)
-                        <img src="{{ $faktur->foto_url }}" alt="Thumbnail Faktur" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition cursor-pointer" onclick="toggleAdminPhotoModal(true)">
+                        <img src="{{ $faktur->foto_url }}" alt="Miniatur Faktur" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition cursor-pointer" onclick="toggleAdminPhotoModal(true)">
                     @else
                         <div class="flex flex-col items-center justify-center text-gray-400">
                             <svg class="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z"></path></svg>
@@ -103,7 +103,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <a href="{{ route('admin.pembukuan.invoice', $faktur->id) }}" class="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-[14px] shadow-md transition duration-150 flex items-center justify-center space-x-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Lihat Invoice</span>
+                    <span>Lihat Faktur</span>
                 </a>
                 <a href="{{ $backUrl ?? route('admin.pembukuan.index') }}" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl text-[14px] transition duration-150 flex items-center justify-center">Kembali</a>
             </div>
@@ -128,7 +128,7 @@
                     Memuat Dokumen...
                 </div>
 
-                <img id="admin-preview-image" src="" alt="Faktur Full" 
+                <img id="admin-preview-image" src="" alt="Faktur Lengkap"
                      class="max-w-full max-h-full object-contain rounded-lg shadow-lg relative z-10 hidden transition-opacity duration-300"
                      onload="document.getElementById('loading-admin-image').classList.add('hidden'); this.classList.remove('hidden');"
                      onerror="this.classList.add('hidden'); document.getElementById('loading-admin-image').innerHTML = '&#9888;&#65039; Foto telah dihapus dari server atau koneksi terputus.';">

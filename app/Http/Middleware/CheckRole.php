@@ -24,7 +24,7 @@ class CheckRole
         // Cek apakah role user di database cocok dengan role yang diminta di web.php
         if (Auth::user()->role !== $role) {
             // Jika Sales mencoba buka link Admin (atau sebaliknya), tolak dan kembalikan!
-            abort(403, 'Akses Ditolak! Lu gak punya izin buat masuk ke halaman ini.');
+            abort(403, 'Akses Ditolak! Anda tidak punya izin untuk masuk ke halaman ini.');
         }
 
         return $next($request);

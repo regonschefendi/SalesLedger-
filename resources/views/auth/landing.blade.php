@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Welcome - Sales Ledger" />
+    <x-head title="Selamat Datang - Sales Ledger" />
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -14,10 +14,10 @@
         <div class="pb-20 space-y-6">
             <div class="space-y-3">
                 <button onclick="goToLogin()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-xl shadow-md transition duration-200 text-sm">
-                    Sign In
+                    Masuk
                 </button>
                 <button onclick="goToSignUp()" class="w-full bg-white border border-[#0F47A1] text-[#0F47A1] hover:bg-gray-50 font-semibold py-4 rounded-xl shadow-sm transition duration-200 text-sm">
-                    Create Account
+                    Buat Akun
                 </button>
             </div>
         </div>

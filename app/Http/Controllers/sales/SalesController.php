@@ -15,7 +15,7 @@ class SalesController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if (! $user->parent_admin_id) {
-            return redirect('/select-role')->with('error', 'Lu harus masukin Kode Referal Admin dulu!');
+            return redirect('/select-role')->with('error', 'Anda harus memasukkan Kode Referal Admin terlebih dahulu!');
         }
 
         // Satu query: 5 riwayat terbaru + agregat seluruh faktur lewat window function.

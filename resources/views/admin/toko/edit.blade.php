@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <x-head title="Edit Toko - Sales Ledger" />
+    <x-head title="Ubah Toko - Sales Ledger" />
 </head>
 <body class="bg-white text-gray-800 antialiased">
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 overflow-hidden">
         
         <!-- Header -->
-        <x-back-header title="Edit Toko" :back-url="route('admin.toko.show', $toko->id)" />
+                    <x-back-header title="Ubah Toko" :back-url="route('admin.toko.show', $toko->id)" />
 
         <!-- Content/Form -->
         <div class="flex-grow overflow-y-auto no-scrollbar">

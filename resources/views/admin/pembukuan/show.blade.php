@@ -10,7 +10,7 @@
         
         <x-back-header
             title="Detail Pembukuan"
-            :back-url="route('admin.pembukuan.index')"
+            :back-url="$backUrl ?? route('admin.pembukuan.index')"
             color="text-blue-600"
             border-class="border-b border-gray-50"
         />
@@ -105,7 +105,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span>Lihat Invoice</span>
                 </a>
-                <a href="{{ route('admin.pembukuan.index') }}" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl text-[14px] transition duration-150 flex items-center justify-center">Kembali</a>
+                <a href="{{ $backUrl ?? route('admin.pembukuan.index') }}" class="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl text-[14px] transition duration-150 flex items-center justify-center">Kembali</a>
             </div>
         </div>
     </div>

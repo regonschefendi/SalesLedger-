@@ -241,7 +241,7 @@ class AdminController extends Controller
     // ==========================================
     // LAYER DETAIL: TAMPILKAN SPESIFIK DATA NOTA
     // ==========================================
-    public function pembukuanShow($id)
+    public function pembukuanShow(Request $request, $id)
     {
         /** @var User $admin */
         $admin = Auth::user();
@@ -249,7 +249,17 @@ class AdminController extends Controller
         // Mencegah admin luar menembak ID nota lewat URL manual.
         $faktur = Faktur::forAdmin($admin)->with(['user', 'toko'])->findOrFail($id);
 
-        return view('admin.pembukuan.show', compact('faktur'));
+        $backUrl = route('admin.pembukuan.index');
+
+        if ($request->query('from') === 'toko' && $faktur->toko_id) {
+            $backUrl = route('admin.toko.show', array_filter([
+                'id' => $faktur->toko_id,
+                'from' => $request->filled('from_sales') ? 'sales' : null,
+                'sales_id' => $request->query('from_sales'),
+            ]));
+        }
+
+        return view('admin.pembukuan.show', compact('faktur', 'backUrl'));
     }
 
     // ==========================================

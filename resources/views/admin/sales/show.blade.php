@@ -99,7 +99,7 @@
             <h3 class="text-[16px] font-bold text-gray-900 mb-3">Toko Pegangan</h3>
             <div class="space-y-3">
                 @forelse($tokoPegangan as $toko)
-                <a href="{{ $toko->id ? route('admin.toko.show', $toko->id) : '#' }}" class="flex items-center border border-gray-100 rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition">
+                <a href="{{ $toko->id ? route('admin.toko.show', ['id' => $toko->id, 'from' => 'sales', 'sales_id' => $sales->id]) : '#' }}" class="flex items-center border border-gray-100 rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition">
                     <div class="w-11 h-11 bg-blue-50 text-[#2563EB] rounded-xl flex items-center justify-center flex-shrink-0 mr-4">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 7V5c0-1.103-.897-2-2-2H5c-1.103 0-2 .897-2 2v2a3 3 0 0 0 1.488 2.585V19c0 1.103.897 2 2 2h11c1.103 0 2-.897 2-2V9.585A3 3 0 0 0 21 7zM5 5h14v2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5zm12.5 14H6.5V9.038A2.969 2.969 0 0 0 8 9.5a2.969 2.969 0 0 0 2-1.5 2.969 2.969 0 0 0 2 1.5 2.969 2.969 0 0 0 2-1.5 2.969 2.969 0 0 0 2 1.5c.571 0 1.102-.178 1.5-.462V19z"></path></svg>
                     </div>

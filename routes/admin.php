@@ -23,7 +23,6 @@ Route::get('/toko/{id}', [TokoController::class, 'show'])->name('toko.show');
 Route::get('/toko/{toko}/edit', [TokoController::class, 'edit'])->name('toko.edit');
 Route::put('/toko/{toko}', [TokoController::class, 'update'])->name('toko.update');
 Route::delete('/toko/{toko}', [TokoController::class, 'destroy'])->name('toko.destroy');
-Route::get('/nota/{id}', [TokoController::class, 'showNota'])->name('nota.show');
 
 // Profile
 Route::get('/profile', [AdminController::class, 'profileIndex'])->name('profile.index');

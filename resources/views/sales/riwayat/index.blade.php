@@ -15,10 +15,7 @@
         <div class="px-5 space-y-4 flex-grow overflow-y-auto no-scrollbar pb-10">
             <form action="{{ route('sales.riwayat.index') }}" method="GET">
                 <input type="hidden" name="status" value="{{ request('status', 'semua') }}">
-                <div class="relative flex items-center">
-                    <svg class="w-5 h-5 absolute left-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama toko atau no. faktur" class="w-full border border-gray-200 rounded-full pl-12 pr-4 py-3.5 text-[13px] focus:ring-2 focus:ring-[#0F47A1] focus:outline-none">
-                </div>
+                <x-search-input name="q" placeholder="Cari nama toko atau no. faktur" accent="#0F47A1" />
             </form>
 
             <div class="flex space-x-2 pt-1 overflow-x-auto no-scrollbar">

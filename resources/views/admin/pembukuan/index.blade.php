@@ -37,11 +37,7 @@
             <input type="hidden" name="start_date" id="param-start" value="{{ request('start_date') }}">
             <input type="hidden" name="end_date" id="param-end" value="{{ request('end_date') }}">
 
-            <div class="relative">
-                <svg class="w-5 h-5 absolute left-4 top-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" name="search" value="{{ request('search') }}" onchange="this.form.submit()" placeholder="Cari nama toko atau no. nota" 
-                       class="w-full bg-white border border-gray-200 rounded-full pl-12 pr-4 py-3.5 text-[13px] focus:ring-2 focus:ring-[#2563EB] focus:outline-none transition">
-            </div>
+            <x-search-input name="search" placeholder="Cari nama toko atau no. nota" submit-on-change />
 
             <div class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
                 <button type="button" onclick="setChip('time', 'semua')" class="px-5 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap transition {{ $filter_time == 'semua' && $filter_status == 'semua' ? 'bg-[#2563EB] text-white shadow-sm font-bold' : 'bg-gray-100 text-gray-500' }}">Semua</button>
@@ -114,7 +110,13 @@
     <div id="bottom-sheet" class="fixed inset-0 z-50 hidden items-end justify-center bg-black/40 backdrop-blur-xs animate-fadeIn">
         <div class="bg-white w-full max-w-md rounded-t-[30px] p-6 pb-8 space-y-6 transform transition-transform duration-300">
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-1" onclick="toggleBottomSheet(false)"></div>
-            <h3 class="text-[16px] font-bold text-gray-900">Filter Pembukuan</h3>
+            <div class="flex items-center justify-between">
+                <h3 class="text-[16px] font-bold text-gray-900">Filter Pembukuan</h3>
+                <button type="button" onclick="toggleBottomSheet(false)" aria-label="Tutup filter"
+                        class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition inline-flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
             
             <div class="space-y-4">
                 <p class="text-[13px] font-bold text-gray-800">Rentang Tanggal</p>

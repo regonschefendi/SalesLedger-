@@ -6,7 +6,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
-    <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
+    <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative {{ $faktur->status === 'belum_lunas' ? 'pb-40' : 'pb-24' }} shadow-2xl overflow-hidden">
         
         <div class="px-5 pt-8 flex-grow overflow-y-auto no-scrollbar pb-10">
             

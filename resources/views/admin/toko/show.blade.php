@@ -8,7 +8,7 @@
 
     <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white relative pb-24 shadow-2xl overflow-hidden">
         
-        <x-back-header title="Detail Toko" :back-url="route('admin.toko.index')">
+        <x-back-header title="Detail Toko" :back-url="$backUrl ?? route('admin.toko.index')">
             <a href="{{ route('admin.toko.edit', $toko->id) }}" class="text-slate-500 hover:text-blue-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </a>
@@ -94,7 +94,11 @@
             <h3 class="text-[16px] font-bold text-gray-900 mb-3">Riwayat Nota</h3>
             <div class="space-y-3">
                 @forelse($toko->fakturs as $faktur)
-                <a href="{{ route('admin.nota.show', $faktur->id) }}" class="flex items-center border border-gray-100 rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition">
+                <a href="{{ route('admin.pembukuan.show', array_filter([
+                    'id' => $faktur->id,
+                    'from' => 'toko',
+                    'from_sales' => request('from') === 'sales' ? request('sales_id') : null,
+                ])) }}" class="flex items-center border border-gray-100 rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition">
                     <div class="w-10 h-10 {{ $faktur->status == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : 'bg-[#EBF1FF] text-[#2563EB]' }} rounded-lg flex items-center justify-center flex-shrink-0 mr-4">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
                     </div>
@@ -117,7 +121,7 @@
         </div>
 
         <div class="fixed bottom-0 max-w-md mx-auto inset-x-0 bg-white border-t border-gray-100 p-5 z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
-            <a href="{{ route('admin.toko.index') }}" class="w-full bg-[#2563EB] hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md transition duration-200 text-[14px] flex items-center justify-center">Kembali</a>
+            <a href="{{ $backUrl ?? route('admin.toko.index') }}" class="w-full bg-[#2563EB] hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md transition duration-200 text-[14px] flex items-center justify-center">Kembali</a>
         </div>
     </div>
 </body>

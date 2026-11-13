@@ -59,7 +59,7 @@ class AuthController extends Controller
         if (blank(config('services.brevo.key'))
             && config('mail.default') === 'smtp'
             && (blank(config('mail.mailers.smtp.username')) || blank(config('mail.mailers.smtp.password')))) {
-            throw new RuntimeException('Konfigurasi email belum lengkap. Isi BREVO_API_KEY atau MAIL_USERNAME/MAIL_PASSWORD.');
+            throw new RuntimeException('Konfigurasi email belum lengkap. Isi BREVO_API_KEY (disarankan untuk hosting) atau MAIL_USERNAME/MAIL_PASSWORD.');
         }
 
         $otp = random_int(100000, 999999);
@@ -73,7 +73,7 @@ class AuthController extends Controller
             Cache::forget('otp_'.$email);
             Log::error('Gagal mengirim OTP verifikasi.', ['email' => $email, 'error' => $e->getMessage()]);
 
-            throw new RuntimeException('Gagal mengirim kode OTP ke email. Silakan coba lagi.', 0, $e);
+            throw new RuntimeException('Gagal mengirim kode OTP: '.$e->getMessage(), 0, $e);
         }
     }
 

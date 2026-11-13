@@ -19,10 +19,9 @@
 
         <div class="px-5 space-y-4 flex-grow overflow-y-auto no-scrollbar pb-10">
             
-            <div class="relative flex items-center">
-                <svg class="w-5 h-5 absolute left-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" placeholder="Cari nama toko atau no. nota" class="w-full border border-gray-200 rounded-full pl-12 pr-4 py-3.5 text-[13px] focus:ring-2 focus:ring-[#2563EB] focus:outline-none">
-            </div>
+            <form action="{{ route('admin.toko.index') }}" method="GET">
+                <x-search-input name="q" placeholder="Cari nama toko atau no. nota" />
+            </form>
 
             <div class="flex space-x-2 pt-1">
                 <button class="bg-[#2563EB] text-white px-5 py-2 rounded-full text-[12px] font-semibold">Semua</button>

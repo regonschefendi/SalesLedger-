@@ -4,10 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TokoRequest;
-use App\Models\Faktur;
 use App\Models\Toko;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
@@ -17,13 +17,21 @@ class TokoController extends Controller
     // ==========================================
     // TAMPILAN INDEX TOKO
     // ==========================================
-    public function index()
+    public function index(Request $request)
     {
         /** @var User $admin */
         $admin = Auth::user();
 
+        $search = $request->query('q');
+
         // Admin hanya boleh melihat toko yang dia tambahkan sendiri.
         $tokos = Toko::ownedByAdmin($admin)
+            ->when(is_string($search) && $search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_toko', 'ILIKE', "%{$search}%")
+                        ->orWhereHas('fakturs', fn ($fakturQuery) => $fakturQuery->where('nomor_faktur', 'ILIKE', "%{$search}%"));
+                });
+            })
             ->withSum(['fakturs as total_tagihan_sum' => fn ($q) => $q->forAdmin($admin)], 'total_tagihan')
             ->withSum(['fakturs as total_dibayar_sum' => fn ($q) => $q->forAdmin($admin)], 'total_dibayar')
             ->addSelect([
@@ -61,7 +69,7 @@ class TokoController extends Controller
     // ==========================================
     // MENAMPILKAN HALAMAN DETAIL TOKO (SHOW)
     // ==========================================
-    public function show($id)
+    public function show(Request $request, $id)
     {
         /** @var User $admin */
         $admin = Auth::user();
@@ -97,7 +105,11 @@ class TokoController extends Controller
         $latestFaktur = $toko->fakturs->first();
         $toko->sales_name = $latestFaktur && $latestFaktur->user ? $latestFaktur->user->full_name : 'Belum ditugaskan';
 
-        return view('admin.toko.show', compact('toko', 'stats', 'salesPegangan'));
+        $backUrl = $request->query('from') === 'sales' && $request->filled('sales_id')
+            ? route('admin.sales.show', $request->integer('sales_id'))
+            : route('admin.toko.index');
+
+        return view('admin.toko.show', compact('toko', 'stats', 'salesPegangan', 'backUrl'));
     }
 
     // Menampilkan halaman SPA Tambah Toko
@@ -133,18 +145,6 @@ class TokoController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Gagal menyimpan data sistem.']);
         }
-    }
-
-    // Menampilkan Halaman Detail Nota Spesifik
-    public function showNota($id)
-    {
-        /** @var User $admin */
-        $admin = Auth::user();
-
-        // Tarik data faktur beserta relasi toko dan sales-nya (hanya milik tim admin ini)
-        $faktur = Faktur::forAdmin($admin)->with(['toko', 'user'])->findOrFail($id);
-
-        return view('admin.toko.detail-faktur', compact('faktur'));
     }
 
     // Menampilkan Form Edit

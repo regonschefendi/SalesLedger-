@@ -66,48 +66,168 @@
 </div>
 
 <script>
+    const OCR_MAX_DIMENSION = 1600;
+    const OCR_TARGET_BYTES = 1.5 * 1024 * 1024;
+    const OCR_MIN_QUALITY = 0.45;
+
     function toggleUploadModal() {
         const modal = document.getElementById('upload-modal');
         if(modal.classList.contains('hidden')){ modal.classList.remove('hidden'); modal.classList.add('flex'); } 
         else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
     }
 
-    function compressImageToBase64(file) {
+    function showLoadingOverlay(show) {
+        const loader = document.getElementById('loading-overlay');
+        if (!loader) return;
+        loader.classList.toggle('hidden', !show);
+        loader.classList.toggle('flex', show);
+    }
+
+    function safeSessionSet(key, value) {
+        try {
+            sessionStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            console.error('sessionStorage tidak tersedia/penuh:', e);
+            return false;
+        }
+    }
+
+    function showSessionError() {
+        alert('Penyimpanan sementara browser penuh atau diblokir. Tutup tab lain atau matikan mode privat, lalu coba lagi.');
+    }
+
+    function dataUrlToBlob(dataUrl) {
+        const parts = dataUrl.split(',');
+        const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+        const binary = atob(parts[1]);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return new Blob([bytes], { type: mime });
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+        return new Promise((resolve, reject) => {
+            if (canvas.toBlob) {
+                canvas.toBlob((blob) => {
+                    blob ? resolve(blob) : reject(new Error('Gagal mengompres foto.'));
+                }, type, quality);
+                return;
+            }
+
+            // Fallback untuk browser lama yang belum punya canvas.toBlob.
+            try {
+                resolve(dataUrlToBlob(canvas.toDataURL(type, quality)));
+            } catch (e) {
+                reject(new Error('Browser tidak mendukung pemrosesan gambar.'));
+            }
+        });
+    }
+
+    function blobToDataUrl(blob) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image(); img.src = e.target.result;
-                img.onload = () => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Gagal membaca foto.'));
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    /**
+     * Kompres foto dari kamera/galeri agar aman untuk semua device:
+     * - Membatasi sisi terpanjang ke 1600px (teks nota tetap terbaca).
+     * - Menurunkan kualitas bertahap sampai ukuran file <= 2MB.
+     * - Hasilnya berupa Blob (dikirim ke server) + base64 (untuk sessionStorage).
+     */
+    function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            // Sebagian browser HP tidak mengisi file.type (mis. HEIC), jadi
+            // biarkan gambar tetap dicoba dibaca selama bukan tipe non-gambar.
+            if (!file || (file.type && !file.type.startsWith('image/'))) {
+                reject(new Error('File yang dipilih bukan gambar.'));
+                return;
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            const img = new Image();
+            const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+            img.onload = async () => {
+                try {
+                    let width = img.naturalWidth || img.width;
+                    let height = img.naturalHeight || img.height;
+
+                    if (!width || !height) {
+                        throw new Error('Foto tidak dapat dibaca. Coba ambil ulang.');
+                    }
+
+                    const scale = Math.min(1, OCR_MAX_DIMENSION / Math.max(width, height));
+                    width = Math.max(1, Math.round(width * scale));
+                    height = Math.max(1, Math.round(height * scale));
+
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; let w = img.width, h = img.height;
-                    if (w > MAX_WIDTH) { 
-                        h = Math.round((h * MAX_WIDTH) / w); 
-                        w = MAX_WIDTH; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.6));
-                };
-                img.onerror = reject;
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        throw new Error('Browser tidak mendukung pemrosesan gambar.');
+                    }
+
+                    // Latar putih agar PNG transparan tidak menjadi hitam saat dijadikan JPEG.
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.85;
+                    let blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+
+                    while (blob.size > OCR_TARGET_BYTES && quality > OCR_MIN_QUALITY) {
+                        quality = Math.max(OCR_MIN_QUALITY, quality - 0.1);
+                        blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+                    }
+
+                    const dataUrl = await blobToDataUrl(blob);
+                    resolve({ blob, dataUrl });
+                } catch (e) {
+                    reject(e);
+                } finally {
+                    cleanup();
+                }
             };
-            reader.onerror = reject;
+
+            img.onerror = () => {
+                cleanup();
+                reject(new Error('Format foto tidak didukung. Gunakan JPG/PNG atau ambil ulang dari kamera.'));
+            };
+
+            img.src = objectUrl;
         });
     }
 
     async function handleUpload(input) {
-        if (input.files && input.files[0]) {
-            toggleUploadModal();
-            const file = input.files[0];
-            const loader = document.getElementById('loading-overlay');
-            loader.classList.remove('hidden'); loader.classList.add('flex');
-            try {
-                const compressedBase64 = await compressImageToBase64(file);
-                await sendToOcrApi(file, compressedBase64);
-            } catch (e) {
-                alert("Gagal memproses gambar."); loader.classList.add('hidden'); loader.classList.remove('flex');
-            }
-        }
+        const file = input.files && input.files[0];
         input.value = '';
+
+        if (!file) return;
+
+        toggleUploadModal();
+        showLoadingOverlay(true);
+
+        try {
+            const { blob, dataUrl } = await compressImage(file);
+            await sendToOcrApi(blob, dataUrl);
+        } catch (e) {
+            console.error(e);
+            showLoadingOverlay(false);
+            alert(e.message || 'Gagal memproses gambar. Coba ambil ulang foto.');
+        }
     }
 
     function closeOcrFailModal() {
@@ -117,9 +237,8 @@
     }
 
     function triggerManualFallback(compressedBase64) {
-        document.getElementById('loading-overlay').classList.add('hidden'); 
-        document.getElementById('loading-overlay').classList.remove('flex');
-        
+        showLoadingOverlay(false);
+
         const modal = document.getElementById('ocr-fail-modal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -138,16 +257,27 @@
             };
             
             // PENTING: Foto tetap disimpen ke sessionStorage biar ga hilang!
-            sessionStorage.setItem('ocrData', JSON.stringify(fallbackData));
-            sessionStorage.setItem('ocrImage', compressedBase64);
+            const dataSaved = safeSessionSet('ocrData', JSON.stringify(fallbackData));
+            const imageSaved = safeSessionSet('ocrImage', compressedBase64);
+
+            if (!dataSaved || !imageSaved) {
+                showSessionError();
+                return;
+            }
             
             window.location.href = "{{ route('sales.input') }}";
         };
     }
 
-    async function sendToOcrApi(imageFile, compressedBase64) {
+    async function sendToOcrApi(imageBlob, compressedBase64) {
         const formData = new FormData(); 
-        formData.append('image', imageFile);
+        // Kirim hasil kompresi (bukan foto asli) agar tidak kena limit upload
+        // server dan lebih cepat di jaringan mobile.
+        formData.append('image', imageBlob, 'nota.jpg');
+
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 60000) : null;
+
         try {
             const response = await fetch("{{ route('sales.scan') }}", {
                 method: 'POST',
@@ -155,24 +285,41 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 
                     'Accept': 'application/json' 
                 },
-                body: formData
+                body: formData,
+                signal: controller ? controller.signal : undefined
             });
-            
-            const result = await response.json();
-            
-            if (response.ok && result.success) {
-                sessionStorage.setItem('ocrData', JSON.stringify(result.data));
-                sessionStorage.setItem('ocrImage', compressedBase64);
+
+            const raw = await response.text();
+            let result = null;
+
+            try {
+                result = JSON.parse(raw);
+            } catch (e) {
+                result = null;
+            }
+
+            if (response.ok && result && result.success) {
+                const dataSaved = safeSessionSet('ocrData', JSON.stringify(result.data));
+                const imageSaved = safeSessionSet('ocrImage', compressedBase64);
+
+                if (!dataSaved || !imageSaved) {
+                    showLoadingOverlay(false);
+                    showSessionError();
+                    return;
+                }
+
                 window.location.href = "{{ route('sales.input') }}";
             } else {
                 // JIKA API GEMINI GAGAL/LIMIT, LEMPAR KE MODAL MANUAL
-                console.warn('OCR Gagal:', result.message);
+                console.warn('OCR Gagal:', result && result.message ? result.message : raw);
                 triggerManualFallback(compressedBase64);
             }
         } catch (e) {
             // JIKA ERROR JARINGAN / TIMEOUT / IPHONE MEMORY LIMIT, LEMPAR KE MODAL MANUAL
             console.error('Network/System Error:', e);
             triggerManualFallback(compressedBase64);
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 </script>

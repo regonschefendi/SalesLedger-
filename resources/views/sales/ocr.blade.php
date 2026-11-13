@@ -260,28 +260,52 @@
             metode_bayar: ''
         };
         let savedFotoUrl = '';
+        let tanggalPicker = null;
 
-        const formatRp = (angka) => 'Rp' + parseInt(angka || 0).toLocaleString('id-ID');
+        const formatRp = (angka) => 'Rp' + parseInt(angka || 0, 10).toLocaleString('id-ID');
+
+        function safeSessionGet(key) {
+            try {
+                return sessionStorage.getItem(key);
+            } catch (e) {
+                console.error('sessionStorage tidak dapat diakses:', e);
+                return null;
+            }
+        }
+
+        function formatTanggalHariIni() {
+            const now = new Date();
+            return String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+        }
+
+        function isValidDateDmy(value) {
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || '')) return false;
+
+            const [day, month, year] = value.split('/').map(Number);
+            const date = new Date(year, month - 1, day);
+
+            return date.getFullYear() === year
+                && date.getMonth() === month - 1
+                && date.getDate() === day;
+        }
 
         // INIT PAGE & BACA SESSION (Pencegah "Loading..." abadi)
         window.addEventListener('DOMContentLoaded', () => {
-            const ocrDataString = sessionStorage.getItem('ocrData');
+            const ocrDataString = safeSessionGet('ocrData');
 
             // Jika data kosong, beri tahu user daripada macet
             if (!ocrDataString) {
-                alert("Waduh, data hasil scan tidak ditemukan di memori! Silakan kembali dan scan ulang fotonya.");
+                alert("Data hasil scan tidak ditemukan di memori! Silakan kembali dan scan ulang fotonya.");
                 return;
             }
 
             try {
                 const parsed = JSON.parse(ocrDataString);
-                currentData.nama_toko = '';
+                currentData.nama_toko = String(parsed.nama_toko || '').trim();
                 currentData.toko_id = null;
                 currentData.nomor_faktur = parsed.nomor_faktur || '-';
-                const now = new Date();
-                const tanggalHariIni = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-                currentData.tanggal_nota = parsed.tanggal_nota || tanggalHariIni;
-                currentData.total_tagihan = parseInt(parsed.total_tagihan) || 0;
+                currentData.tanggal_nota = parsed.tanggal_nota || formatTanggalHariIni();
+                currentData.total_tagihan = parseInt(parsed.total_tagihan, 10) || 0;
                 currentData.total_dibayar = 0;
 
                 updateCalculations();
@@ -301,12 +325,19 @@
                     setTimeout(() => {
                         alert("Silakan ketik data faktur, foto bukti nota tetap aman terlampir.");
                     }, 300);
+                } else if (currentData.nama_toko !== '') {
+                    // Nama toko hasil AI dicocokkan otomatis ke daftar toko admin.
+                    document.getElementById('input-nama').value = currentData.nama_toko;
+                    autoMatchToko(currentData.nama_toko);
+                } else {
+                    showTokoAlert('Nama toko tidak terbaca. Pilih toko secara manual di kolom pencarian.');
                 }
             } catch (e) {
                 console.error("Gagal membaca data JSON:", e);
-                alert("AI sedang sibuk. Silakan masukkan data faktur secara manual.");
+                alert("Data hasil scan tidak dapat dibaca. Silakan masukkan data faktur secara manual.");
                 
                 // Paksa render UI kosong dan buka form edit
+                currentData.tanggal_nota = currentData.tanggal_nota || formatTanggalHariIni();
                 renderReview();
                 switchView('edit');
             }
@@ -314,29 +345,35 @@
 
         // FUNGSI AUTO-MATCH TOKO DARI DATABASE
         async function autoMatchToko(keyword) {
+            const query = String(keyword || '').trim();
+
+            if (query.length < 2) {
+                showTokoAlert('Nama toko tidak terbaca. Pilih toko secara manual di kolom pencarian.');
+                return;
+            }
+
             try {
-                const response = await fetch(`{{ route('sales.toko.search') }}?q=${keyword}`);
+                const response = await fetch(`{{ route('sales.toko.search') }}?q=${encodeURIComponent(query)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Pencarian toko gagal (' + response.status + ')');
+                }
+
                 const tokos = await response.json();
-                
-                if (tokos.length > 0) {
+
+                if (Array.isArray(tokos) && tokos.length > 0) {
                     // Ambil toko urutan pertama yang paling mirip
-                    currentData.toko_id = tokos[0].id;
-                    currentData.nama_toko = tokos[0].nama_toko;
-                    
-                    // Update tampilan teks di layar
-                    document.getElementById('txt-nama').innerText = currentData.nama_toko;
-                    document.getElementById('input-nama').value = currentData.nama_toko;
-                    
-                    // Sembunyikan alert error
-                    document.getElementById('alert-toko-review').classList.add('hidden');
-                    checkSaveButton(); // Cek apakah metode bayar udah diisi juga
+                    selectToko(tokos[0].id, tokos[0].nama_toko || '');
                 } else {
                     // Kalau AI ngawur dan tokonya nggak ada di DB
                     currentData.toko_id = null;
-                    showTokoAlert(`Toko "${keyword}" tidak terdaftar. Klik Edit Faktur.`);
+                    showTokoAlert(`Toko "${query}" tidak terdaftar. Pilih toko secara manual di kolom pencarian.`);
                 }
             } catch (e) {
                 console.error("Auto match gagal", e);
+                showTokoAlert('Gagal mencocokkan toko. Pilih toko secara manual di kolom pencarian.');
             }
         }
 
@@ -361,8 +398,9 @@
         // LOGIKA KLIK HASIL PENCARIAN
         function selectToko(id, nama) {
             currentData.toko_id = id;
-            currentData.nama_toko = nama;
-            document.getElementById('input-nama').value = nama;
+            currentData.nama_toko = nama || '';
+            document.getElementById('input-nama').value = currentData.nama_toko;
+            document.getElementById('txt-nama').innerText = currentData.nama_toko || '-';
             document.getElementById('dropdown-toko').classList.add('hidden');
             document.getElementById('alert-toko-review').classList.add('hidden');
             document.getElementById('btn-clear-toko').classList.remove('hidden');
@@ -371,7 +409,9 @@
 
         function clearTokoSelection() {
             currentData.toko_id = null;
+            currentData.nama_toko = '';
             document.getElementById('input-nama').value = '';
+            document.getElementById('txt-nama').innerText = '-';
             document.getElementById('btn-clear-toko').classList.add('hidden');
             document.getElementById('input-nama').focus();
             checkSaveButton();
@@ -435,36 +475,70 @@
 
         // DROPDOWN PENCARIAN TOKO MANUAL (Di Halaman Edit)
         let searchTimeout;
+        let searchRequestId = 0;
+
         async function searchTokoProcess(keyword) {
             const dropdown = document.getElementById('dropdown-toko');
             const listToko = document.getElementById('list-toko');
+            const query = String(keyword || '').trim();
             
             currentData.toko_id = null;
             document.getElementById('btn-clear-toko').classList.add('hidden');
 
-            if (keyword.length < 2) { dropdown.classList.add('hidden'); return; }
+            if (query.length < 2) { dropdown.classList.add('hidden'); return; }
 
             clearTimeout(searchTimeout);
+            const requestId = ++searchRequestId;
+
             searchTimeout = setTimeout(async () => {
                 try {
-                    const response = await fetch(`{{ route('sales.toko.search') }}?q=${keyword}`);
+                    const response = await fetch(`{{ route('sales.toko.search') }}?q=${encodeURIComponent(query)}`, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Pencarian toko gagal (' + response.status + ')');
+                    }
+
                     const tokos = await response.json();
-                    
+
+                    // Abaikan respons lama jika user sudah mengetik query baru.
+                    if (requestId !== searchRequestId) return;
+
                     listToko.innerHTML = '';
-                    if (tokos.length > 0) {
+
+                    if (Array.isArray(tokos) && tokos.length > 0) {
                         tokos.forEach(toko => {
-                            listToko.innerHTML += `
-                                <li onclick="selectToko(${toko.id}, '${toko.nama_toko.replace(/'/g, "\\'")}')" class="p-3 hover:bg-blue-50 cursor-pointer transition">
-                                    <p class="text-[13px] font-bold text-gray-900">${toko.nama_toko}</p>
-                                    <p class="text-[10px] text-gray-400 truncate">${toko.alamat || 'Alamat belum diisi'}</p>
-                                </li>`;
+                            const item = document.createElement('li');
+                            item.className = 'p-3 hover:bg-blue-50 cursor-pointer transition';
+
+                            const nama = document.createElement('p');
+                            nama.className = 'text-[13px] font-bold text-gray-900';
+                            nama.textContent = toko.nama_toko || '-';
+
+                            const alamat = document.createElement('p');
+                            alamat.className = 'text-[10px] text-gray-400 truncate';
+                            alamat.textContent = toko.alamat || 'Alamat belum diisi';
+
+                            item.appendChild(nama);
+                            item.appendChild(alamat);
+                            item.addEventListener('click', () => selectToko(toko.id, toko.nama_toko || ''));
+
+                            listToko.appendChild(item);
                         });
                         dropdown.classList.remove('hidden');
                     } else {
-                        listToko.innerHTML = `<li class="p-3 text-[12px] text-gray-500 text-center">Toko tidak ditemukan. Hubungi Admin.</li>`;
+                        listToko.innerHTML = '<li class="p-3 text-[12px] text-gray-500 text-center">Toko tidak ditemukan. Hubungi Admin.</li>';
                         dropdown.classList.remove('hidden');
                     }
-                } catch (e) { console.error(e); }
+                } catch (e) {
+                    console.error(e);
+
+                    if (requestId === searchRequestId) {
+                        listToko.innerHTML = '<li class="p-3 text-[12px] text-red-500 text-center">Gagal memuat daftar toko. Coba lagi.</li>';
+                        dropdown.classList.remove('hidden');
+                    }
+                }
             }, 300);
         }
 
@@ -502,8 +576,18 @@
                 document.getElementById('view-review').classList.remove('hidden');
                 
             } else if (view === 'edit') {
-                document.getElementById('input-nofaktur').value = currentData.nomor_faktur;
-                document.getElementById('tanggal_faktur').value = currentData.tanggal_nota;
+                document.getElementById('input-nofaktur').value = currentData.nomor_faktur === '-' ? '' : currentData.nomor_faktur;
+
+                if (tanggalPicker) {
+                    if (isValidDateDmy(currentData.tanggal_nota)) {
+                        tanggalPicker.setDate(currentData.tanggal_nota, false, 'd/m/Y');
+                    } else {
+                        tanggalPicker.clear();
+                    }
+                } else {
+                    document.getElementById('tanggal_faktur').value = currentData.tanggal_nota;
+                }
+
                 document.getElementById('input-tagihan').value = currentData.total_tagihan;
                 document.getElementById('input-dibayar').value = currentData.total_dibayar;
                 calcSisaEdit();
@@ -533,16 +617,36 @@
         }
 
         function calcSisaEdit() {
-            const tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
-            const dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
+            const tagihan = parseInt(document.getElementById('input-tagihan').value || 0, 10);
+            const dibayar = parseInt(document.getElementById('input-dibayar').value || 0, 10);
             document.getElementById('input-sisa').value = formatRp(Math.max(0, tagihan - dibayar));
         }
 
         function saveEdit() {
-            currentData.nomor_faktur = document.getElementById('input-nofaktur').value;
-            currentData.tanggal_nota = document.getElementById('tanggal_faktur').value;
-            currentData.total_tagihan = parseInt(document.getElementById('input-tagihan').value || 0);
-            currentData.total_dibayar = parseInt(document.getElementById('input-dibayar').value || 0);
+            const nomorFaktur = document.getElementById('input-nofaktur').value.trim();
+            const tanggal = document.getElementById('tanggal_faktur').value.trim();
+            const tagihan = parseInt(document.getElementById('input-tagihan').value || 0, 10) || 0;
+            const dibayar = parseInt(document.getElementById('input-dibayar').value || 0, 10) || 0;
+
+            if (nomorFaktur === '') {
+                alert('Nomor faktur wajib diisi.');
+                return;
+            }
+
+            if (!isValidDateDmy(tanggal)) {
+                alert('Tanggal faktur tidak valid. Gunakan format dd/mm/yyyy.');
+                return;
+            }
+
+            if (tagihan < 0 || dibayar < 0) {
+                alert('Nominal tagihan/pembayaran tidak boleh negatif.');
+                return;
+            }
+
+            currentData.nomor_faktur = nomorFaktur;
+            currentData.tanggal_nota = tanggal;
+            currentData.total_tagihan = tagihan;
+            currentData.total_dibayar = Math.min(dibayar, tagihan);
 
             updateCalculations();
             renderReview();
@@ -550,88 +654,119 @@
             switchView('review');
         }
 
-        // SUBMIT DATA & AUTO COMPRESS IMAGE
+        function extractErrorMessage(result, fallback) {
+            if (!result) return fallback;
+            if (result.message) return result.message;
+
+            if (result.errors) {
+                const first = Object.values(result.errors)[0];
+                if (Array.isArray(first) && first.length > 0) return first[0];
+                if (typeof first === 'string') return first;
+            }
+
+            return fallback;
+        }
+
+        // SUBMIT DATA
         document.getElementById('btn-save-database').addEventListener('click', async function() {
-            if (typeof Loading !== 'undefined') Loading.show('Memproses dan mengunggah foto...');
             const btn = this;
-            btn.disabled = true;
 
-            const formData = new FormData();
-            formData.append('toko_id', currentData.toko_id);
-            formData.append('nomor_faktur', currentData.nomor_faktur);
-            formData.append('tanggal_nota', currentData.tanggal_nota);
-            formData.append('total_tagihan', currentData.total_tagihan);
-            formData.append('total_dibayar', currentData.total_dibayar);
-            formData.append('metode_bayar', currentData.metode_bayar);
+            if (btn.disabled) return;
 
-            const ocrImage = sessionStorage.getItem('ocrImage');
-            
-            // Pengecekan ketat memori foto
-            if (!ocrImage || ocrImage.length < 100) {
-                alert("Foto tidak ditemukan di memori! Silakan kembali dan ulangi proses scan.");
-                if (typeof Loading !== 'undefined') Loading.hide();
-                btn.disabled = false;
+            if (!currentData.toko_id) {
+                showTokoAlert('Pilih toko pelanggan terlebih dahulu sebelum menyimpan.');
                 return;
             }
 
+            if (!currentData.metode_bayar) {
+                alert('Pilih metode pembayaran terlebih dahulu.');
+                return;
+            }
+
+            if (!isValidDateDmy(currentData.tanggal_nota)) {
+                alert('Tanggal faktur tidak valid. Perbaiki lewat tombol Edit Faktur.');
+                switchView('edit');
+                return;
+            }
+
+            if (typeof Loading !== 'undefined') Loading.show('Memproses dan mengunggah foto...');
+            btn.disabled = true;
+
             try {
-                // MESIN KOMPRESOR GAMBAR HTML5 CANVAS
-                await new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 1200; // Resolusi aman baca teks
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        // Perkecil dimensi jika terlalu besar
-                        if (width > MAX_WIDTH) {
-                            height = Math.round((height * MAX_WIDTH) / width);
-                            width = MAX_WIDTH;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Ubah jadi JPEG dan kompres size-nya (Kualitas 70%)
-                        canvas.toBlob((blob) => {
-                            if (blob) {
-                                formData.append('foto_file', blob, 'bukti_faktur.jpg');
-                                resolve();
-                            } else {
-                                reject(new Error("Gagal konversi Canvas ke Blob"));
-                            }
-                        }, 'image/jpeg', 0.7); 
-                    };
-                    img.onerror = () => reject(new Error("Gagal meload gambar dari memori"));
-                    
-                    // Antisipasi jika murni Base64 tanpa header data URL
-                    img.src = ocrImage.indexOf('base64,') === -1 ? 'data:image/jpeg;base64,' + ocrImage : ocrImage;
-                });
+                const ocrImage = safeSessionGet('ocrImage');
 
-                // KIRIM KE LARAVEL
-                const response = await fetch("{{ route('sales.addFaktur') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                });
+                // Pengecekan ketat memori foto
+                if (!ocrImage || ocrImage.length < 100) {
+                    alert("Foto tidak ditemukan di memori! Silakan kembali dan ulangi proses scan.");
+                    return;
+                }
 
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
+                let fotoBlob;
+
+                try {
+                    // Foto sudah dikompres saat proses scan, jadi cukup
+                    // dikonversi ke Blob tanpa dikompres ulang.
+                    fotoBlob = base64ToBlob(ocrImage, 'image/jpeg');
+                } catch (e) {
+                    throw new Error('Foto di memori rusak. Silakan ulangi proses scan.');
+                }
+
+                if (!fotoBlob || fotoBlob.size < 100) {
+                    throw new Error('Foto di memori rusak. Silakan ulangi proses scan.');
+                }
+
+                const formData = new FormData();
+                formData.append('toko_id', currentData.toko_id);
+                formData.append('nomor_faktur', currentData.nomor_faktur);
+                formData.append('tanggal_nota', currentData.tanggal_nota);
+                formData.append('total_tagihan', currentData.total_tagihan);
+                formData.append('total_dibayar', currentData.total_dibayar);
+                formData.append('metode_bayar', currentData.metode_bayar);
+                formData.append('foto_file', fotoBlob, 'bukti_faktur.jpg');
+
+                const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                const timeoutId = controller ? setTimeout(() => controller.abort(), 90000) : null;
+
+                let response;
+
+                try {
+                    // KIRIM KE LARAVEL
+                    response = await fetch("{{ route('sales.addFaktur') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        },
+                        body: formData,
+                        signal: controller ? controller.signal : undefined
+                    });
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+
+                const raw = await response.text();
+                let result = null;
+
+                try {
+                    result = JSON.parse(raw);
+                } catch (e) {
+                    result = null;
+                }
+
+                if (response.ok && result && result.success) {
                     savedFotoUrl = result.foto_url;
                     switchView('success');
                 } else {
-                    alert(result.message); // Akan memunculkan peringatan Jebakan Batman jika gagal
+                    alert(extractErrorMessage(result, 'Gagal menyimpan faktur. Silakan coba lagi.'));
                 }
             } catch (err) {
                 console.error("Critical Error:", err);
-                alert("Terjadi kesalahan sistem: " + err.message);
+
+                if (err.name === 'AbortError') {
+                    alert('Koneksi terlalu lama. Periksa internet lalu coba lagi.');
+                } else {
+                    alert(err.message || 'Terjadi kesalahan sistem.');
+                }
             } finally {
                 if (typeof Loading !== 'undefined') Loading.hide();
                 btn.disabled = false;
@@ -639,8 +774,13 @@
         });
 
         function finishProcess() {
-            sessionStorage.removeItem('ocrData');
-            sessionStorage.removeItem('ocrImage');
+            try {
+                sessionStorage.removeItem('ocrData');
+                sessionStorage.removeItem('ocrImage');
+            } catch (e) {
+                console.error(e);
+            }
+
             window.location.href = "{{ route('sales.home') }}";
         }
     </script>
@@ -651,12 +791,26 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            flatpickr("#tanggal_faktur", {
-                dateFormat: "d/m/Y", // Memaksa format dd/MM/yyyy
-                locale: "id",        // Pakai bahasa Indonesia
-                allowInput: true,    // Izinkan ketik manual tapi difilter
-                disableMobile: true  // Memaksa pakai UI Kalender Flatpickr, bukan bawaan browser HP
-            });
+            if (typeof flatpickr !== 'undefined') {
+                tanggalPicker = flatpickr("#tanggal_faktur", {
+                    dateFormat: "d/m/Y", // Memaksa format dd/MM/yyyy
+                    locale: "id",        // Pakai bahasa Indonesia
+                    allowInput: true,    // Izinkan ketik manual tapi difilter
+                    disableMobile: true  // Memaksa pakai UI Kalender Flatpickr, bukan bawaan browser HP
+                });
+            }
+        });
+
+        // Tutup dropdown toko saat user klik di luar area pencarian.
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdown-toko');
+            const input = document.getElementById('input-nama');
+
+            if (!dropdown || !input) return;
+
+            if (!dropdown.contains(event.target) && !input.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
         });
     </script>
 </body>

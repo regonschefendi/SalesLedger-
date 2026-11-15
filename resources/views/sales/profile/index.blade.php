@@ -88,7 +88,7 @@
                     </a>
                 </div>
 
-                <button id="pwa-install-btn" class="hidden w-full border border-gray-100 rounded-2xl p-4 shadow-sm bg-white hover:bg-blue-50/40 transition text-left flex items-center space-x-4">
+                <button id="pwa-install-btn" data-pwa-install class="hidden w-full border border-gray-100 rounded-2xl p-4 shadow-sm bg-white hover:bg-blue-50/40 transition text-left flex items-center space-x-4">
                     <div class="w-9 h-9 bg-[#EBF1FF] text-[#0F47A1] rounded-xl flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     </div>
@@ -107,48 +107,5 @@
         </div>
     </div>
 
-    <script>
-        let deferredPrompt;
-        const installBtn = document.getElementById('pwa-install-btn');
-
-        // Tangkap event saat browser mendeteksi PWA siap di-install
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Cegah browser nampilin prompt bawaan secara otomatis
-            e.preventDefault();
-            // Simpan event ke variabel untuk di-trigger nanti
-            deferredPrompt = e;
-            // Munculkan tombol Install kita
-            if (installBtn) {
-                installBtn.classList.remove('hidden');
-            }
-        });
-
-        // Eksekusi saat tombol Install diklik
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // Munculkan prompt install bawaan browser
-                    deferredPrompt.prompt();
-                    // Tunggu user milih Install atau Cancel
-                    const { outcome } = await deferredPrompt.userChoice;
-                    
-                    // Bersihkan variabel karena prompt hanya bisa dipanggil sekali
-                    deferredPrompt = null;
-                    
-                    // Sembunyikan tombol lagi
-                    installBtn.classList.add('hidden');
-                }
-            });
-        }
-
-        // Kalau aplikasi udah berhasil di-install, sembunyikan tombol permanen
-        window.addEventListener('appinstalled', () => {
-            if (installBtn) {
-                installBtn.classList.add('hidden');
-            }
-            deferredPrompt = null;
-            console.log('PWA berhasil di-install');
-        });
-    </script>
 </body>
 </html>

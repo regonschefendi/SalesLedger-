@@ -208,6 +208,16 @@
                 </div>
 
                 <div class="w-full mt-auto space-y-3">
+                    <div id="success-invoice-actions" class="grid grid-cols-2 gap-3" style="display: none;">
+                        <a id="success-view-invoice" href="#" target="_blank" rel="noopener" class="flex items-center justify-center space-x-2 bg-white border border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-semibold py-4 rounded-full shadow-sm transition duration-200 text-[14px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span>Lihat Invoice</span>
+                        </a>
+                        <a id="success-download-invoice" href="#" class="flex items-center justify-center space-x-2 bg-white border border-[#10B981] text-[#10B981] hover:bg-emerald-50 font-semibold py-4 rounded-full shadow-sm transition duration-200 text-[14px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span>Unduh Invoice</span>
+                        </a>
+                    </div>
                     <button onclick="togglePhotoModal(true)" class="w-full bg-white border border-[#0F47A1] text-[#0F47A1] hover:bg-blue-50 font-semibold py-4 rounded-full shadow-sm transition duration-200 text-[14px]">Lihat Foto Faktur</button>
                     <button onclick="finishProcess()" class="w-full bg-[#0F47A1] hover:bg-blue-900 text-white font-semibold py-4 rounded-full shadow-md transition duration-200 text-[14px]">Selesai</button>
                 </div>
@@ -260,6 +270,8 @@
             metode_bayar: ''
         };
         let savedFotoUrl = '';
+        let savedInvoiceUrl = '';
+        let savedInvoiceDownloadUrl = '';
         let tanggalPicker = null;
 
         const formatRp = (angka) => 'Rp' + parseInt(angka || 0, 10).toLocaleString('id-ID');
@@ -611,6 +623,19 @@
                     badge.className = "text-[#F59E0B] bg-[#FFF7ED] text-[11px] font-bold px-3 py-1 rounded";
                     badge.innerText = "Belum Lunas";
                 }
+
+                const invoiceActions = document.getElementById('success-invoice-actions');
+                const viewInvoiceLink = document.getElementById('success-view-invoice');
+                const downloadInvoiceLink = document.getElementById('success-download-invoice');
+
+                if (invoiceActions && viewInvoiceLink && downloadInvoiceLink && savedInvoiceUrl) {
+                    viewInvoiceLink.href = savedInvoiceUrl;
+                    downloadInvoiceLink.href = savedInvoiceDownloadUrl || savedInvoiceUrl + '/download';
+                    invoiceActions.style.display = 'grid';
+                } else if (invoiceActions) {
+                    invoiceActions.style.display = 'none';
+                }
+
                 document.getElementById('view-success').classList.remove('hidden');
                 document.getElementById('view-success').classList.add('flex');
             }
@@ -755,6 +780,8 @@
 
                 if (response.ok && result && result.success) {
                     savedFotoUrl = result.foto_url;
+                    savedInvoiceUrl = result.invoice_url || (result.faktur_id ? `/sales/riwayat/${result.faktur_id}/invoice` : '');
+                    savedInvoiceDownloadUrl = result.invoice_download_url || (savedInvoiceUrl ? `${savedInvoiceUrl}/download` : '');
                     switchView('success');
                 } else {
                     alert(extractErrorMessage(result, 'Gagal menyimpan faktur. Silakan coba lagi.'));

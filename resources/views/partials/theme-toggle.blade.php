@@ -1,4 +1,4 @@
-<div class="border border-gray-100 rounded-2xl bg-white shadow-sm p-4">
+<div class="border border-gray-100 rounded-2xl bg-white shadow-sm p-4 mb-3.5">
     <div class="flex items-center space-x-4 mb-3">
         <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

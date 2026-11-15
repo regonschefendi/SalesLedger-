@@ -6,6 +6,7 @@ use App\Auth\CachedUserProvider;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\BrevoMailService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -36,11 +37,35 @@ class AuthController extends Controller
         return mb_strtolower(trim((string) $email));
     }
 
+    private function homePathFor(User $user): string
+    {
+        if (! $user->email_verified_at) {
+            return '/verify-email';
+        }
+
+        if ($user->role === 'admin') {
+            return '/admin/dashboard';
+        }
+
+        if ($user->role === 'sales') {
+            return '/sales/home';
+        }
+
+        return '/select-role';
+    }
+
     // ==========================================
     // PROSES SIGNUP & VERIFIKASI EMAIL
     // ==========================================
     public function register(Request $request)
     {
+        if (Auth::check()) {
+            return response()->json([
+                'success' => true,
+                'redirect' => $this->homePathFor(Auth::user()),
+            ]);
+        }
+
         $request->merge([
             'full_name' => trim((string) $request->full_name),
             'username' => trim((string) $request->username),
@@ -78,12 +103,19 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|max:255|same:confirm_password',
         ]);
 
-        $user = User::create([
-            'full_name' => $request->full_name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            $user = User::create([
+                'full_name' => $request->full_name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nama pengguna atau email sudah digunakan.',
+            ], 422);
+        }
 
         // Login secara otomatis, tapi statusnya belum verified
         Auth::login($user);
@@ -235,6 +267,16 @@ class AuthController extends Controller
     // ==========================================
     public function login(Request $request)
     {
+        if (Auth::check()) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            return response()->json([
+                'success' => true,
+                'redirect' => $this->homePathFor($user),
+            ]);
+        }
+
         $request->validate([
             'login_id' => 'required|string|max:255',
             'password' => 'required|string|max:255',
@@ -278,20 +320,7 @@ class AuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // 4. Routing Berdasarkan Status & Role
-        if (! $user->email_verified_at) {
-            // Kalau belum verifikasi OTP, lempar ke halaman verifikasi
-            return response()->json(['success' => true, 'redirect' => '/verify-email']);
-        }
-
-        if ($user->role === 'admin') {
-            return response()->json(['success' => true, 'redirect' => '/admin/dashboard']);
-        } elseif ($user->role === 'sales') {
-            return response()->json(['success' => true, 'redirect' => '/sales/home']);
-        } else {
-            // Kalau udah login tapi aplikasinya sempet ketutup sebelum dia milih role
-            return response()->json(['success' => true, 'redirect' => '/select-role']);
-        }
+        return response()->json(['success' => true, 'redirect' => $this->homePathFor($user)]);
     }
 
     public function showVerifyEmail()
@@ -352,6 +381,7 @@ class AuthController extends Controller
         } catch (Throwable $e) {
             Cache::forget('reset_otp_'.$email);
             Cache::forget('reset_otp_attempts_'.$email);
+            Cache::forget('reset_otp_cooldown_'.$email);
             Log::error('Gagal mengirim OTP atur ulang kata sandi.', ['email' => $email, 'error' => $e->getMessage()]);
 
             return response()->json([

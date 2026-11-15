@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <x-head title="Profil Sales - Sales Ledger" :manifest="true" />
+    <x-head title="Profil Sales - Sales Ledger" :manifest="true" :csrf="true" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -67,6 +67,8 @@
             </div>
 
             <div class="space-y-3 pt-2">
+                @include('partials.theme-toggle')
+
                 <div class="border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden divide-y divide-gray-50">
                     <a href="{{ route('sales.toko-pegangan.index') }}" class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
                         <div class="flex items-center space-x-4">

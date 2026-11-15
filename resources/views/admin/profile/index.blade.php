@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <x-head title="Profil - Sales Ledger" :manifest="true" />
+    <x-head title="Profil - Sales Ledger" :manifest="true" :csrf="true" />
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -68,6 +68,8 @@
             </div>
 
             <div class="pt-2">
+                @include('partials.theme-toggle')
+
                 <button id="pwa-install-btn" data-pwa-install class="hidden w-full border border-gray-100 rounded-2xl p-4 mb-2 shadow-sm bg-white hover:bg-blue-50/40 transition text-left flex items-center space-x-4">
                     <div class="w-9 h-9 bg-[#EBF1FF] text-[#0F47A1] rounded-xl flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>

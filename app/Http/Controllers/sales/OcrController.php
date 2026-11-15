@@ -299,6 +299,9 @@ class OcrController extends Controller
             'success' => true,
             'message' => 'Data faktur berhasil disimpan!',
             'foto_url' => $fotoUrl,
+            'faktur_id' => $faktur->id,
+            'invoice_url' => route('sales.riwayat.invoice', $faktur->id),
+            'invoice_download_url' => route('sales.riwayat.invoice.download', $faktur->id),
         ]);
     }
 }

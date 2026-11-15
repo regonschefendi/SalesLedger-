@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -94,6 +95,62 @@ class AuthFlowTest extends TestCase
         ])->assertOk()->assertJson(['redirect' => '/admin/dashboard']);
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_register_with_active_session_returns_json_redirect_instead_of_redirecting_to_html(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'budi@example.com',
+            'username' => 'budi',
+            'role' => null,
+            'email_verified_at' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->postJson('/api/register', $this->registerPayload([
+                'username' => 'userbaru',
+                'email' => 'baru@example.com',
+            ]))
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => '/verify-email']);
+
+        $this->assertSame(1, User::count());
+    }
+
+    public function test_register_with_active_session_redirects_verified_user_to_their_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson('/api/register', $this->registerPayload([
+                'username' => 'userbaru',
+                'email' => 'baru@example.com',
+            ]))
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => '/admin/dashboard']);
+
+        $this->assertSame(1, User::count());
+    }
+
+    public function test_login_with_active_session_returns_json_redirect_instead_of_redirecting_to_html(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson('/api/login', [
+                'login_id' => 'someone@example.com',
+                'password' => 'password123',
+            ])
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => '/admin/dashboard']);
+
+        $this->assertAuthenticatedAs($admin);
     }
 
     public function test_registration_rejects_username_that_differs_only_by_case(): void
@@ -228,5 +285,134 @@ class AuthFlowTest extends TestCase
         $this->actingAs($admin)
             ->get('/select-role')
             ->assertRedirect('/admin/dashboard');
+    }
+
+    public function test_registration_returns_validation_errors_as_json(): void
+    {
+        $this->postJson('/api/register', [
+            'full_name' => '',
+            'username' => 'ab',
+            'email' => 'bukan-email',
+            'password' => 'pendek',
+            'confirm_password' => 'beda',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['full_name', 'username', 'email', 'password']);
+    }
+
+    public function test_registration_keeps_account_when_otp_email_fails(): void
+    {
+        config()->set('services.brevo.key', 'test-key');
+        config()->set('mail.from.address', 'sender@example.com');
+
+        Http::fake([
+            'api.brevo.com/*' => Http::response(['message' => 'server error'], 500),
+        ]);
+
+        $this->postJson('/api/register', $this->registerPayload())
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => '/verify-email?mail_failed=1']);
+
+        $this->assertAuthenticated();
+
+        $user = User::where('email', 'budi@example.com')->firstOrFail();
+
+        $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_resend_otp_respects_cooldown(): void
+    {
+        $this->registerAndGetOtp();
+
+        $this->postJson('/api/resend-otp')
+            ->assertStatus(429)
+            ->assertJson(['success' => false]);
+    }
+
+    public function test_login_rejects_wrong_credentials(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'budi@example.com',
+            'password' => 'password123',
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $this->postJson('/api/login', [
+            'login_id' => $user->email,
+            'password' => 'kata-sandi-salah',
+        ])
+            ->assertStatus(401)
+            ->assertJson(['success' => false]);
+
+        $this->assertGuest();
+    }
+
+    public function test_login_sends_unverified_user_to_verification_page(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'budi@example.com',
+            'password' => 'password123',
+            'email_verified_at' => null,
+        ]);
+
+        $this->postJson('/api/login', [
+            'login_id' => $user->email,
+            'password' => 'password123',
+        ])
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => '/verify-email']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_throttled_requests_return_friendly_json_message(): void
+    {
+        $payload = [
+            'full_name' => '',
+            'username' => 'ab',
+            'email' => 'bukan-email',
+            'password' => 'pendek',
+            'confirm_password' => 'beda',
+        ];
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->postJson('/api/register', $payload)->assertStatus(422);
+        }
+
+        $this->postJson('/api/register', $payload)
+            ->assertStatus(429)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Terlalu banyak percobaan. Tunggu sekitar 1 menit lalu coba lagi.',
+            ]);
+    }
+
+    public function test_unauthenticated_api_requests_return_friendly_json_message(): void
+    {
+        $this->postJson('/api/verify-otp', ['otp' => '123456'])
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Sesi Anda sudah berakhir. Silakan masuk kembali.',
+            ]);
+    }
+
+    public function test_guests_can_open_signup_and_login_pages(): void
+    {
+        $this->get('/signup')->assertOk()->assertSee('Buat Akun');
+        $this->get('/login')->assertOk();
+    }
+
+    public function test_authenticated_users_cannot_open_signup_page(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/signup')
+            ->assertRedirect('/');
     }
 }

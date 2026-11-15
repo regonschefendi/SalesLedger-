@@ -69,6 +69,7 @@
     </div>
 
     @include('partials.loading')
+    @include('partials.api-client')
 
     <!-- AJAX LOGIC -->
     <script>
@@ -91,31 +92,42 @@
             btn.disabled = true;
             notifBox.classList.add('hidden');
 
+            const resetButton = function() {
+                btn.disabled = false;
+                btn.innerText = "Kirim Kode OTP";
+            };
+
+            let response;
+
             try {
-                const response = await fetch('/api/forgot-password/send-otp', {
+                response = await fetch('/api/forgot-password/send-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                     body: JSON.stringify({ email: email })
                 });
-                
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    showNotif(result.message, false);
-                    document.getElementById('instruction-text').innerText = "Masukkan kode yang baru saja kami kirimkan ke email Anda, beserta kata sandi baru.";
-                    
-                    // Transisi UI (Sembunyikan form minta email, munculkan form input OTP)
-                    document.getElementById('requestOtpForm').classList.add('hidden');
-                    document.getElementById('resetPasswordForm').classList.remove('hidden');
-                } else {
-                    showNotif(result.message || "Email tidak ditemukan di sistem kami.");
-                    btn.disabled = false;
-                    btn.innerText = "Kirim Kode OTP";
-                }
             } catch (error) {
-                showNotif("Terjadi kesalahan jaringan.");
-                btn.disabled = false;
-                btn.innerText = "Kirim Kode OTP";
+                showNotif("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
+                resetButton();
+                return;
+            }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                showNotif(result.message, false);
+                document.getElementById('instruction-text').innerText = "Masukkan kode yang baru saja kami kirimkan ke email Anda, beserta kata sandi baru.";
+                
+                // Transisi UI (Sembunyikan form minta email, munculkan form input OTP)
+                document.getElementById('requestOtpForm').classList.add('hidden');
+                document.getElementById('resetPasswordForm').classList.remove('hidden');
+            } else if (result) {
+                showNotif(result.message || "Email tidak ditemukan di sistem kami.");
+                resetButton();
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                showNotif(ApiClient.message(response.status));
+                resetButton();
             }
         });
 
@@ -132,32 +144,44 @@
             btn.disabled = true;
             notifBox.classList.add('hidden');
 
+            const resetButton = function() {
+                btn.disabled = false;
+                btn.innerText = "Simpan Kata Sandi Baru";
+            };
+
+            let response;
+
             try {
-                const response = await fetch('/api/forgot-password/reset', {
+                response = await fetch('/api/forgot-password/reset', {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                     body: formData
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    alert(result.message); // Native alert biar jelas
-                    window.location.href = result.redirect; // Lempar ke halaman Login
-                } else {
-                    let errorMsg = result.message || "Gagal mereset sandi.";
-                    if(result.errors) errorMsg = Object.values(result.errors).flat().join('<br>');
-                    showNotif(errorMsg, true);
-                    btn.disabled = false;
-                    btn.innerText = "Simpan Kata Sandi Baru";
-                }
             } catch (error) {
-                showNotif("Terjadi kesalahan jaringan.");
-                btn.disabled = false;
-                btn.innerText = "Simpan Kata Sandi Baru";
-            } finally {
+                showNotif("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
+                resetButton();
                 Loading.hide();
+                return;
             }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                alert(result.message); // Native alert biar jelas
+                window.location.href = result.redirect; // Lempar ke halaman Login
+            } else if (result) {
+                let errorMsg = result.message || "Gagal mereset sandi.";
+                if (result.errors) errorMsg = Object.values(result.errors).flat().join('<br>');
+                showNotif(errorMsg, true);
+                resetButton();
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                showNotif(ApiClient.message(response.status));
+                resetButton();
+            }
+
+            Loading.hide();
         });
     </script>
 </body>

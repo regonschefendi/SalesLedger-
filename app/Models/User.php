@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 
-#[Fillable(['full_name', 'username', 'email', 'password', 'phone_number', 'role', 'admin_code', 'parent_admin_id'])]
+#[Fillable(['full_name', 'username', 'email', 'password', 'phone_number', 'role', 'admin_code', 'parent_admin_id', 'theme'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {

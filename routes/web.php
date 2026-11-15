@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\auth\ProfileChangePasswordController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ThemeController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,8 @@ Route::get('/', function () {
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/profile/theme', [ThemeController::class, 'update'])->name('profile.theme');
+
     Route::get('/profile/change-password', [ProfileChangePasswordController::class, 'edit'])->name('profile.password.edit');
     Route::post('/profile/change-password', [ProfileChangePasswordController::class, 'update'])->name('profile.password.update');
 

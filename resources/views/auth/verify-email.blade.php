@@ -49,6 +49,7 @@
     </div>
 
     @include('partials.loading')
+    @include('partials.api-client')
 
     <script>
         let timeLeft = 120; // 2 Menit dalam hitungan detik
@@ -87,7 +88,7 @@
         window.onload = function() {
             if (mailFailed) {
                 const errorBox = document.getElementById('error-box');
-                errorBox.innerText = 'Kode OTP gagal dikirim ke email. Periksa konfigurasi email atau klik "Kirim Ulang Kode".';
+                errorBox.innerText = 'Kode OTP gagal dikirim ke email. Klik "Kirim Ulang Kode" untuk mencoba lagi.';
                 errorBox.classList.remove('hidden');
                 startTimer(0);
                 return;
@@ -109,8 +110,15 @@
             btnSubmit.disabled = true;
             errorBox.classList.add('hidden');
 
+            const showError = function(message) {
+                errorBox.innerText = message;
+                errorBox.classList.remove('hidden');
+            };
+
+            let response;
+
             try {
-                const response = await fetch('/api/verify-otp', {
+                response = await fetch('/api/verify-otp', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -118,23 +126,34 @@
                     },
                     body: formData
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    window.location.href = result.redirect; // Lanjut ke halaman Pilih Peran
-                } else {
-                    errorBox.innerText = result.message || "Kode OTP salah.";
-                    errorBox.classList.remove('hidden');
-                }
             } catch (error) {
-                errorBox.innerText = "Terjadi kesalahan sistem jaringan.";
-                errorBox.classList.remove('hidden');
-            } finally {
+                showError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
                 btnText.innerText = "Verifikasi & Lanjutkan";
                 btnSubmit.disabled = false;
                 Loading.hide();
+                return;
             }
+
+            const result = await ApiClient.read(response);
+
+            if (response.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            if (result && response.ok && result.success) {
+                window.location.href = result.redirect; // Lanjut ke halaman Pilih Peran
+            } else if (result) {
+                showError(result.message || "Kode OTP salah.");
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                showError(ApiClient.message(response.status));
+            }
+
+            btnText.innerText = "Verifikasi & Lanjutkan";
+            btnSubmit.disabled = false;
+            Loading.hide();
         });
 
         // AJAX: Resend OTP
@@ -142,25 +161,30 @@
             const errorBox = document.getElementById('error-box');
             errorBox.classList.add('hidden');
 
+            let response;
+
             try {
-                const response = await fetch('/api/resend-otp', {
+                response = await fetch('/api/resend-otp', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'Accept': 'application/json'
                     }
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    alert('Kode baru berhasil dikirim ke email Anda!');
-                    startTimer(); // Reset countdown biar mulai dari 2 menit lagi
-                } else {
-                    alert(result.message || 'Gagal mengirim ulang kode.');
-                }
             } catch (error) {
-                alert('Gagal terhubung ke server.');
+                alert("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
+                return;
+            }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                alert('Kode baru berhasil dikirim ke email Anda!');
+                startTimer(); // Reset countdown biar mulai dari 2 menit lagi
+            } else if (result) {
+                alert(result.message || 'Gagal mengirim ulang kode.');
+            } else {
+                alert(ApiClient.message(response.status));
             }
         }
     </script>

@@ -68,6 +68,7 @@
     </div>
 
     @include('partials.loading')
+    @include('partials.api-client')
 
     <script>
         // Fungsi Toggle Visibilitas Kata Sandi
@@ -88,13 +89,20 @@
             const btnSubmit = document.getElementById('btn-submit');
             const errorBox = document.getElementById('error-box');
 
+            const showError = function(message) {
+                errorBox.innerHTML = message;
+                errorBox.classList.remove('hidden');
+            };
+
             // Set Loading state
             btnText.innerText = "Memproses...";
             btnSubmit.disabled = true;
             errorBox.classList.add('hidden');
 
+            let response;
+
             try {
-                const response = await fetch('/api/register', {
+                response = await fetch('/api/register', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -102,29 +110,33 @@
                     },
                     body: formData
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    // Redirect otomatis ke halaman verifikasi email OTP bawaan Controller
-                    window.location.href = result.redirect;
-                } else {
-                    // Handle validasi error dari Laravel (kata sandi tidak sama, email duplikat, dll)
-                    let errorMsg = result.message || "Terjadi kesalahan registrasi.";
-                    if(result.errors) {
-                        errorMsg = Object.values(result.errors).flat().join('<br>');
-                    }
-                    errorBox.innerHTML = errorMsg;
-                    errorBox.classList.remove('hidden');
-                }
             } catch (error) {
-                errorBox.innerHTML = "Gagal terhubung ke server. Periksa koneksi internet.";
-                errorBox.classList.remove('hidden');
-            } finally {
+                showError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
                 Loading.hide();
                 btnText.innerText = "Buat Akun";
                 btnSubmit.disabled = false;
+                return;
             }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                window.location.href = result.redirect;
+            } else if (result) {
+                let errorMsg = result.message || "Terjadi kesalahan registrasi.";
+                if (result.errors) {
+                    errorMsg = Object.values(result.errors).flat().join('<br>');
+                }
+                showError(errorMsg);
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                showError(ApiClient.message(response.status));
+            }
+
+            Loading.hide();
+            btnText.innerText = "Buat Akun";
+            btnSubmit.disabled = false;
         });
     </script>
 </body>

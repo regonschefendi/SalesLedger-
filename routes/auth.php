@@ -9,12 +9,12 @@ Route::middleware('guest')->group(function () {
     Route::view('/login', 'auth.login')->name('login');
     Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
 
-    Route::post('/api/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-    Route::post('/api/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-
     Route::post('/api/forgot-password/send-otp', [AuthController::class, 'sendResetOtp'])->middleware('throttle:5,1');
     Route::post('/api/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:10,1');
 });
+
+Route::post('/api/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/api/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

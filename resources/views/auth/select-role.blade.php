@@ -59,6 +59,7 @@
     </div>
 
     @include('partials.loading')
+    @include('partials.api-client')
 
     <script>
         let currentRole = 'admin'; // Default
@@ -110,8 +111,10 @@
             // Deteksi endpoint berdasarkan role aktif
             const endpoint = currentRole === 'admin' ? '/api/set-admin' : '/api/set-sales';
 
+            let response;
+
             try {
-                const response = await fetch(endpoint, {
+                response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -119,24 +122,38 @@
                     },
                     body: formData
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    // Masuk ke dashboard masing-masing sesuai respons backend
-                    window.location.href = result.redirect;
-                } else {
-                    errorBox.innerText = result.message || "Gagal memproses peran database.";
-                    errorBox.classList.remove('hidden');
-                }
             } catch (error) {
-                errorBox.innerText = "Gagal menghubungi server.";
+                errorBox.innerText = "Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.";
                 errorBox.classList.remove('hidden');
-            } finally {
                 btnSubmit.disabled = false;
-                toggleRole(currentRole); // Reset tombol text state
+                toggleRole(currentRole);
                 Loading.hide();
+                return;
             }
+
+            if (response.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                // Masuk ke dashboard masing-masing sesuai respons backend
+                window.location.href = result.redirect;
+            } else if (result) {
+                errorBox.innerText = result.message || "Gagal memproses peran database.";
+                errorBox.classList.remove('hidden');
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                errorBox.innerText = ApiClient.message(response.status);
+                errorBox.classList.remove('hidden');
+            }
+
+            btnSubmit.disabled = false;
+            toggleRole(currentRole); // Reset tombol text state
+            Loading.hide();
         });
     </script>
 </body>

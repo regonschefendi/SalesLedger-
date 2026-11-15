@@ -52,6 +52,7 @@
     </div>
 
     @include('partials.loading')
+    @include('partials.api-client')
 
     <script>
         // Fungsi Toggle Visibilitas Kata Sandi
@@ -79,8 +80,18 @@
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
 
+            const showError = function(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.id = 'error-message';
+                errorDiv.className = 'text-xs bg-red-50 border border-red-200 text-red-600 px-4 py-2.5 rounded-xl font-medium mb-4 text-center animate-pulse';
+                errorDiv.innerText = message;
+                form.insertBefore(errorDiv, form.firstChild);
+            };
+
+            let response;
+
             try {
-                const response = await fetch('/api/login', {
+                response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -88,29 +99,33 @@
                     },
                     body: formData
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    // Redirect sesuai peran/status dari backend
-                    window.location.href = result.redirect;
-                } else {
-                    // Tampilkan pesan error di atas form
-                    const errorDiv = document.createElement('div');
-                    errorDiv.id = 'error-message';
-                    errorDiv.className = 'text-xs bg-red-50 border border-red-200 text-red-600 px-4 py-2.5 rounded-xl font-medium mb-4 text-center animate-pulse';
-                    errorDiv.innerText = result.message || "Gagal melakukan login.";
-                    form.insertBefore(errorDiv, form.firstChild);
-                }
             } catch (error) {
-                alert("Terjadi kesalahan jaringan.");
-            } finally {
-                // Kembalikan tombol ke semula
+                showError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.");
                 Loading.hide();
                 btnText.innerText = "Masuk";
                 btn.disabled = false;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                return;
             }
+
+            const result = await ApiClient.read(response);
+
+            if (result && response.ok && result.success) {
+                // Redirect sesuai peran/status dari backend
+                window.location.href = result.redirect;
+            } else if (result) {
+                showError(result.message || "Gagal melakukan login.");
+            } else if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                showError(ApiClient.message(response.status));
+            }
+
+            // Kembalikan tombol ke semula
+            Loading.hide();
+            btnText.innerText = "Masuk";
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
         });
     </script>
 </body>

@@ -16,6 +16,14 @@
 
         <div class="px-5 pt-4 flex-grow overflow-y-auto no-scrollbar pb-10">
 
+            @if(session('success'))
+                <div class="mb-4 text-xs bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl font-medium">{{ session('success') }}</div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-4 text-xs bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl font-medium">{{ session('error') }}</div>
+            @endif
+
             <div id="view-assigned" class="space-y-3 block">
                 @forelse($assignedTokos as $toko)
                     <div onclick="openDetail({{ $toko->id }}, 'assigned')" class="flex items-center border border-gray-100 rounded-xl p-4 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition">

@@ -108,19 +108,6 @@
     </div>
 
     <script>
-        // Registrasi Service Worker dari Vite PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                    .then(registration => {
-                        console.log('ServiceWorker mantap bro:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker gagal:', error);
-                    });
-            });
-        }
-        
         let deferredPrompt;
         const installBtn = document.getElementById('pwa-install-btn');
 

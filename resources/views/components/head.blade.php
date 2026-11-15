@@ -1,6 +1,6 @@
 @props([
     'title',
-    'manifest' => false,
+    'manifest' => true,
     'csrf' => false,
 ])
 
@@ -28,3 +28,5 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
+
+@include('partials.pwa')

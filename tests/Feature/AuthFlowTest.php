@@ -329,6 +329,29 @@ class AuthFlowTest extends TestCase
             ->assertJson(['success' => false]);
     }
 
+    public function test_login_with_remember_me_issues_persistent_cookie(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'budi@example.com',
+            'password' => 'password123',
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'login_id' => $user->email,
+            'password' => 'password123',
+            'remember' => '1',
+        ])->assertOk()->assertJson(['success' => true]);
+
+        $this->assertNotNull($user->fresh()->remember_token);
+
+        $rememberCookie = collect($response->headers->getCookies())
+            ->first(fn ($cookie) => str_starts_with($cookie->getName(), 'remember_web_'));
+
+        $this->assertNotNull($rememberCookie);
+    }
+
     public function test_login_rejects_wrong_credentials(): void
     {
         $user = User::factory()->create([
@@ -401,7 +424,7 @@ class AuthFlowTest extends TestCase
     public function test_guests_can_open_signup_and_login_pages(): void
     {
         $this->get('/signup')->assertOk()->assertSee('Buat Akun');
-        $this->get('/login')->assertOk();
+        $this->get('/login')->assertOk()->assertSee('Ingat saya');
     }
 
     public function test_authenticated_users_cannot_open_signup_page(): void

@@ -50,6 +50,9 @@ export default defineConfig({
                 ]
             },
             workbox: {
+                // Handler push & klik notifikasi (tampil di luar aplikasi).
+                importScripts: ['/push-sw.js'],
+
                 // MATIKAN MODE SPA BIAR NAVIGASI NORMAL
                 navigateFallback: null, 
                 

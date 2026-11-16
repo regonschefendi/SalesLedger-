@@ -160,3 +160,5 @@
         });
     })();
 </script>
+
+@include('partials.push-notifications')

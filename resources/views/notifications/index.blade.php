@@ -25,6 +25,10 @@
                 </div>
             @endif
 
+            <div class="mb-4">
+                @include('partials.push-toggle')
+            </div>
+
             <div class="flex items-center justify-between mb-4">
                 <p class="text-[12px] font-medium text-gray-500">
                     {{ $unreadCount > 0 ? $unreadCount . ' notifikasi belum dibaca' : 'Semua notifikasi sudah dibaca' }}

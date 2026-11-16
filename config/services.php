@@ -48,4 +48,11 @@ return [
         'key' => env('BREVO_API_KEY'),
         'timeout' => env('BREVO_TIMEOUT', 15),
     ],
+
+    'webpush' => [
+        'subject' => env('WEBPUSH_VAPID_SUBJECT', env('APP_URL', 'http://localhost')),
+        'public_key' => env('WEBPUSH_VAPID_PUBLIC_KEY'),
+        'private_key' => env('WEBPUSH_VAPID_PRIVATE_KEY'),
+        'timeout' => env('WEBPUSH_TIMEOUT', 15),
+    ],
 ];

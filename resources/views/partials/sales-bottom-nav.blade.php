@@ -1,4 +1,4 @@
-<div class="fixed bottom-0 max-w-md mx-auto inset-x-0 w-full bg-white border-t border-gray-100 h-[72px] flex justify-between items-center px-10 z-40 rounded-t-[20px] shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
+<div data-nav-prerender class="fixed bottom-0 max-w-md mx-auto inset-x-0 w-full bg-white border-t border-gray-100 h-[72px] flex justify-between items-center px-10 z-40 rounded-t-[20px] shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
     
     <a href="{{ route('sales.home') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('sales.home') ? 'text-[#0F47A1]' : 'text-gray-400 hover:text-gray-700' }}">
         <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>

@@ -92,14 +92,36 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @endif
 
+<script type="speculationrules">
+{
+    "prerender": [
+        {
+            "where": {
+                "and": [
+                    { "href_matches": "/*" },
+                    { "not": { "href_matches": "/logout*" } },
+                    { "not": { "href_matches": "/admin/pembukuan/export*" } },
+                    { "not": { "href_matches": "/admin/pembukuan/*/invoice/download" } },
+                    { "not": { "href_matches": "/sales/riwayat/*/invoice/download" } },
+                    { "not": { "selector_matches": "[data-no-prerender]" } }
+                ]
+            },
+            "eagerness": "moderate"
+        }
+    ]
+}
+</script>
+
 {{ $slot }}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
-@vite('resources/css/app.css')
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 <style>
+    html { background-color: #f9fafb; }
+    html.dark { background-color: #0b1220; }
     body { font-family: 'Inter', sans-serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

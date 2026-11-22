@@ -1,4 +1,4 @@
-<div class="fixed bottom-0 max-w-md mx-auto inset-x-0 w-full bg-white border-t border-gray-100 h-[72px] flex justify-around items-center px-6 z-40 rounded-t-[24px] shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+<div data-nav-prerender class="fixed bottom-0 max-w-md mx-auto inset-x-0 w-full bg-white border-t border-gray-100 h-[72px] flex justify-around items-center px-6 z-40 rounded-t-[24px] shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
     
     <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center w-16 transition {{ request()->routeIs('admin.dashboard') ? 'text-[#2563EB]' : 'text-gray-400 hover:text-gray-700' }}">
         <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>

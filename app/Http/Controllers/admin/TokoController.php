@@ -32,6 +32,7 @@ class TokoController extends Controller
                         ->orWhereHas('fakturs', fn ($fakturQuery) => $fakturQuery->where('nomor_faktur', 'ILIKE', "%{$search}%"));
                 });
             })
+            ->withCount(['fakturs as faktur_count' => fn ($q) => $q->forAdmin($admin)])
             ->withSum(['fakturs as total_tagihan_sum' => fn ($q) => $q->forAdmin($admin)], 'total_tagihan')
             ->withSum(['fakturs as total_dibayar_sum' => fn ($q) => $q->forAdmin($admin)], 'total_dibayar')
             ->addSelect([
@@ -45,12 +46,17 @@ class TokoController extends Controller
             ])
             ->get()->map(function ($toko) {
 
-                // Kalkulasi status lunas/belum lunas dari seluruh faktur
-                $totalTagihan = (float) $toko->total_tagihan_sum;
-                $totalDibayar = (float) $toko->total_dibayar_sum;
-                $sisa = $totalTagihan - $totalDibayar;
+                // Kalkulasi status lunas/belum lunas dari seluruh faktur.
+                // Toko tanpa faktur tidak boleh dianggap lunas.
+                if ($toko->faktur_count === 0) {
+                    $toko->status_pembayaran = 'belum_ada_faktur';
+                } else {
+                    $totalTagihan = (float) $toko->total_tagihan_sum;
+                    $totalDibayar = (float) $toko->total_dibayar_sum;
+                    $sisa = $totalTagihan - $totalDibayar;
 
-                $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
+                    $toko->status_pembayaran = $sisa > 0 ? 'belum_lunas' : 'lunas';
+                }
 
                 $toko->sales_name = $toko->sales_name ?: 'Belum ditugaskan';
 

@@ -53,7 +53,7 @@
             <div class="space-y-3">
                 @forelse($tokos as $toko)
                 <a href="{{ route('admin.toko.show', $toko->id) }}" class="flex items-center border border-gray-100 rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 {{ $toko->status_pembayaran == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : 'bg-[#EBF1FF] text-[#2563EB]' }} rounded-xl flex items-center justify-center flex-shrink-0 mr-4">
+                    <div class="w-12 h-12 {{ $toko->status_pembayaran == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : ($toko->status_pembayaran == 'belum_lunas' ? 'bg-[#FFF7ED] text-[#F59E0B]' : 'bg-gray-100 text-gray-400') }} rounded-xl flex items-center justify-center flex-shrink-0 mr-4">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"></path></svg>
                     </div>
                     <div class="flex-grow">
@@ -61,8 +61,15 @@
                         <p class="text-[11px] text-gray-500 mt-0.5">Sales: {{ $toko->sales_name ?? 'Belum ada' }}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-md {{ $toko->status_pembayaran == 'lunas' ? 'bg-[#ECFDF5] text-[#10B981]' : 'bg-[#FFF7ED] text-[#F59E0B]' }}">
-                            {{ $toko->status_pembayaran == 'lunas' ? 'Lunas' : 'Belum Lunas' }}
+                        @php
+                            $statusBadge = match ($toko->status_pembayaran) {
+                                'lunas' => ['label' => 'Lunas', 'class' => 'bg-[#ECFDF5] text-[#10B981]'],
+                                'belum_lunas' => ['label' => 'Belum Lunas', 'class' => 'bg-[#FFF7ED] text-[#F59E0B]'],
+                                default => ['label' => 'Belum Ada Faktur', 'class' => 'bg-gray-100 text-gray-500'],
+                            };
+                        @endphp
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-md {{ $statusBadge['class'] }}">
+                            {{ $statusBadge['label'] }}
                         </span>
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                     </div>

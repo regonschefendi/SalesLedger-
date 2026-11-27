@@ -35,7 +35,7 @@
 
                     <div class="flex items-center justify-between pl-1">
                         <label for="remember" class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none">
-                            <input type="checkbox" id="remember" name="remember" value="1" class="w-4 h-4 text-[#0F47A1] border-gray-300 rounded focus:ring-[#0F47A1] cursor-pointer">
+                            <input type="checkbox" id="remember" name="remember" value="1" checked class="w-4 h-4 text-[#0F47A1] border-gray-300 rounded focus:ring-[#0F47A1] cursor-pointer">
                             Ingat saya
                         </label>
                     </div>

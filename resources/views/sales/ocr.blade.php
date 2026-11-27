@@ -291,14 +291,23 @@
         }
 
         function isValidDateDmy(value) {
-            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || '')) return false;
+            const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(value || '').trim());
+            if (!match) return false;
 
-            const [day, month, year] = value.split('/').map(Number);
+            const day = Number(match[1]);
+            const month = Number(match[2]);
+            const year = Number(match[3]);
             const date = new Date(year, month - 1, day);
 
             return date.getFullYear() === year
                 && date.getMonth() === month - 1
                 && date.getDate() === day;
+        }
+
+        function normalizeDateDmy(value) {
+            const [day, month, year] = String(value || '').split('/');
+
+            return day.padStart(2, '0') + '/' + month.padStart(2, '0') + '/' + year;
         }
 
         // INIT PAGE & BACA SESSION (Pencegah "Memuat..." abadi)
@@ -316,7 +325,9 @@
                 currentData.nama_toko = String(parsed.nama_toko || '').trim();
                 currentData.toko_id = null;
                 currentData.nomor_faktur = parsed.nomor_faktur || '-';
-                currentData.tanggal_nota = parsed.tanggal_nota || formatTanggalHariIni();
+                currentData.tanggal_nota = isValidDateDmy(parsed.tanggal_nota)
+                    ? normalizeDateDmy(parsed.tanggal_nota)
+                    : formatTanggalHariIni();
                 currentData.total_tagihan = parseInt(parsed.total_tagihan, 10) || 0;
                 currentData.total_dibayar = 0;
 
@@ -669,7 +680,7 @@
             }
 
             currentData.nomor_faktur = nomorFaktur;
-            currentData.tanggal_nota = tanggal;
+            currentData.tanggal_nota = normalizeDateDmy(tanggal);
             currentData.total_tagihan = tagihan;
             currentData.total_dibayar = Math.min(dibayar, tagihan);
 

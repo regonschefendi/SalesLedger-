@@ -96,6 +96,24 @@ class CreateFakturInvoiceTest extends TestCase
             ->assertSee('Unduh Invoice');
     }
 
+    public function test_it_rejects_an_impossible_invoice_date(): void
+    {
+        Storage::fake('supabase');
+        Notification::fake();
+
+        [, $sales, $toko] = $this->makeSalesWithAdmin();
+
+        $payload = $this->fakturPayload($toko);
+        $payload['tanggal_nota'] = '31/02/2026';
+
+        $this->actingAs($sales)
+            ->post(route('sales.addFaktur'), $payload, ['Accept' => 'application/json'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['tanggal_nota']);
+
+        $this->assertSame(0, Faktur::count());
+    }
+
     public function test_another_sales_cannot_view_the_generated_invoice(): void
     {
         Storage::fake('supabase');

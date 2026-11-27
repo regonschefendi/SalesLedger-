@@ -59,7 +59,12 @@ class OcrController extends Controller
             $base64Image = base64_encode(file_get_contents($imagePath));
 
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
-            $prompt = 'Anda adalah asisten admin entri data. Ekstrak data dari faktur ini. Cari "Nama Toko" (biasanya di samping/bawah tulisan Kepada/Penerima/Tgl). Cari "Nomor Faktur" (nomor faktur/nota). Cari "Tanggal Nota" (tanggal faktur). Cari "Total Tagihan" (jumlah total akhir berupa angka murni tanpa titik/koma/Rp). Kembalikan HANYA JSON.';
+            $prompt = 'Anda adalah asisten admin entri data. Ekstrak data dari foto faktur/nota ini. '
+                .'Kembalikan HANYA JSON valid tanpa markdown dengan format: '
+                .'{"nama_toko":"...","nomor_faktur":"...","tanggal_nota":"YYYY-MM-DD","total_tagihan":0}. '
+                .'Nama toko biasanya berada di samping/bawah tulisan Kepada/Penerima/Tgl. '
+                .'total_tagihan adalah jumlah akhir berupa angka murni tanpa titik, koma, atau Rp. '
+                .'Jika suatu data tidak ditemukan, kosongkan string atau isi 0.';
 
             $response = Http::connectTimeout(10)
                 ->timeout(60)
@@ -95,10 +100,10 @@ class OcrController extends Controller
             $result = $response->json();
             $jsonString = $result['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
 
-            $jsonString = preg_replace('/^```json\s*(.*?)\s*```$/is', '$1', trim($jsonString));
-
-            // Parsing JSON dari Gemini
-            $extractedData = json_decode($jsonString, true);
+            // Parsing JSON dari Gemini. Model kadang membungkus JSON dengan
+            // markdown atau menambahkan kalimat lain, jadi ambil payload JSON
+            // yang benar-benar valid.
+            $extractedData = $this->extractJsonPayload((string) $jsonString);
 
             if (! is_array($extractedData)) {
                 return response()->json([
@@ -109,6 +114,7 @@ class OcrController extends Controller
 
             $namaToko = trim((string) ($extractedData['Nama Toko'] ?? $extractedData['nama_toko'] ?? ''));
             $nomorFaktur = trim((string) ($extractedData['Nomor Faktur'] ?? $extractedData['nomor_faktur'] ?? ''));
+            $rawTanggal = (string) ($extractedData['Tanggal Nota'] ?? $extractedData['tanggal_nota'] ?? $extractedData['Tanggal Faktur'] ?? $extractedData['tanggal_faktur'] ?? '');
             $rawTotal = (string) ($extractedData['Total Tagihan'] ?? $extractedData['total_tagihan'] ?? '0');
 
             if ($nomorFaktur === '') {
@@ -120,7 +126,8 @@ class OcrController extends Controller
                 'data' => [
                     'nama_toko' => Str::limit($namaToko, 255, ''),
                     'nomor_faktur' => Str::limit($nomorFaktur, 100, ''),
-                    'total_tagihan' => preg_replace('/[^0-9]/', '', $rawTotal) ?: '0',
+                    'tanggal_nota' => $this->normalizeOcrDate($rawTanggal),
+                    'total_tagihan' => $this->normalizeOcrTotal($rawTotal),
                 ],
             ]);
 
@@ -139,6 +146,190 @@ class OcrController extends Controller
                 'message' => 'Terjadi kesalahan saat memproses faktur.',
             ], 500);
         }
+    }
+
+    /**
+     * Ambil objek JSON dari teks yang dikembalikan model AI. Model kadang
+     * menambahkan markdown atau kalimat pembuka/penutup.
+     */
+    private function extractJsonPayload(string $text): ?array
+    {
+        $text = trim($text);
+
+        if ($text === '') {
+            return null;
+        }
+
+        // Buang pembungkus markdown ```json ... ```.
+        $cleaned = preg_replace('/^```(?:json)?\s*/i', '', $text);
+        $cleaned = preg_replace('/\s*```$/', '', (string) $cleaned);
+        $cleaned = trim((string) $cleaned);
+
+        $decoded = json_decode($cleaned, true);
+
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        // Fallback: ambil dari kurung kurawal pertama sampai terakhir.
+        $start = strpos($text, '{');
+        $end = strrpos($text, '}');
+
+        if ($start !== false && $end !== false && $end > $start) {
+            $decoded = json_decode(substr($text, $start, $end - $start + 1), true);
+
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Ubah tanggal hasil OCR menjadi format dd/mm/yyyy yang dipakai form.
+     */
+    private function normalizeOcrDate(string $value): string
+    {
+        $value = trim($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        // Buang bagian waktu, mis. "2026-11-24T10:30:00" atau "24/11/2026 10:30".
+        $value = trim((string) preg_replace('/[T\s]\d{1,2}:\d{2}(?::\d{2})?.*$/', '', $value));
+
+        // Format ISO: 2026-11-24.
+        if (preg_match('/^(\d{4})[\s\/\-.](\d{1,2})[\s\/\-.](\d{1,2})$/', $value, $matches)) {
+            $year = (int) $matches[1];
+            $month = (int) $matches[2];
+            $day = (int) $matches[3];
+
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%02d/%02d/%04d', $day, $month, $year);
+            }
+        }
+
+        // Format angka: 24/11/2026, 24-11-2026, 24.11.2026, atau 11/24/2026.
+        if (preg_match('/^(\d{1,2})[\s\/\-.](\d{1,2})[\s\/\-.](\d{2,4})$/', $value, $matches)) {
+            $day = (int) $matches[1];
+            $month = (int) $matches[2];
+            $year = $this->normalizeOcrYear((int) $matches[3]);
+
+            // Sebagian model AI mengembalikan format bulan/tanggal/tahun.
+            if (! checkdate($month, $day, $year) && checkdate($day, $month, $year)) {
+                [$day, $month] = [$month, $day];
+            }
+
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%02d/%02d/%04d', $day, $month, $year);
+            }
+        }
+
+        // Format dengan nama bulan di belakang: 24 November 2026 / 24 Nov 2026.
+        if (preg_match('/^(\d{1,2})[\s\-\/\.]+([A-Za-z]+)[\s\-\/\.]+(\d{2,4})$/', $value, $matches)) {
+            $day = (int) $matches[1];
+            $month = $this->ocrMonthNumber($matches[2]);
+            $year = $this->normalizeOcrYear((int) $matches[3]);
+
+            if ($month > 0 && checkdate($month, $day, $year)) {
+                return sprintf('%02d/%02d/%04d', $day, $month, $year);
+            }
+        }
+
+        // Format dengan nama bulan di depan: November 24, 2026 / Nov 24 2026.
+        if (preg_match('/^([A-Za-z]+)[\s\-\/\.]+(\d{1,2}),?[\s\-\/\.]+(\d{2,4})$/', $value, $matches)) {
+            $month = $this->ocrMonthNumber($matches[1]);
+            $day = (int) $matches[2];
+            $year = $this->normalizeOcrYear((int) $matches[3]);
+
+            if ($month > 0 && checkdate($month, $day, $year)) {
+                return sprintf('%02d/%02d/%04d', $day, $month, $year);
+            }
+        }
+
+        return '';
+    }
+
+    private function normalizeOcrYear(int $year): int
+    {
+        return $year < 100 ? $year + 2000 : $year;
+    }
+
+    /**
+     * Ubah nominal hasil OCR menjadi angka murni. Menangani format ribuan
+     * Indonesia (1.500.000) maupun internasional (1,500,000.00).
+     */
+    private function normalizeOcrTotal($value): string
+    {
+        $raw = trim((string) $value);
+
+        if ($raw === '') {
+            return '0';
+        }
+
+        // Angka negatif tidak masuk akal untuk total tagihan.
+        if (str_starts_with($raw, '-') || preg_match('/^\(.*\)$/', $raw)) {
+            return '0';
+        }
+
+        $numeric = preg_replace('/[^0-9,.]/', '', $raw);
+
+        if ($numeric === null || $numeric === '') {
+            return '0';
+        }
+
+        $lastComma = strrpos($numeric, ',');
+        $lastDot = strrpos($numeric, '.');
+        $decimalPosition = -1;
+
+        if ($lastComma !== false && $lastDot !== false) {
+            // Pemisah yang paling kanan adalah pemisah desimal.
+            $decimalPosition = max($lastComma, $lastDot);
+        } elseif ($lastComma !== false) {
+            // Satu koma dengan 3 digit di belakang = pemisah ribuan.
+            $digitsAfter = strlen($numeric) - $lastComma - 1;
+            $decimalPosition = ($digitsAfter !== 3) ? $lastComma : -1;
+        } elseif ($lastDot !== false) {
+            // Satu titik dengan 3 digit di belakang = pemisah ribuan.
+            $digitsAfter = strlen($numeric) - $lastDot - 1;
+            $decimalPosition = ($digitsAfter !== 3) ? $lastDot : -1;
+        }
+
+        if ($decimalPosition >= 0) {
+            $numeric = substr($numeric, 0, $decimalPosition);
+        }
+
+        $digits = preg_replace('/[^0-9]/', '', $numeric);
+
+        if ($digits === null || $digits === '') {
+            return '0';
+        }
+
+        $normalized = ltrim($digits, '0');
+
+        return $normalized === '' ? '0' : $normalized;
+    }
+
+    private function ocrMonthNumber(string $name): int
+    {
+        $months = [
+            'januari' => 1, 'jan' => 1, 'january' => 1,
+            'februari' => 2, 'feb' => 2, 'february' => 2,
+            'maret' => 3, 'mar' => 3, 'march' => 3,
+            'april' => 4, 'apr' => 4,
+            'mei' => 5, 'may' => 5,
+            'juni' => 6, 'jun' => 6, 'june' => 6,
+            'juli' => 7, 'jul' => 7, 'july' => 7,
+            'agustus' => 8, 'agu' => 8, 'ags' => 8, 'aug' => 8, 'august' => 8,
+            'september' => 9, 'sep' => 9, 'sept' => 9,
+            'oktober' => 10, 'okt' => 10, 'oct' => 10, 'october' => 10,
+            'november' => 11, 'nov' => 11,
+            'desember' => 12, 'des' => 12, 'dec' => 12, 'december' => 12,
+        ];
+
+        return $months[mb_strtolower(trim($name))] ?? 0;
     }
 
     // Fungsi API untuk fitur Dropdown Search Toko di Frontend
@@ -182,7 +373,22 @@ class OcrController extends Controller
                 ),
             ],
             'nomor_faktur' => 'required|string|max:100',
-            'tanggal_nota' => 'required|string|max:100|date_format:d/m/Y',
+            'tanggal_nota' => [
+                'required',
+                'string',
+                'max:100',
+                function (string $attribute, $value, \Closure $fail) {
+                    if (! preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', (string) $value, $matches)) {
+                        $fail('Format tanggal faktur harus dd/mm/yyyy.');
+
+                        return;
+                    }
+
+                    if (! checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3])) {
+                        $fail('Tanggal faktur tidak valid.');
+                    }
+                },
+            ],
             'total_tagihan' => 'required|numeric|min:0',
             'total_dibayar' => 'nullable|numeric|min:0',
             'metode_bayar' => 'required|in:Cash,Transfer',

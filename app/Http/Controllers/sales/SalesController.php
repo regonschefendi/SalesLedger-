@@ -18,6 +18,19 @@ class SalesController extends Controller
             return redirect('/select-role')->with('error', 'Anda harus memasukkan Kode Referal Admin terlebih dahulu!');
         }
 
+        // Di sebagian HP, membuka aplikasi kamera membuat PWA dimuat ulang dan
+        // sesi login hilang. Pastikan sales punya cookie "ingat saya" supaya
+        // sesi bisa dipulihkan otomatis tanpa terlempar ke halaman login.
+        // Lewati permintaan prefetch/prerender agar tidak mengubah sesi halaman
+        // yang sedang aktif.
+        $purpose = strtolower((string) request()->header('Sec-Purpose', request()->header('Purpose', '')));
+        $isPrefetch = str_contains($purpose, 'prefetch') || str_contains($purpose, 'prerender');
+
+        $guard = Auth::guard('web');
+        if (! $isPrefetch && ! request()->cookies->has($guard->getRecallerName())) {
+            $guard->login($user, true);
+        }
+
         // Satu query: 5 riwayat terbaru + agregat seluruh faktur lewat window function.
         $riwayat = Faktur::where('fakturs.sales_id', $user->id)
             ->leftJoin('tokos', function ($join) {

@@ -28,21 +28,34 @@
             </button>
         </div>
         <div class="grid grid-cols-2 gap-4">
-            <label class="cursor-pointer bg-[#F0F5FF] border border-[#0F47A1]/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center transition hover:bg-blue-50 active:scale-95">
-                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleUpload(this)">
+            <label onclick="return handleCameraLabelClick(event)" class="cursor-pointer bg-[#F0F5FF] border border-[#0F47A1]/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center transition hover:bg-blue-50 active:scale-95">
+                <input type="file" id="input-camera-native" accept="image/*" capture="environment" class="hidden" onchange="handleUpload(this)">
                 <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#0F47A1] mb-3 shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
                 </div>
                 <span class="text-[13px] font-bold text-[#0F47A1]">Buka Kamera</span>
             </label>
-            <label class="cursor-pointer bg-white border border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center transition hover:bg-gray-50 active:scale-95 shadow-sm">
-                <input type="file" accept="image/*" class="hidden" onchange="handleUpload(this)">
+            <label for="input-gallery-native" class="cursor-pointer bg-white border border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center transition hover:bg-gray-50 active:scale-95 shadow-sm">
                 <div class="w-12 h-12 bg-[#ECFDF5] rounded-full flex items-center justify-center text-[#10B981] mb-3">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
                 <span class="text-[13px] font-bold text-gray-700">Pilih Galeri</span>
             </label>
         </div>
+    </div>
+</div>
+
+<input type="file" id="input-gallery-native" accept="image/*" class="hidden" onchange="handleUpload(this)">
+
+<div id="camera-modal" class="fixed inset-0 z-[80] hidden flex-col bg-black">
+    <div class="relative flex-grow flex items-center justify-center overflow-hidden">
+        <video id="camera-preview" autoplay playsinline muted class="w-full h-full object-contain"></video>
+        <div id="camera-status" class="absolute inset-0 hidden items-center justify-center bg-black/70 px-8 text-center text-[13px] font-medium text-white"></div>
+    </div>
+    <div class="bg-black px-8 pt-5 pb-10 flex items-center justify-between">
+        <button type="button" onclick="closeCamera()" class="text-white/80 hover:text-white font-semibold text-[14px] px-3 py-2">Batal</button>
+        <button type="button" id="btn-capture-camera" onclick="captureCamera()" disabled class="w-16 h-16 rounded-full bg-white border-4 border-white/40 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Ambil foto"></button>
+        <button type="button" onclick="openGalleryFromCamera()" class="text-white/80 hover:text-white font-semibold text-[14px] px-3 py-2">Galeri</button>
     </div>
 </div>
 
@@ -70,10 +83,223 @@
     const OCR_TARGET_BYTES = 1.5 * 1024 * 1024;
     const OCR_MIN_QUALITY = 0.45;
 
+    let cameraStream = null;
+    let cameraBusy = false;
+    let cameraRequestId = 0;
+
     function toggleUploadModal() {
         const modal = document.getElementById('upload-modal');
         if(modal.classList.contains('hidden')){ modal.classList.remove('hidden'); modal.classList.add('flex'); } 
         else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    }
+
+    function closeUploadModal() {
+        const modal = document.getElementById('upload-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function canUseInAppCamera() {
+        return !!(window.isSecureContext
+            && navigator.mediaDevices
+            && typeof navigator.mediaDevices.getUserMedia === 'function');
+    }
+
+    function handleCameraLabelClick(event) {
+        // Kalau browser mendukung getUserMedia, jangan tinggalkan aplikasi ke
+        // aplikasi kamera bawaan. Perpindahan aplikasi inilah yang membuat
+        // sesi login hilang di sebagian HP ketika kamera ditutup.
+        if (!canUseInAppCamera()) {
+            return true;
+        }
+
+        event.preventDefault();
+        openCamera();
+        return false;
+    }
+
+    function showCameraStatus(message) {
+        const status = document.getElementById('camera-status');
+        if (!status) return;
+        status.innerText = message;
+        status.classList.remove('hidden');
+        status.classList.add('flex');
+    }
+
+    function hideCameraStatus() {
+        const status = document.getElementById('camera-status');
+        if (!status) return;
+        status.classList.add('hidden');
+        status.classList.remove('flex');
+    }
+
+    function stopCameraStream() {
+        if (!cameraStream) return;
+
+        cameraStream.getTracks().forEach(function (track) {
+            try { track.stop(); } catch (error) {}
+        });
+        cameraStream = null;
+    }
+
+    function closeCamera() {
+        // Naikkan request id supaya hasil getUserMedia yang telat datang
+        // tidak menyalakan kamera setelah modal ditutup.
+        cameraRequestId++;
+        cameraBusy = false;
+        stopCameraStream();
+
+        const modal = document.getElementById('camera-modal');
+        const video = document.getElementById('camera-preview');
+
+        if (video) {
+            video.srcObject = null;
+        }
+
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function openGalleryFromCamera() {
+        closeCamera();
+
+        const input = document.getElementById('input-gallery-native');
+
+        if (input) {
+            input.click();
+        }
+    }
+
+    async function openCamera() {
+        if (cameraBusy) return;
+
+        const requestId = ++cameraRequestId;
+        cameraBusy = true;
+        closeUploadModal();
+
+        const modal = document.getElementById('camera-modal');
+        const video = document.getElementById('camera-preview');
+        const captureButton = document.getElementById('btn-capture-camera');
+
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        showCameraStatus('Menyiapkan kamera...');
+
+        if (captureButton) {
+            captureButton.disabled = true;
+        }
+
+        try {
+            const baseConstraints = {
+                audio: false,
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            };
+
+            let stream;
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(baseConstraints);
+            } catch (error) {
+                // Kamera belakang mungkin tidak tersedia; coba kamera apa pun.
+                stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+            }
+
+            // Modal sudah ditutup / permintaan lain sudah dimulai.
+            if (requestId !== cameraRequestId) {
+                stream.getTracks().forEach(function (track) {
+                    try { track.stop(); } catch (error) {}
+                });
+
+                return;
+            }
+
+            if (!video) {
+                throw new Error('Elemen kamera tidak tersedia.');
+            }
+
+            cameraStream = stream;
+            video.srcObject = cameraStream;
+            await video.play().catch(function () {});
+
+            hideCameraStatus();
+
+            if (captureButton) {
+                captureButton.disabled = false;
+            }
+        } catch (error) {
+            if (requestId !== cameraRequestId) {
+                return;
+            }
+
+            console.error('Kamera gagal dibuka:', error);
+            stopCameraStream();
+            showCameraStatus('Kamera tidak dapat dibuka. Periksa izin kamera, lalu coba lagi atau gunakan Pilih Galeri.');
+        } finally {
+            if (requestId === cameraRequestId) {
+                cameraBusy = false;
+            }
+        }
+    }
+
+    async function captureCamera() {
+        const video = document.getElementById('camera-preview');
+        const captureButton = document.getElementById('btn-capture-camera');
+
+        if (!video || !video.videoWidth || !video.videoHeight) {
+            alert('Kamera belum siap. Tunggu sebentar lalu coba lagi.');
+            return;
+        }
+
+        if (captureButton) {
+            captureButton.disabled = true;
+        }
+
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        const scale = Math.min(1, OCR_MAX_DIMENSION / Math.max(width, height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(width * scale));
+        canvas.height = Math.max(1, Math.round(height * scale));
+
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+            closeCamera();
+            alert('Browser tidak mendukung pemrosesan gambar.');
+            return;
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        closeCamera();
+        showLoadingOverlay(true);
+
+        try {
+            let quality = 0.85;
+            let blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+
+            while (blob.size > OCR_TARGET_BYTES && quality > OCR_MIN_QUALITY) {
+                quality = Math.max(OCR_MIN_QUALITY, quality - 0.1);
+                blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+            }
+
+            const dataUrl = await blobToDataUrl(blob);
+            await sendToOcrApi(blob, dataUrl);
+        } catch (error) {
+            console.error(error);
+            showLoadingOverlay(false);
+            alert(error.message || 'Gagal memproses foto. Silakan ambil ulang.');
+        }
     }
 
     function showLoadingOverlay(show) {
@@ -217,7 +443,7 @@
 
         if (!file) return;
 
-        toggleUploadModal();
+        closeUploadModal();
         showLoadingOverlay(true);
 
         try {
@@ -289,6 +515,16 @@
                 signal: controller ? controller.signal : undefined
             });
 
+            // Sesi bisa saja berakhir saat pengguna berpindah ke kamera.
+            // Jangan lempar ke mode manual; minta halaman dimuat ulang agar
+            // sesi bisa dipulihkan lewat cookie "ingat saya" bila ada.
+            if (response.status === 401 || response.status === 419 || response.redirected) {
+                showLoadingOverlay(false);
+                alert('Sesi Anda sudah berakhir. Halaman akan dimuat ulang, silakan coba lagi.');
+                window.location.reload();
+                return;
+            }
+
             const raw = await response.text();
             let result = null;
 
@@ -322,4 +558,18 @@
             clearTimeout(timeoutId);
         }
     }
+
+    // Pastikan kamera benar-benar dimatikan saat pengguna keluar/menyembunyikan
+    // halaman supaya baterai dan izin kamera tidak tertahan. Jangan hentikan
+    // stream saat kamera masih dalam proses dibuka (mis. dialog izin muncul),
+    // karena itu membuat kamera terlihat gagal.
+    window.addEventListener('pagehide', function () {
+        cameraRequestId++;
+        stopCameraStream();
+    });
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden' && !cameraBusy && cameraStream) {
+            closeCamera();
+        }
+    });
 </script>
